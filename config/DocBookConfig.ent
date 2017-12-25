@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Common variables -->
+<!ENTITY ChangeLogDate "2017-11-01">
+<!ENTITY ChangeLogRelease "1.1.0">
+<!ENTITY ChangeLogIssuer "Arwed Richert">
+<!ENTITY CopyrightYear "2017">
+
+<!-- Luxoft Populus Safety Critical -->
+<!ENTITY ChangeLogProduct_PopulusSC "Luxoft Populus Safety Critical">

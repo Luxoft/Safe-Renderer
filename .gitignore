@@ -1,0 +1,6 @@
+build/
+# generated documentation
+LXFT.POPULUS.*.pdf
+
+# fake folder for hard linking to the real DK_WIN
+DK_Win/

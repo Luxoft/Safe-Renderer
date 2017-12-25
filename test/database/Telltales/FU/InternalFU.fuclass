@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fuclass:FUClass xmlns:fuclass="http://www.populus.luxoft.com/fuclass" fuclass:FUSchemaVersion="4.0.0" fuclass:Name="InternalFU">
+  <VersionData>
+    <CurrentVersion>0.0</CurrentVersion>
+    <ReleaseDate>TBD</ReleaseDate>
+    <Author>Author</Author>
+    <ReleaseDescription>None</ReleaseDescription>
+  </VersionData>
+  <FUClassId>255</FUClassId>
+  <DynamicDataEntry fuclass:Name="BreakErrorCount">
+    <DataId>1</DataId>
+    <DataType>Integer</DataType>
+  </DynamicDataEntry>
+  <DynamicDataEntry fuclass:Name="AirbagErrorCount">
+    <DataId>2</DataId>
+    <DataType>Integer</DataType>
+  </DynamicDataEntry>
+</fuclass:FUClass>

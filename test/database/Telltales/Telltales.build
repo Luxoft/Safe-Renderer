@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build:BuildSettings xmlns:build="http://www.populus.luxoft.com/build">
+  <BuildOptions>
+    <SerializeDDH>true</SerializeDDH>
+    <SerializeFontsAndBitmaps>true</SerializeFontsAndBitmaps>
+    <SerializeLanguages>false</SerializeLanguages>
+    <SerializePriorities>false</SerializePriorities>
+    <GenerateCharUsage>false</GenerateCharUsage>
+    <GenerateNameToIDMap>false</GenerateNameToIDMap>
+    <GenerateSerializationLog>false</GenerateSerializationLog>
+    <GenerateObjectUsage>false</GenerateObjectUsage>
+    <CopyReportBitmaps>false</CopyReportBitmaps>
+    <EmbedFontAndImageInfo>true</EmbedFontAndImageInfo>
+    <CompileScripts>false</CompileScripts>
+    <ClearOutputDirectory>true</ClearOutputDirectory>
+  </BuildOptions>
+  <Languages>
+    <LanguageName>English</LanguageName>
+    <LanguageFormat>UTF8</LanguageFormat>
+    <IncludeInSerialization>false</IncludeInSerialization>
+  </Languages>
+  <Languages>
+    <LanguageName>Swedish</LanguageName>
+    <LanguageFormat>UTF8</LanguageFormat>
+    <IncludeInSerialization>false</IncludeInSerialization>
+  </Languages>
+  <PlatformOptions>
+    <DefaultImagePreprocessMode>All</DefaultImagePreprocessMode>
+    <SerializeMostSignificantByteOrder>false</SerializeMostSignificantByteOrder>
+    <ImagePreprocessor>
+      <Path>ImagePreprocessorPlugin\imageConverterPlugin.exe</Path>
+      <CmdLineOptions>--processing=off --output-format=32 --pixel-layout=bgr</CmdLineOptions>
+    </ImagePreprocessor>
+  </PlatformOptions>
+</build:BuildSettings>

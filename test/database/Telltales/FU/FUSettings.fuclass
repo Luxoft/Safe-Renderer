@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fuclass:FUClass xmlns:fuclass="http://www.populus.luxoft.com/fuclass" fuclass:Name="FUSettings">
+  <VersionData>
+    <CurrentVersion>0.0</CurrentVersion>
+    <ReleaseDate>TBD</ReleaseDate>
+    <Author>Author</Author>
+    <ReleaseDescription>None</ReleaseDescription>
+  </VersionData>
+  <FUClassId>1</FUClassId>
+  <EnumerationSet fuclass:Documentation="This enumeration contains the supported units of measurement for display. In the running project, numerical values will be adjusted in accordance with the selected display unit.&#xA;Enumeration values 0, 1, and 2 are reserved for Metric, US, and Imperial, correspondingly." fuclass:Name="Display Units">
+    <EnumerationSetId>1</EnumerationSetId>
+    <EnumerationValue fuclass:Name="Metric">0</EnumerationValue>
+    <EnumerationValue fuclass:Name="US">1</EnumerationValue>
+    <EnumerationValue fuclass:Name="Imperial">2</EnumerationValue>
+  </EnumerationSet>
+  <EnumerationSet fuclass:Documentation="This enumeration must match the language list specified in the language definition (.langdef) file. The names can be arbitral; the correspondence is established through the values of enumeration and IDs of language definitions." fuclass:Name="Display Language">
+    <EnumerationSetId>2</EnumerationSetId>
+    <EnumerationValue fuclass:Name="English">0</EnumerationValue>
+  </EnumerationSet>
+  <EnumerationSet fuclass:Documentation="This enumeration contains the supported variants of time notation." fuclass:Name="Display Time Unit Notation">
+    <EnumerationSetId>3</EnumerationSetId>
+    <EnumerationValue fuclass:Documentation="Time of day shall be displayed with 24-hour notation." fuclass:Name="24-hour notation">0</EnumerationValue>
+    <EnumerationValue fuclass:Documentation="Time of day shall be displayed with 12-hour notation." fuclass:Name="12-hour notation">1</EnumerationValue>
+  </EnumerationSet>
+  <EnumerationSet fuclass:Documentation="This enumeration must match the skin list defined in the master settings of the master DDH file. The names can be arbitral; the correspondence is established through the values of enumeration and skins." fuclass:Name="Display Skin">
+    <EnumerationSetId>4</EnumerationSetId>
+    <EnumerationValue fuclass:Name="Default Skin">0</EnumerationValue>
+    <EnumerationValue fuclass:Name="Second Skin ">1</EnumerationValue>
+    <EnumerationValue fuclass:Name="Third Skin ">2</EnumerationValue>
+  </EnumerationSet>
+  <Action fuclass:Name="SetDisplayUnit">
+    <ActionId>1</ActionId>
+    <ActionType>ValueAction</ActionType>
+    <ActionValueType>EnumerationValue</ActionValueType>
+    <EnumerationSetId>1</EnumerationSetId>
+  </Action>
+  <Action fuclass:Name="SetDisplayLanguage">
+    <ActionId>2</ActionId>
+    <ActionType>ValueAction</ActionType>
+    <ActionValueType>EnumerationValue</ActionValueType>
+    <EnumerationSetId>2</EnumerationSetId>
+  </Action>
+  <Action fuclass:Name="SetDisplayTimeNotation">
+    <ActionId>3</ActionId>
+    <ActionType>ValueAction</ActionType>
+    <ActionValueType>EnumerationValue</ActionValueType>
+    <EnumerationSetId>3</EnumerationSetId>
+  </Action>
+  <Action fuclass:Name="SetSkinValue">
+    <ActionId>4</ActionId>
+    <ActionType>ValueAction</ActionType>
+    <ActionValueType>EnumerationValue</ActionValueType>
+    <EnumerationSetId>4</EnumerationSetId>
+  </Action>
+  <DynamicDataEntry fuclass:Documentation="The current DisplayUnits setting for the HMIEngine. The DisplayUnits setting is either received externally from another FU or set internally by a particular display." fuclass:Name="DisplayUnits">
+    <DataId>1</DataId>
+    <DataType>EnumerationValue</DataType>
+    <EnumerationSetId>1</EnumerationSetId>
+  </DynamicDataEntry>
+  <DynamicDataEntry fuclass:Documentation="This is the currently active language." fuclass:Name="DisplayLanguage">
+    <DataId>2</DataId>
+    <DataType>EnumerationValue</DataType>
+    <EnumerationSetId>2</EnumerationSetId>
+  </DynamicDataEntry>
+  <DynamicDataEntry fuclass:Documentation="This shows the current setting of how time of day is displayed." fuclass:Name="DisplayTimeNotation">
+    <DataId>3</DataId>
+    <DataType>EnumerationValue</DataType>
+    <EnumerationSetId>3</EnumerationSetId>
+  </DynamicDataEntry>
+  <DynamicDataEntry fuclass:Documentation="The current skin value for the display. The value of this data affects which colors, bitmaps and fonts shall be used by the display." fuclass:Name="SkinValue">
+    <DataId>4</DataId>
+    <DataType>EnumerationValue</DataType>
+    <EnumerationSetId>4</EnumerationSetId>
+  </DynamicDataEntry>
+  <DynamicDataEntry fuclass:Documentation="The current time value containing hours, minutes, seconds and hundredths of seconds." fuclass:Name="TimeOfDay">
+    <DataId>5</DataId>
+    <DataType>Time</DataType>
+  </DynamicDataEntry>
+  <DynamicDataEntry fuclass:Documentation="The current date containing year, month, day of week and day." fuclass:Name="CurrentDate">
+    <DataId>6</DataId>
+    <DataType>Date</DataType>
+  </DynamicDataEntry>
+  <Indication fuclass:Documentation="True when DisplayUnits=Metric, false otherwise. Defined to support guards based on DisplayUnits." fuclass:Name="DisplayUnits_Metric">
+    <IndicationId>1</IndicationId>
+  </Indication>
+  <Indication fuclass:Documentation="True when DisplayUnits=US, false otherwise. Defined to support guards based on DisplayUnits." fuclass:Name="DisplayUnits_US">
+    <IndicationId>2</IndicationId>
+  </Indication>
+  <Indication fuclass:Documentation="True when DisplayUnits=Imperial, false otherwise. Defined to support guards based on DisplayUnits." fuclass:Name="DisplayUnits_Imperial">
+    <IndicationId>3</IndicationId>
+  </Indication>
+  <Indication fuclass:Documentation="False for 24-hour units, True for 12-hour AM/PM units. The value of this indication affects how data with a data type of Time is formatted in format strings." fuclass:Name="DisplayTimeUnits">
+    <IndicationId>4</IndicationId>
+  </Indication>
+</fuclass:FUClass>
