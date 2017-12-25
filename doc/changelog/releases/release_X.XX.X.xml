@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title>Changelog For Release X.XX.X</title>
+  <section>
+    <title>Release X.XX.X</title>
+    <section>
+      <title>Fixed Defects</title>
+      <informaltable>
+        <tgroup cols="2">
+          <colspec colname="col2" colnum="2" colwidth="4*"/>
+          <tbody>
+            <row>
+              <entry>Defect 1</entry>
+              <entry>Solution</entry>
+            </row>
+            <row>
+              <entry>Defect 2</entry>
+              <entry>Solution</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </section>
+    <section>
+      <title>New Features</title>
+      <informaltable>
+        <tgroup cols="2">
+          <colspec colname="col2" colnum="2" colwidth="4*"/>
+          <tbody>
+            <row>
+              <entry>Feature 1</entry>
+              <entry>Description</entry>
+            </row>
+            <row>
+              <entry>Feature 2</entry>
+              <entry>Description</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </section>
+  </section>
+</section>

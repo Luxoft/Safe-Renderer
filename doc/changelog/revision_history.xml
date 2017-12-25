@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://docbook.org/ns/docbook" version="5.0">
+  <title>Revision History</title>
+  <section role="NotInToc">
+    <title>Revision History</title>
+    <informaltable xml:id="REVHIST_TABLE">
+      <tgroup cols="2">
+        <colspec colname="col2" colnum="2" colwidth="3*"/>
+        <thead>
+          <row>
+            <entry>Date</entry>
+            <entry>Change Description</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>2017-11-01</entry>
+            <entry>Release 1.1.0</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+  </section>
+</section>
