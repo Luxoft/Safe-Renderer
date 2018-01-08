@@ -63,7 +63,7 @@ namespace
     // Usage message and config options enum
     void usage(char* name)
     {
-        printf("Luxoft Populus SC simulation engine\n");
+        printf("Luxoft Safe Renderer simulation\n");
         //printf("Version: %s.%s.%s\n", VersionInfo::GetMajorVersion(), VersionInfo::GetMinorVersion(), VersionInfo::GetPatchVersion());
         //printf("Git revision: %s\n", VersionInfo::GetGitVersion());
         printf("usage:\n");

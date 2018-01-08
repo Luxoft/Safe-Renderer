@@ -219,7 +219,7 @@ static NativeWindowType getNativeWindow(NativeDisplayType dsp, int32_t width, in
 
         XSetNormalHints(dsp, wnd, &sizehints);
 
-        XSetStandardProperties(dsp, wnd, "Populus Engine", "Populus Engine",
+        XSetStandardProperties(dsp, wnd, "Luxoft Safe Renderer", "Luxoft Safe Renderer",
             None, (char **)NULL, 0, &sizehints);
     }
     XFree(visInfo);
