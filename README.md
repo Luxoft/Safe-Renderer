@@ -1,4 +1,20 @@
-# Safe-Renderer
+# Luxoft Safe-Renderer
 
-# Dual-Licensing
-It is known that LGPLv3 may be an issue in automotive industry. Therefore we are willing to offer another licensing schema. Just get in contact with us (ARichert@luxoft.com). Idea is that you don't have to pay royalties for using the safe renderer but our expectation is that we know more details how / in which environment it is used.
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+
+## Install
+
+## Usage
+
+## Bugs
+Please use 'issues' on GitHub for Luxoft Safe-Renderer.
+
+## Contribute
+Patches and pull requests are welcomed.
+
+## Copyright and License
+Copyright (c) 2018 Luxoft GmbH
+
+This software is licensed under the LGPLv3 to protect Luxoft
+intellectual property. If you're interested in discussing licensing
+terms get in contact with us (ARichert@luxoft.com).
