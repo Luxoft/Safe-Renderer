@@ -16,5 +16,4 @@ Patches and pull requests are welcomed.
 Copyright (c) 2018 Luxoft GmbH
 
 This software is licensed under the LGPLv3 to protect Luxoft
-intellectual property. If you're interested in discussing licensing
-terms get in contact with us (ARichert@luxoft.com).
+intellectual property. We are open for discussion about different licensing schemas - just get in contact with us (ARichert@luxoft.com)
