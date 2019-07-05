@@ -1,0 +1,464 @@
+<!--
+This is the title page customization layer.
+After editing the parameters here it is required to create an .xsl file based on this .xml file.
+To do it, run ..\titlepage_bat\ArticleTitlepage.bat.
+-->
+
+<!DOCTYPE t:templates [
+<!ENTITY hsize0 "10pt">
+<!ENTITY hsize1 "12pt">
+<!ENTITY hsize2 "14.4pt">
+<!ENTITY hsize3 "17.28pt">
+<!ENTITY hsize4 "20.736pt">
+<!ENTITY hsize5 "24.8832pt">
+<!ENTITY hsize6 "36pt">
+<!ENTITY hsize0space "7.5pt"> <!-- 0.75 * hsize0 -->
+<!ENTITY hsize1space "9pt"> <!-- 0.75 * hsize1 -->
+<!ENTITY hsize2space "10.8pt"> <!-- 0.75 * hsize2 -->
+<!ENTITY hsize3space "12.96pt"> <!-- 0.75 * hsize3 -->
+<!ENTITY hsize4space "15.552pt"> <!-- 0.75 * hsize4 -->
+<!ENTITY hsize5space "18.6624pt"> <!-- 0.75 * hsize5 -->
+<!ENTITY hsize6space "27pt"> <!-- 0.75 * hsize6 -->
+]>
+<t:templates xmlns:t="http://nwalsh.com/docbook/xsl/template/1.0"
+             xmlns:param="http://nwalsh.com/docbook/xsl/template/1.0/param"
+             xmlns:fo="http://www.w3.org/1999/XSL/Format"
+             xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+<!-- ********************************************************************
+     $Id: titlepage.templates.xml 9722 2013-02-01 19:44:13Z bobstayton $
+     ********************************************************************
+
+     This file is part of the DocBook XSL Stylesheet distribution.
+     See ../README or http://docbook.sf.net/ for copyright
+     copyright and other information.
+
+     ******************************************************************** -->
+
+<!-- ==================================================================== -->
+
+<t:titlepage t:element="article" t:wrapper="fo:block"
+             font-family="{$title.fontset}">
+
+  <t:titlepage-before t:side="recto">
+  </t:titlepage-before>
+
+  <t:titlepage-content t:side="recto" start-indent="0pt" text-align="center">
+
+    <mediaobject space-before="1in"/>
+
+    <title t:named-template="component.title"
+           param:node="ancestor-or-self::article[1]"
+           keep-with-next.within-column="always"
+           font-size="&hsize6;"
+           font-weight="bold"
+           space-before="2in"/>
+
+    <subtitle font-size="&hsize3;" space-before="0.7in" space-after="3in"/>
+
+    <pubdate text-align="left"/>
+
+    <issuenum text-align="left"/>
+
+  </t:titlepage-content>
+
+  <t:titlepage-before t:side="verso">
+    <xsl:call-template name="component.toc.separator"/>
+  </t:titlepage-before>
+
+  <t:titlepage-content t:side="verso" start-indent="0pt" text-align="center">
+    <legalnotice t:wrapper="fo:block"
+                 text-align="start"
+                 font-family="{$body.fontset}"/>
+
+    <revhistory t:wrapper="fo:block" space-before="0.6in"/>
+  </t:titlepage-content>
+
+  <t:titlepage-separator>
+    <xsl:call-template name="component.toc.separator"/>
+  </t:titlepage-separator>
+
+</t:titlepage>
+
+<!-- ==================================================================== -->
+
+  <t:titlepage t:element="table.of.contents" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'TableofContents'"
+             space-before.minimum="1em"
+             space-before.optimum="1.5em"
+             space-before.maximum="2em"
+       space-after="0.5em"
+       start-indent="0pt"
+       font-size="&hsize3;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="list.of.tables" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofTables'"
+             space-before.minimum="1em"
+             space-before.optimum="1.5em"
+             space-before.maximum="2em"
+       space-after="0.5em"
+       start-indent="0pt"
+       font-size="&hsize3;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="list.of.figures" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofFigures'"
+             space-before.minimum="1em"
+             space-before.optimum="1.5em"
+             space-before.maximum="2em"
+       space-after="0.5em"
+       start-indent="0pt"
+       font-size="&hsize3;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="list.of.examples" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofExamples'"
+             space-before.minimum="1em"
+             space-before.optimum="1.5em"
+             space-before.maximum="2em"
+       space-after="0.5em"
+       start-indent="0pt"
+       font-size="&hsize3;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="list.of.equations" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofEquations'"
+             space-before.minimum="1em"
+             space-before.optimum="1.5em"
+             space-before.maximum="2em"
+       space-after="0.5em"
+       start-indent="0pt"
+       font-size="&hsize3;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="list.of.procedures" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofProcedures'"
+             space-before.minimum="1em"
+             space-before.optimum="1.5em"
+             space-before.maximum="2em"
+       space-after="0.5em"
+       start-indent="0pt"
+       font-size="&hsize3;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="list.of.unknowns" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofUnknown'"
+             space-before.minimum="1em"
+             space-before.optimum="1.5em"
+             space-before.maximum="2em"
+       space-after="0.5em"
+       start-indent="0pt"
+       font-size="&hsize3;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="component.list.of.tables" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofTables'"
+             space-before.minimum="1em"
+             space-before.optimum="1em"
+             space-before.maximum="1em"
+       space-after="0.5em"
+       margin-left="{$title.margin.left}"
+       font-size="&hsize1;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="component.list.of.figures" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofFigures'"
+             space-before.minimum="1em"
+             space-before.optimum="1em"
+             space-before.maximum="1em"
+       space-after="0.5em"
+       margin-left="{$title.margin.left}"
+       font-size="&hsize1;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="component.list.of.examples" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofExamples'"
+             space-before.minimum="1em"
+             space-before.optimum="1em"
+             space-before.maximum="1em"
+       space-after="0.5em"
+       margin-left="{$title.margin.left}"
+       font-size="&hsize1;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="component.list.of.equations" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofEquations'"
+             space-before.minimum="1em"
+             space-before.optimum="1em"
+             space-before.maximum="1em"
+       space-after="0.5em"
+       margin-left="{$title.margin.left}"
+       font-size="&hsize1;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="component.list.of.procedures" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofProcedures'"
+             space-before.minimum="1em"
+             space-before.optimum="1em"
+             space-before.maximum="1em"
+       space-after="0.5em"
+       margin-left="{$title.margin.left}"
+       font-size="&hsize1;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+  <t:titlepage t:element="component.list.of.unknowns" t:wrapper="fo:block">
+    <t:titlepage-content t:side="recto">
+      <title
+       t:force="1"
+       t:named-template="gentext"
+       param:key="'ListofUnknown'"
+             space-before.minimum="1em"
+             space-before.optimum="1em"
+             space-before.maximum="1em"
+       space-after="0.5em"
+       margin-left="{$title.margin.left}"
+       font-size="&hsize1;"
+       font-weight="bold"
+       font-family="{$title.fontset}"/>
+    </t:titlepage-content>
+
+    <t:titlepage-content t:side="verso">
+    </t:titlepage-content>
+
+    <t:titlepage-separator>
+    </t:titlepage-separator>
+
+    <t:titlepage-before t:side="recto">
+    </t:titlepage-before>
+
+    <t:titlepage-before t:side="verso">
+    </t:titlepage-before>
+  </t:titlepage>
+
+<!-- ==================================================================== -->
+
+</t:templates>

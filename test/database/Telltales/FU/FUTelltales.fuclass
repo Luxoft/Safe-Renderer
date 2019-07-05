@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fuclass:FUClass xmlns:fuclass="http://www.populus.luxoft.com/fuclass" fuclass:FUSchemaVersion="4.0.0" fuclass:Name="FUTelltales">
+  <VersionData>
+    <CurrentVersion>0.0</CurrentVersion>
+    <ReleaseDate>TBD</ReleaseDate>
+    <Author>Author</Author>
+    <ReleaseDescription>None</ReleaseDescription>
+  </VersionData>
+  <FUClassId>42</FUClassId>
+  <DynamicDataEntry fuclass:Name="BreakOn">
+    <DataId>1</DataId>
+    <DataType>Boolean</DataType>
+    <RepeatTimeout>100</RepeatTimeout>
+  </DynamicDataEntry>
+  <DynamicDataEntry fuclass:Documentation="Inverted redundant value for &quot;BreakOn&quot;" fuclass:Name="BreakOff">
+    <DataId>2</DataId>
+    <DataType>Boolean</DataType>
+  </DynamicDataEntry>
+  <DynamicDataEntry fuclass:Name="Airbag">
+    <DataId>3</DataId>
+    <DataType>Boolean</DataType>
+    <RepeatTimeout>200</RepeatTimeout>
+  </DynamicDataEntry>
+</fuclass:FUClass>

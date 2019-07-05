@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section [
+<!ENTITY % myents SYSTEM "../../config/DocBookConfig.ent">
+%myents;
+]>
+<section role="NotInToc" version="5.0" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title>Document Information</title>
+  <section role="NotInToc">
+    <title>Approval</title>
+    <informaltable colsep="0" frame="none" rowsep="0">
+      <tgroup cols="4">
+        <colspec colname="_2" colnum="2"/>
+        <colspec colname="_3"/>
+        <colspec colname="_4"/>
+        <tbody>
+          <row>
+            <entry>Issued By/Sign.:</entry>
+            <entry nameend="_4"
+            namest="_2"><parameter>&ChangeLogIssuer;</parameter></entry>
+          </row>
+          <row>
+            <entry>Approved By/Sign.:</entry>
+            <entry><parameter>Valery Lavrov</parameter></entry>
+            <entry>Date:</entry>
+            <entry><parameter>&ChangeLogDate;</parameter></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+  </section>
+  <section role="NotInToc">
+    <title>Contact</title>
+    <informaltable colsep="0" frame="none" rowsep="0">
+      <tgroup cols="2">
+        <colspec colname="col2" colnum="2" colwidth="4*"/>
+        <tbody>
+          <row>
+            <entry>Name:</entry>
+            <entry><parameter>Valery Lavrov</parameter></entry>
+          </row>
+          <row>
+            <entry>Phone:</entry>
+            <entry><parameter>+7 812 457 1044 ext. 6528</parameter></entry>
+          </row>
+          <row>
+            <entry>E-mail:</entry>
+            <entry><para><email>populus-support@luxoft.com</email>
+            <parameter>for defect and issue
+            reports</parameter></para><para><email>populus-feature@luxoft.com</email>
+            <parameter>for general inquiries regarding Luxoft Populus Suite
+            and its features</parameter></para></entry>
+          </row>
+          <row>
+            <entry>Web-site:</entry>
+            <entry><para><parameter>Luxoft Populus Helpdesk at</parameter>
+            <parameter><link
+            xlink:href="https://populus-support.luxoft.com/">populus-support.luxoft.com</link></parameter></para></entry>
+          </row>
+          <row>
+            <entry>Address:</entry>
+            <entry><para><parameter>Luxoft GmbH, Stadionstrasse
+            66</parameter></para><para><parameter>70771
+            Leinfelden-Echterdingen, Germany</parameter></para></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+  </section>
+  <section role="NotInToc">
+    <title>Copyright</title>
+    <para>All rights reserved. No part of this publication may be reproduced,
+    in any form or by any means, without the prior permission of
+    Luxoft.</para>
+  </section>
+  <section role="NotInToc">
+    <title>Confidentiality</title>
+    <para>Information in this document is the sole property of Luxoft and must
+    not be disclosed to any third party without the prior written permission
+    from Luxoft.</para>
+    <para>Failure to comply with the terms of this warning may expose you to
+    legal action for copyright infringement.</para>
+  </section>
+</section>
