@@ -28,8 +28,6 @@ if(NOT DEFINED ENGINE_PREFIX)
 endif()
 
 add_subdirectory(common)
-add_subdirectory(communication)
-add_subdirectory(odi)
 add_subdirectory(database)
 add_subdirectory(datahandler)
 add_subdirectory(display)
@@ -38,8 +36,6 @@ add_subdirectory(framehandler)
 
 add_library(${PROJECT_NAME} STATIC
     $<TARGET_OBJECTS:common>
-    $<TARGET_OBJECTS:communication>
-    $<TARGET_OBJECTS:odi>
     $<TARGET_OBJECTS:database>
     $<TARGET_OBJECTS:datahandler>
     $<TARGET_OBJECTS:display>

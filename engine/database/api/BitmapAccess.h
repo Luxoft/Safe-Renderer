@@ -28,7 +28,6 @@
 ******************************************************************************/
 
 #include "ResourceBuffer.h"
-#include "FonBinReader.h"
 #include "ddh_defs.h"
 #include "LSRError.h"
 #include "StaticBitmap.h"
@@ -38,26 +37,24 @@ namespace lsr
 
 struct DDHType;
 struct BitmapDefinitionType;
-struct BitmapStateDefinitionType;
 
 class BitmapAccess
 {
 public:
-    BitmapAccess(const DDHType* ddh, const ResourceBuffer& imgbin);
+    BitmapAccess(const DDHType* const ddh);
 
     LSRError getError() const;
 
-    StaticBitmap getBitmap(BitmapId bitmapId, U16 skin) const;
+    StaticBitmap getBitmap(const BitmapId bitmapId, const U16 skin) const;
 
-    ResourceBuffer getBitmapBuffer(const StaticBitmap& bitmap) const;
+    const LsrImage* getBitmapBuffer(const StaticBitmap& bitmap) const;
 
 private:
-    const BitmapDefinitionType* getBitmapDefinition(BitmapId bitmapId, U16 skin) const;
+    const BitmapDefinitionType* getBitmapDefinition(const BitmapId bitmapId, const U16 skinIx) const;
     const DDHType* m_ddh;
-    FonBinReader m_fonbin;
     LSRError m_error;
 };
 
-} // namespace database
+} // namespace lsr
 
 #endif // LUXOFTSAFERENDERER_BITMAP_ACCESS_H

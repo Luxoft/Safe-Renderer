@@ -32,16 +32,13 @@
 #include <LsrTypes.h>
 #include <LSRErrorCollector.h>
 #include <NonCopyable.h>
-
-#include <DefaultDataContext.h>
+#include <DataContext.h>
 
 class FrameHandlerCorrupter;
 
 namespace lsr
 {
 
-class Database;
-class DisplayManager;
 class IDataHandler;
 class Window;
 
@@ -83,7 +80,7 @@ public:
      *
      * @param[in] monotonicTimeMs current monotonic system time in milliseconds.
      */
-    void update(U32 monotonicTimeMs);
+    void update(const U32 monotonicTimeMs);
 
     /**
      * Method renders the hole widgets tree on some canvas.
@@ -124,7 +121,7 @@ private:
     Database& m_db;
     WidgetPool m_widgetPool;
     IDataHandler& m_dataHandler;
-    DefaultDataContext m_dataContext;
+    DataContext m_dataContext;
     DisplayManager& m_display;
     LSRErrorCollector m_error;
     Window* m_pWindow;

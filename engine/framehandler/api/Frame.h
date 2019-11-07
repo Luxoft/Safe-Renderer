@@ -39,7 +39,6 @@ struct DDHType;
 
 class Database;
 class DataContext;
-class WidgetPool;
 class Window;
 
 /**
@@ -68,9 +67,9 @@ public:
      */
     static Frame* create(WidgetPool& widgetPool,
                          const Database& db,
-                         FrameId frameId,
+                         const FrameId frameId,
                          Window* pParent,
-                         DataContext* pContext,
+                         DataContext* const pContext,
                          LSRErrorCollector& error);
 
 private:
@@ -79,7 +78,7 @@ private:
      *
      * @param[in] pDdh @c lsr::PageType ddh configuration.
      */
-    explicit Frame(const PageType* pDdh);
+    explicit Frame(const PageType* const pDdh);
 
     /**
      * Method initialize object.
@@ -94,7 +93,7 @@ private:
      */
     bool setup(WidgetPool& widgetPool,
                const Database& db,
-               DataContext* pContext,
+               DataContext* const pContext,
                LSRErrorCollector& error);
 
     /**

@@ -141,12 +141,11 @@ GILBoolean gilSetColor(GILContext context, uint8_t red, uint8_t green, uint8_t b
     return GIL_TRUE;
 }
 
-GILBoolean gilLoadTexture(GILTexture tex, uint32_t width, uint32_t height, GILFormat format, GILBoolean copy, const void* data)
+GILBoolean gilTexPixels(GILTexture tex, uint32_t width, uint32_t height, GILFormat format, const void* data)
 {
     GILBoolean ret = GIL_FALSE;
     if (gilIsValidTexture(tex,GIL_FALSE) // check if texture is valid
         && GIL_REQUIRE(data) // check if data is valid
-        && GIL_REQUIRE(!copy) // As copy comes along with heap-management this is not a valid use case for Functional Safety solution
         )
     {
         const uint8_t bpp = gil_helper_getbpp(format);
@@ -162,7 +161,7 @@ GILBoolean gilLoadTexture(GILTexture tex, uint32_t width, uint32_t height, GILFo
         tex->mHeight = height;
         tex->mFormat = format;
         tex->mSize = bufSize;
-        tex->mAllocated = copy;
+        tex->mAllocated = GIL_FALSE;
         //if (copy)
         //{
 
@@ -179,6 +178,24 @@ GILBoolean gilLoadTexture(GILTexture tex, uint32_t width, uint32_t height, GILFo
     }
 
     return ret;
+}
+
+GILBoolean gilTexPalette4(GILTexture tex, const void* palette, uint32_t size)
+{
+    // TODO:
+    return GIL_FALSE;
+}
+
+GILBoolean gilTexPalette3(GILTexture tex, const void* palette, uint32_t size)
+{
+    // TODO:
+    return GIL_FALSE;
+}
+
+GILBoolean gilTexPalette2(GILTexture tex, const void* palette, uint32_t size)
+{
+    // TODO:
+    return GIL_FALSE;
 }
 
 void gilBindTexture(GILContext context, GILTexture t)

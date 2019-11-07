@@ -34,47 +34,23 @@ using namespace lsr;
 
 class ExpressionMinMaxOpFixture : public ExpressionTestFixture
 {
-protected:
-    ExpressionMinMaxOpFixture()
-    {
-    }
-
-    void prepareExpression(U32 value, U32 minValue, U32 maxValue)
-    {
-        ExpressionTypeFactory exprFactory;
-        exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_MIN_MAX, 3U);
-
-        ExpressionTermTypeFactory termValue;
-        termValue.createIntegerExprTerm(value);
-
-        ExpressionTermTypeFactory termMin;
-        termMin.createIntegerExprTerm(minValue);
-
-        ExpressionTermTypeFactory termMax;
-        termMax.createIntegerExprTerm(maxValue);
-
-        exprFactory.addExprTerm(termValue.getDdh(), termValue.getSize());
-        exprFactory.addExprTerm(termMin.getDdh(), termMin.getSize());
-        exprFactory.addExprTerm(termMax.getDdh(), termMax.getSize());
-
-        m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-    }
 };
 
 
 TEST_F(ExpressionMinMaxOpFixture, MinMaxReturnValueTest)
 {
-    U32 expected = 32U;
-    prepareExpression(expected, 5U, 100U);
+    ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 32U, NULL };
+    ExpressionTermType tmin = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType tmax = { ExpressionTermType::INTEGER_CHOICE, 100U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &tmin, &tmax };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 3 };
 
-    const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
+    const lsr::Number expectedValue(32U, lsr::DATATYPE_INTEGER);
     const lsr::DataStatus expectedStatus = lsr::DataStatus::VALID;
     lsr::Number actualValue;
 
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::minMax(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::minMax(&expr, &m_context, actualValue);
 
     EXPECT_EQ(expectedStatus, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -82,17 +58,19 @@ TEST_F(ExpressionMinMaxOpFixture, MinMaxReturnValueTest)
 
 TEST_F(ExpressionMinMaxOpFixture, MinMaxReturnMinTest)
 {
-    U32 expected = 32U;
-    prepareExpression(1U, expected, 100U);
+    ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 1U, NULL };
+    ExpressionTermType tmin = { ExpressionTermType::INTEGER_CHOICE, 32U, NULL };
+    ExpressionTermType tmax = { ExpressionTermType::INTEGER_CHOICE, 100U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &tmin, &tmax };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 3 };
 
+    U32 expected = 32U;
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     const lsr::DataStatus expectedStatus = lsr::DataStatus::VALID;
     lsr::Number actualValue;
 
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::minMax(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::minMax(&expr, &m_context, actualValue);
 
     EXPECT_EQ(expectedStatus, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -100,17 +78,19 @@ TEST_F(ExpressionMinMaxOpFixture, MinMaxReturnMinTest)
 
 TEST_F(ExpressionMinMaxOpFixture, MinMaxReturnMaxTest)
 {
-    U32 expected = 100U;
-    prepareExpression(200U, 5U, expected);
+    ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 200U, NULL };
+    ExpressionTermType tmin = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType tmax = { ExpressionTermType::INTEGER_CHOICE, 100U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &tmin, &tmax };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 3 };
 
+    U32 expected = 100U;
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     const lsr::DataStatus expectedStatus = lsr::DataStatus::VALID;
     lsr::Number actualValue;
 
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::minMax(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::minMax(&expr, &m_context, actualValue);
 
     EXPECT_EQ(expectedStatus, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -118,93 +98,51 @@ TEST_F(ExpressionMinMaxOpFixture, MinMaxReturnMaxTest)
 
 TEST_F(ExpressionMinMaxOpFixture, MinMaxWithWrongFirstTermTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_MIN_MAX, 3U);
-
-    ExpressionTermTypeFactory termValue;
-    termValue.createWrongExprTerm(200U);
-
-    ExpressionTermTypeFactory termMin;
-    termMin.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory termMax;
-    termMax.createIntegerExprTerm(100U);
-
-    exprFactory.addExprTerm(termValue.getDdh(), termValue.getSize());
-    exprFactory.addExprTerm(termMin.getDdh(), termMin.getSize());
-    exprFactory.addExprTerm(termMax.getDdh(), termMax.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    ExpressionTermType t1 = { ExpressionTermType::NONE, 200U, NULL };
+    ExpressionTermType tmin = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType tmax = { ExpressionTermType::INTEGER_CHOICE, 100U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &tmin, &tmax };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 3 };
 
     const lsr::DataStatus expectedStatus = lsr::DataStatus::INCONSISTENT;
     lsr::Number actualValue;
 
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::minMax(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::minMax(&expr, &m_context, actualValue); 
 
     EXPECT_EQ(expectedStatus, actualStatus);
 }
 
 TEST_F(ExpressionMinMaxOpFixture, MinMaxWithWrongSecondTermTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_MIN_MAX, 3U);
-
-    ExpressionTermTypeFactory termValue;
-    termValue.createIntegerExprTerm(200U);
-
-    ExpressionTermTypeFactory termMin;
-    termMin.createWrongExprTerm(5U);
-
-    ExpressionTermTypeFactory termMax;
-    termMax.createIntegerExprTerm(100U);
-
-    exprFactory.addExprTerm(termValue.getDdh(), termValue.getSize());
-    exprFactory.addExprTerm(termMin.getDdh(), termMin.getSize());
-    exprFactory.addExprTerm(termMax.getDdh(), termMax.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 200U, NULL };
+    ExpressionTermType tmin = { ExpressionTermType::NONE, 5U, NULL };
+    ExpressionTermType tmax = { ExpressionTermType::INTEGER_CHOICE, 100U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &tmin, &tmax };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 3 };
 
     const lsr::DataStatus expectedStatus = lsr::DataStatus::INCONSISTENT;
     lsr::Number actualValue;
 
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::minMax(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::minMax(&expr, &m_context, actualValue);
 
     EXPECT_EQ(expectedStatus, actualStatus);
 }
 
 TEST_F(ExpressionMinMaxOpFixture, MinMaxWithWrongThirdTermTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_MIN_MAX, 3U);
-
-    ExpressionTermTypeFactory termValue;
-    termValue.createIntegerExprTerm(200U);
-
-    ExpressionTermTypeFactory termMin;
-    termMin.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory termMax;
-    termMax.createWrongExprTerm(100U);
-
-    exprFactory.addExprTerm(termValue.getDdh(), termValue.getSize());
-    exprFactory.addExprTerm(termMin.getDdh(), termMin.getSize());
-    exprFactory.addExprTerm(termMax.getDdh(), termMax.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    const ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 200U, NULL };
+    const ExpressionTermType tmin = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    const ExpressionTermType tmax = { ExpressionTermType::NONE, 100U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &tmin, &tmax };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 3 };
 
     const lsr::DataStatus expectedStatus = lsr::DataStatus::INCONSISTENT;
     lsr::Number actualValue;
 
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::minMax(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::minMax(&expr, &m_context, actualValue);
 
     EXPECT_EQ(expectedStatus, actualStatus);
 }

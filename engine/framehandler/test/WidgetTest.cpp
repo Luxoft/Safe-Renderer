@@ -26,27 +26,27 @@
 
 #include "MockWidget.h"
 #include "WrongWidget.h"
-#include "DdhStaticBitmapFieldBuilder.h"
-#include "DdhReferenceBitmapFieldBuilder.h"
-#include "DdhPanelBuilder.h"
-#include "DdhBuilder.h"
-#include "DdhPanelBuilder.h"
-#include "DdhPageBuilder.h"
 #include "WidgetPoolHelper.h"
 #include "TestCanvas.h"
 
 #include <ResourceBuffer.h>
 #include <Database.h>
 #include <DisplaySizeType.h>
-#include <ExpressionTermTypeFactory.h>
 
-#include <TestDataContext.h>
+#include <DataContext.h>
 #include <MockDataHandler.h>
 
 #include <DisplayManager.h>
 #include <WindowDefinition.h>
 
 #include <LsrLimits.h>
+
+#include <AreaType.h>
+#include <ExpressionTermType.h>
+#include <StaticBitmapFieldType.h>
+#include <ReferenceBitmapFieldType.h>
+#include <PanelType.h>
+#include <Telltales.hpp>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -55,6 +55,8 @@
 using ::testing::Ref;
 using ::testing::Return;
 using ::testing::_;
+
+using namespace lsr;
 
 TEST(WidgetTest, AddChildrenReturnTrueTest)
 {
@@ -184,20 +186,18 @@ TEST(WidgetTest, UpdateTest)
 
 TEST(WidgetTest, DisposeBitmapFieldTest)
 {
-    lsr::AreaType area;
-    framehandlertests::DdhStaticBitmapFieldBuilder builder;
-    builder.create(area, true, 23U);
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    const StaticBitmapFieldType bmpField = { &area, &visible, &bmp };
 
-    lsr::ResourceBuffer binBuffer;
-    lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     lsr::WidgetPool widgetPool;
     WidgetPoolHelper helper(widgetPool);
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
-    lsr::BitmapField* field = helper.fillUpWithBitmaps(builder.getDdh(),
+    DataContext context(dataHandler);
+    lsr::BitmapField* field = helper.fillUpWithBitmaps(&bmpField,
                                                        db,
                                                        &context);
     EXPECT_TRUE(helper.isBitMapPoolFilled());
@@ -209,20 +209,18 @@ TEST(WidgetTest, DisposeBitmapFieldTest)
 
 TEST(WidgetTest, DisposeReferenceBitmapFieldTest)
 {
-    lsr::AreaType area;
-    framehandlertests::DdhReferenceBitmapFieldBuilder builder;
-    builder.create(43U, area, true, 23U);
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    ReferenceBitmapFieldType bmpField = { 43U, &area, &visible, &bmp };
 
-    lsr::ResourceBuffer binBuffer;
-    lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     lsr::WidgetPool widgetPool;
     WidgetPoolHelper helper(widgetPool);
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
-    lsr::ReferenceBitmapField* field = helper.fillUpWithReferenceBitmaps(builder.getDdh(),
+    DataContext context(dataHandler);
+    lsr::ReferenceBitmapField* field = helper.fillUpWithReferenceBitmaps(&bmpField,
                                                                          db,
                                                                          &context);
     EXPECT_TRUE(helper.isReferenceBitMapPoolFilled());
@@ -235,20 +233,17 @@ TEST(WidgetTest, DisposeReferenceBitmapFieldTest)
 
 TEST(WidgetTest, DisposePanelTest)
 {
-    lsr::AreaType area;
-    framehandlertests::DdhPanelBuilder builder;
-    builder.create(area, true, 2U);
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    PanelType tpanel = { &area, &visible, NULL, 0 };
 
-    lsr::ResourceBuffer binBuffer;
-    lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     lsr::WidgetPool widgetPool;
     WidgetPoolHelper helper(widgetPool);
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
-    lsr::Panel* panel = helper.fillUpWithPanels(builder.getDdh(),
+    DataContext context(dataHandler);
+    lsr::Panel* panel = helper.fillUpWithPanels(&tpanel,
                                                 db,
                                                 &context);
     EXPECT_TRUE(helper.isPanelPoolFilled());
@@ -260,27 +255,12 @@ TEST(WidgetTest, DisposePanelTest)
 
 TEST(WidgetTest, DisposeFrameTest)
 {
-    lsr::AreaType area;
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
-
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.create(area, true, 2U);
-
-    lsr::DisplaySizeType displaySize;
-
-    framehandlertests::DdhBuilder ddhBuilder;
-    ddhBuilder.create(panelBuilder, pageBuilder, displaySize);
-
-    lsr::ResourceBuffer binBuffer(ddhBuilder.getDdh(), ddhBuilder.getSize());
-    lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     lsr::WidgetPool widgetPool;
     WidgetPoolHelper helper(widgetPool);
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
     lsr::Frame* frame = helper.fillUpWithFrames(db,
                                                 1U,
                                                 NULL,
@@ -295,20 +275,7 @@ TEST(WidgetTest, DisposeFrameTest)
 
 TEST(WidgetTest, DisposeWindowTest)
 {
-    lsr::AreaType area;
-    lsr::DisplaySizeType displaySize;
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
-
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.create(area, true, 2U);
-
-    framehandlertests::DdhBuilder ddhBuilder;
-    ddhBuilder.create(panelBuilder, pageBuilder, displaySize);
-
-    lsr::ResourceBuffer binBuffer(ddhBuilder.getDdh(), ddhBuilder.getSize());
-    lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     lsr::WindowDefinition winDef;
     lsr::DisplayManager dm;
@@ -316,8 +283,7 @@ TEST(WidgetTest, DisposeWindowTest)
     lsr::WidgetPool widgetPool;
     WidgetPoolHelper helper(widgetPool);
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
     lsr::Window* window = helper.fillUpWithWindows(db,
                                                    dm,
                                                    winDef,
@@ -411,13 +377,13 @@ TEST(WidgetTest, IsVisibleReturnTrueTest)
 {
     MockWidget widget;
 
-    ExpressionTermTypeFactory visibilityExpr;
-    visibilityExpr.createBoolExprTerm(true);
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
 
-    TestDataContext context;
+    MockDataHandler dataHandler;
+    DataContext context(dataHandler);
 
     lsr::BoolExpression expr;
-    expr.setup(visibilityExpr.getDdh(), &context);
+    expr.setup(&visible, &context);
 
     widget.setVisibilityExpr(&expr);
 
@@ -432,13 +398,13 @@ TEST(WidgetTest, IsVisibleReturnFalseTest)
 {
     MockWidget widget;
 
-    ExpressionTermTypeFactory visibilityExpr;
-    visibilityExpr.createBoolExprTerm(false);
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 0U, NULL };
 
-    TestDataContext context;
+    MockDataHandler dataHandler;
+    DataContext context(dataHandler);
 
     lsr::BoolExpression expr;
-    expr.setup(visibilityExpr.getDdh(), &context);
+    expr.setup(&visible, &context);
 
     widget.setVisibilityExpr(&expr);
 
@@ -464,13 +430,13 @@ TEST(WidgetTest, IsVisibleWithWrongExprTest)
 {
     MockWidget widget;
 
-    ExpressionTermTypeFactory visibilityExpr;
-    visibilityExpr.createWrongExprTerm(5U);
+    ExpressionTermType visible = { ExpressionTermType::NONE, 5U, NULL };
 
-    TestDataContext context;
+    MockDataHandler dataHandler;
+    DataContext context(dataHandler);
 
     lsr::BoolExpression expr;
-    expr.setup(visibilityExpr.getDdh(), &context);
+    expr.setup(&visible, &context);
 
     widget.setVisibilityExpr(&expr);
 
@@ -508,13 +474,13 @@ TEST(WidgetTest, OnDrawWithNotVisibleObjectTest)
     MockWidget child;
     widget.addChild(&child);
 
-    ExpressionTermTypeFactory visibilityExpr;
-    visibilityExpr.createBoolExprTerm(false);
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 0U, NULL };
 
-    TestDataContext context;
+    MockDataHandler dataHandler;
+    DataContext context(dataHandler);
 
     lsr::BoolExpression expr;
-    expr.setup(visibilityExpr.getDdh(), &context);
+    expr.setup(&visible, &context);
 
     widget.setVisibilityExpr(&expr);
 

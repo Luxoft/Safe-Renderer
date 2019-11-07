@@ -1,5 +1,5 @@
-#ifndef _DISPLAYSIZETYPE_H_
-#define _DISPLAYSIZETYPE_H_
+#ifndef _LSR_DISPLAYSIZETYPE_H_
+#define _LSR_DISPLAYSIZETYPE_H_
 
 /******************************************************************************
 **
@@ -8,9 +8,9 @@
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
-**   This file is part of Safe Renderer.
+**   This file is part of Luxoft Safe Renderer.
 **
-**   Safe Renderer is free software: you can redistribute it and/or
+**   Luxoft Safe Renderer is free software: you can redistribute it and/or
 **   modify it under the terms of the GNU Lesser General Public
 **   License as published by the Free Software Foundation.
 **
@@ -28,59 +28,34 @@
 ******************************************************************************/
 
 #include "ddh_defs.h"
-#include "LsrTypes.h"  // for P_STATIC_ASSERT
-
 
 namespace lsr
 {
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(push)
-#pragma pack(1)
-#endif
-
 struct DisplaySizeType
 {
-public:
-    //----------------------------------------------------------------
-    /**
-     * This is the ROM structure for the DisplaySizeType.
-     * Each element of this type has this exact image in ROM memory.
-     */
-    U16 width :16;
-    U16 height :16;
-    //----------------------------------------------------------------
+    const U16 width;
+    const U16 height;
 
-public:
 
     /**
      * Returns the value of the width attribute
      */
-    U16 GetWidth() const;
+    U16 GetWidth() const
+    {
+        return width;
+    }
 
     /**
      * Returns the value of the height attribute
      */
-    U16 GetHeight() const;
+    U16 GetHeight() const
+    {
+        return height;
+    }
+
 };
-
-P_STATIC_ASSERT((sizeof(DisplaySizeType)) == 4, "DisplaySizeType size")
-
-
-inline U16 DisplaySizeType::GetWidth() const
-{
-    return width;
-}
-
-inline U16 DisplaySizeType::GetHeight() const
-{
-    return height;
-}
 
 } // namespace lsr
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(pop)
-#endif
-
-#endif  // #ifndef _DISPLAYSIZETYPE_H_
+#endif // #ifndef _LSR_DISPLAYSIZETYPE_H_

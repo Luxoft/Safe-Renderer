@@ -29,6 +29,9 @@ include_directories(
     ${LSRROOT}/gil/api
     ${LSRROOT}/pil/api
     ${SIMU_BASE}/src
+    ${SIMU_BASE}/communication/api
+    ${SIMU_BASE}/odi/api
+    ${LSRROOT}/test/database/Telltales/Output
 )
 
 set(SIMU_HEADERS
@@ -44,6 +47,7 @@ set(SIMU_SOURCES
     ${SIMU_BASE}/src/FUBridge.cpp
     ${SIMU_BASE}/src/ODIComSession.cpp
     ${SIMU_BASE}/src/MsgTransceiverTCP.cpp
+    ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
 )
 
 add_definitions(-Dlint -DNOMINMAX)
@@ -53,6 +57,13 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 else()
 endif()
 
+add_subdirectory(communication)
+add_subdirectory(odi)
+
+add_library(odicomm STATIC
+    $<TARGET_OBJECTS:communication>
+    $<TARGET_OBJECTS:odi>
+)
 
 add_executable(lsr_simu
     ${SIMU_HEADERS}
@@ -64,7 +75,7 @@ if (MSVC)
 endif()
 
 target_link_libraries(lsr_simu
-    engine gilSample pilSample ${SIMU_LIBS}
+    engine gilSample pilSample odicomm ${SIMU_LIBS}
 )
 
 install(TARGETS ${PROJECT_NAME}
@@ -72,3 +83,5 @@ install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${SIMU_PREFIX}
     ARCHIVE DESTINATION ${SIMU_PREFIX}
 )
+
+

@@ -1,5 +1,5 @@
-#ifndef _PAGETYPE_H_
-#define _PAGETYPE_H_
+#ifndef _LSR_PAGETYPE_H_
+#define _LSR_PAGETYPE_H_
 
 /******************************************************************************
 **
@@ -8,9 +8,9 @@
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
-**   This file is part of Safe Renderer.
+**   This file is part of Luxoft Safe Renderer.
 **
-**   Safe Renderer is free software: you can redistribute it and/or
+**   Luxoft Safe Renderer is free software: you can redistribute it and/or
 **   modify it under the terms of the GNU Lesser General Public
 **   License as published by the Free Software Foundation.
 **
@@ -28,78 +28,50 @@
 ******************************************************************************/
 
 #include "ddh_defs.h"
-#include "LsrTypes.h"  // for P_STATIC_ASSERT
-
 
 namespace lsr
 {
-
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(push)
-#pragma pack(1)
-#endif
+struct AreaType;
+struct ExpressionTermType;
 
 struct PageType
 {
-public:
-    //----------------------------------------------------------------
-    /**
-     * This is the ROM structure for the PageType.
-     * Each element of this type has this exact image in ROM memory.
-     */
-    U16 panelIdSize :16;
-    U16 panelIdOffset :16;
-    //----------------------------------------------------------------
-
-public:
-
-    /**
-     * Returns the number of elements panelId attribute list has
-     */
-    U16 GetSizeOfPanelIdList() const;
-
-    /**
-     * Returns the selected index of the panelId attribute list
-     */
-    U16 GetPanelIdItem(const U16 index) const;
-
-    /**
-     * Returns a pointer to the content of the panelId attribute list
-     */
-     const U16* GetPanelIdPointer() const;
-};
-
-P_STATIC_ASSERT((sizeof(PageType)) == 4, "PageType size")
+    const U16* panelId;
+    const U16 panelIdSize;
+    const AreaType* const area;
+    const ExpressionTermType* const visible;
 
 
-inline U16 PageType::GetSizeOfPanelIdList() const
-{
-    return panelIdSize;
-}
-
-inline U16 PageType::GetPanelIdItem(const U16 index) const
-{
-    U16 result = 0;
-    if (index < GetSizeOfPanelIdList())
+    U16 GetSizeOfPanelIdList() const
     {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        const U16* arr = reinterpret_cast<const U16*>(pThis + panelIdOffset);
-        result = arr[index];
+        return panelIdSize;
     }
-    return result;
-}
 
-inline const U16* PageType::GetPanelIdPointer() const
-{
-    const U8* pThis = reinterpret_cast<const U8*>(this);
-    const U16* arr = reinterpret_cast<const U16*>(pThis + panelIdOffset);
-    return arr;
-}
+    U16 GetPanelIdItem(const U16 i) const
+    {
+        return (i < panelIdSize) ? panelId[i] : 0U;
+    }
+
+    /**
+     * Returns a pointer to the area child reference.
+     * Defines the area of the element relative to the upper left corner of its parent
+     */
+    const AreaType* GetArea() const
+    {
+        return area;
+    }
+
+    /**
+     * Returns a pointer to the visible child reference.
+     * Controls the visibility of the element. It can make sense to have a field invisible if it is also enabled because when it receives focus, it becomes visible and when it loses focus, it becomes invisible again
+     */
+    const ExpressionTermType* GetVisible() const
+    {
+        return visible;
+    }
+
+};
 
 } // namespace lsr
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(pop)
-#endif
-
-#endif  // #ifndef _PAGETYPE_H_
+#endif // #ifndef _LSR_PAGETYPE_H_

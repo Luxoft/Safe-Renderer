@@ -1,5 +1,5 @@
-#ifndef POPOULUSSC_NONCOPYABLE_H
-#define POPOULUSSC_NONCOPYABLE_H
+#ifndef POPULUSSC_NONCOPYABLE_H
+#define POPULUSSC_NONCOPYABLE_H
 
 /******************************************************************************
 **
@@ -42,4 +42,4 @@ private:
     NonCopyable& operator=(const NonCopyable&);
 };
 
-#endif // POPOULUSSC_NONCOPYABLE_H
+#endif // POPULUSSC_NONCOPYABLE_H

@@ -36,12 +36,7 @@ namespace lsr
 {
 
 struct ReferenceBitmapFieldType;
-struct ExpressionTermType;
 
-class Database;
-class DataContext;
-
-class WidgetPool;
 
 /**
  * A non-drawing widget which checks video output.
@@ -71,8 +66,8 @@ public:
      */
     static ReferenceBitmapField* create(WidgetPool& widgetPool,
                                         const Database& db,
-                                        const ReferenceBitmapFieldType* pDdh,
-                                        DataContext* pContext,
+                                        const ReferenceBitmapFieldType* const pDdh,
+                                        DataContext* const pContext,
                                         LSRErrorCollector& error);
 
 private:
@@ -82,7 +77,7 @@ private:
      * @param[in] db   object provides work with database.
      * @param[in] pDdh @c lsr::ReferenceBitmapFieldType ddh configuration.
      */
-    ReferenceBitmapField(const Database& db, const ReferenceBitmapFieldType* pDdh);
+    ReferenceBitmapField(const Database& db, const ReferenceBitmapFieldType* const pDdh);
 
     /**
      * Method initialize object.
@@ -93,7 +88,7 @@ private:
      *
      * @return @c true if object initialization succeeded, @c false otherwise.
      */
-    bool setup(DataContext* pContext, LSRErrorCollector& error);
+    bool setup(DataContext* const pContext, LSRErrorCollector& error);
 
     /**
      * Method updates internal variables (evaluates value of bitmap ID).
@@ -129,8 +124,8 @@ private:
      */
     virtual Widget::WidgetType getType() const P_OVERRIDE;
 
-    bool setupVisibilityExpr(DataContext* pContext);
-    bool setupBitmapExr(DataContext* pContext);
+    bool setupVisibilityExpr(DataContext* const pContext);
+    bool setupBitmapExr(DataContext* const pContext);
 
     /**
      * Method increments error counter inside @c DataHandler object.

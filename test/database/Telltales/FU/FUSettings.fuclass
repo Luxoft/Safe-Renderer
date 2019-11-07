@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<fuclass:FUClass xmlns:fuclass="http://www.populus.luxoft.com/fuclass" fuclass:Name="FUSettings">
+<?xml version="1.1" encoding="UTF-8"?>
+<fuclass:FUClass xmlns:fuclass="http://www.populus.luxoft.com/fuclass">
   <VersionData>
     <CurrentVersion>0.0</CurrentVersion>
     <ReleaseDate>TBD</ReleaseDate>
@@ -7,6 +7,7 @@
     <ReleaseDescription>None</ReleaseDescription>
   </VersionData>
   <FUClassId>1</FUClassId>
+  <InternalFlag>false</InternalFlag>
   <EnumerationSet fuclass:Documentation="This enumeration contains the supported units of measurement for display. In the running project, numerical values will be adjusted in accordance with the selected display unit.&#xA;Enumeration values 0, 1, and 2 are reserved for Metric, US, and Imperial, correspondingly." fuclass:Name="Display Units">
     <EnumerationSetId>1</EnumerationSetId>
     <EnumerationValue fuclass:Name="Metric">0</EnumerationValue>

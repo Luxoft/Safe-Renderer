@@ -42,7 +42,7 @@
 namespace lsr
 {
 
-Frame::Frame(const PageType* pDdh)
+Frame::Frame(const PageType* const pDdh)
     : Widget()
     , m_pDdh(pDdh)
 {
@@ -50,15 +50,15 @@ Frame::Frame(const PageType* pDdh)
 
 bool Frame::setup(WidgetPool& widgetPool,
                   const Database& db,
-                  DataContext* pContext,
+                  DataContext* const pContext,
                   LSRErrorCollector& error)
 {
     bool success = true;
-    const DDHType* pDdh = db.getDdh();
+    const DDHType* const pDdh = db.getDdh();
     ASSERT(NULL != pDdh);
-    const HMIGlobalSettingsType* pSettings = pDdh->GetHMIGlobalSettings();
+    const HMIGlobalSettingsType* const pSettings = pDdh->GetHMIGlobalSettings();
     ASSERT(pSettings != NULL);
-    const DisplaySizeType* pDisplaySize = pSettings->GetDisplaySize();
+    const DisplaySizeType* const pDisplaySize = pSettings->GetDisplaySize();
     ASSERT(pDisplaySize != NULL);
     Area area;
     area.setWidth(static_cast<I32>(pDisplaySize->GetWidth()));
@@ -71,11 +71,11 @@ bool Frame::setup(WidgetPool& widgetPool,
         const PanelId panelId = m_pDdh->GetPanelIdItem(i);
         ASSERT(0U != panelId);
 
-        const PanelDatabaseType* pPanelDB = pDdh->GetPanelDatabase();
+        const PanelDatabaseType* const pPanelDB = pDdh->GetPanelDatabase();
         ASSERT(NULL != pPanelDB && panelId <= pPanelDB->GetPanelCount());
 
         // As id's are 1 based, database is 0 based. we should decrement id.
-        const PanelType* pDdhPanel = pPanelDB->GetPanel(panelId - 1U);
+        const PanelType* const pDdhPanel = pPanelDB->GetPanel(panelId - 1U);
 
         Panel* pPanel = Panel::create(widgetPool, db, pDdhPanel, pContext, error);
         /**
@@ -83,7 +83,7 @@ bool Frame::setup(WidgetPool& widgetPool,
          * @c addChild method will always return @c true value.
          * That's why we have coverage gap here.
          */
-        if (NULL == pPanel || !addChild(pPanel))
+        if ((NULL == pPanel) || (!addChild(pPanel)))
         {
             success = false;
             break;
@@ -94,22 +94,22 @@ bool Frame::setup(WidgetPool& widgetPool,
 
 Frame* Frame::create(WidgetPool& widgetPool,
                      const Database& db,
-                     FrameId frameId,
+                     const FrameId frameId,
                      Window* /* parent */,
-                     DataContext* pContext,
+                     DataContext* const pContext,
                      LSRErrorCollector& error)
 {
-    const DDHType* pDdh = db.getDdh();
+    const DDHType* const pDdh = db.getDdh();
     ASSERT(NULL != pDdh);
 
-    const PageDatabaseType* pDdhPageDB = pDdh->GetPageDatabase();
+    const PageDatabaseType* const pDdhPageDB = pDdh->GetPageDatabase();
     ASSERT(NULL != pDdhPageDB);
 
-    const PageType* pDdhPage = pDdhPageDB->GetPage(static_cast<U16>(frameId - 1U));
+    const PageType* const pDdhPage = pDdhPageDB->GetPage(static_cast<U16>(frameId) - 1U);
     ASSERT(NULL != pDdhPage);
 
     LSRError tmpError = LSR_NO_ERROR;
-    void* pRawMemory = widgetPool.framePool().allocate(tmpError);
+    void* const pRawMemory = widgetPool.framePool().allocate(tmpError);
     error = tmpError;
 
     Frame* pFrame = new(pRawMemory)Frame(pDdhPage);
@@ -125,8 +125,10 @@ Frame* Frame::create(WidgetPool& widgetPool,
     return pFrame;
 }
 
-void Frame::onUpdate(const U32 /* monotonicTimeMs */)
-{}
+void Frame::onUpdate(const U32 monotonicTimeMs)
+{
+    static_cast<void>(monotonicTimeMs);  // ignore unused variable
+}
 
 void Frame::onDraw(Canvas& /* canvas */, const Area& /* area */)
 {}

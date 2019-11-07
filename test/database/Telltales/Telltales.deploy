@@ -1,14 +1,13 @@
-<?xml version="1.0" encoding="ASCII"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <deploy:Deployment xmlns:deploy="http://www.populus.luxoft.com/deploy">
   <MasterDDH>\Telltales\DDH\Telltales.ddh</MasterDDH>
-  <Priority></Priority>
   <FUClass>\Telltales\FU\InternalFU.fuclass</FUClass>
   <FUClass>\Telltales\FU\FUSettings.fuclass</FUClass>
   <FUClass>\Telltales\FU\FUTelltales.fuclass</FUClass>
   <LangDef>\Telltales\Telltales.langdef</LangDef>
   <OutputFolder>\Telltales\Output</OutputFolder>
   <ResultDDH>\Telltales\Output\Result.ddh</ResultDDH>
-  <ResultPrio>\Telltales\Output\Priority.priority</ResultPrio>
   <BuildConfiguration>\Telltales\Telltales.build</BuildConfiguration>
+  <DDHRuntime>\Telltales\FU\MyDDHRuntime.ddhruntime</DDHRuntime>
   <Requirements></Requirements>
 </deploy:Deployment>

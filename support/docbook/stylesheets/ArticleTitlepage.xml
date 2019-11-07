@@ -54,7 +54,7 @@ To do it, run ..\titlepage_bat\ArticleTitlepage.bat.
            font-weight="bold"
            space-before="2in"/>
 
-    <subtitle font-size="&hsize3;" space-before="0.7in" space-after="3in"/>
+    <subtitle font-size="&hsize3;" space-before="0.7in" space-after="2in"/>
 
     <pubdate text-align="left"/>
 

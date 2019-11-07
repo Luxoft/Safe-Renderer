@@ -40,15 +40,13 @@ namespace lsr
     class Database
     {
     public:
-        Database(const ResourceBuffer& ddhbin, const ResourceBuffer& imgbin);
+        Database(const DDHType* const ddh);
 
         LSRError getError() const;
 
         const DDHType* getDdh() const;
 
-        StaticBitmap getBitmap(BitmapId bitmapId) const;
-
-        void setSkin(const U8 skinId);
+        StaticBitmap getBitmap(const BitmapId id) const;
 
     private:
         const DDHType* m_ddh;

@@ -28,8 +28,6 @@
 ******************************************************************************/
 
 #include "IDataHandler.h"
-#include "IMsgReceiver.h"
-#include "InputStream.h"
 #include "LsrLimits.h"
 
 namespace lsr
@@ -50,13 +48,15 @@ struct DynamicDataEntry
 
 struct DynamicDataEntry_Comparer
 {
-    static U32 key(FUClassId fuId, DataId dataId);
-    bool operator ()(struct DynamicDataEntry const& entry, U32 const value) const;
+    static U32 key(const FUClassId fuId, const DataId dataId);
+    bool operator()(struct DynamicDataEntry const& entry, U32 const value) const;
 };
 
-inline U32 DynamicDataEntry_Comparer::key(FUClassId fuId, DataId dataId)
+inline U32 DynamicDataEntry_Comparer::key(const FUClassId fuId, const DataId dataId)
 {
-    return ((fuId << 16) | dataId);
+    const U32 msb = fuId;
+    const U32 lsb = dataId;
+    return (msb << 16U) | lsb;
 }
 
 /**
@@ -71,55 +71,21 @@ inline U32 DynamicDataEntry_Comparer::key(FUClassId fuId, DataId dataId)
  * @reqid SW_ENG_101
  * @reqid SW_ENG_112
  */
-class DataHandler : public IDataHandler, public IMsgReceiver
+class DataHandler : public IDataHandler
 {
 public:
     explicit DataHandler(const Database& db);
 
-    // IDataHandler
-    virtual bool subscribeData(FUClassId fuClassId,
-        DataId dataId,
-        IDataHandler::IListener* pListener) P_OVERRIDE;
-
-    virtual bool subscribeIndication(FUClassId fuClassId,
-        IndicationId indicationId,
-        IDataHandler::IListener* pListener) P_OVERRIDE;
-
-    virtual void unsubscribeData(FUClassId fuClassId,
-        DataId dataId,
-        IDataHandler::IListener* pListener) P_OVERRIDE;
-
-    virtual void unsubscribeIndication(FUClassId fuClassId,
-        IndicationId indicationId,
-        IDataHandler::IListener* pListener) P_OVERRIDE;
-
-    virtual DataStatus getNumber(FUClassId fuClassId,
-        DataId dataId,
+    virtual DataStatus getNumber(const DynamicData& dataId,
         Number &value) const P_OVERRIDE;
 
-    virtual DataStatus getIndication(FUClassId fuClassId,
-        IndicationId indicationId,
-        bool& value) const P_OVERRIDE;
-
-    virtual bool setData(FUClassId fuClassId,
-        DataId dataId,
+    virtual bool setData(const DynamicData& dataId,
         const Number& value,
-        DataStatus status) P_OVERRIDE;
-
-    // IMsgReceiver
-    virtual LSRError onMessage(IMsgTransmitter* pMsgTransmitter,
-        const U8 messageType,
-        InputStream& stream) P_OVERRIDE;
-
-    virtual void onConnect(IMsgTransmitter* pMsgTransmitter) P_OVERRIDE;
-
-    virtual void onDisconnect(IMsgTransmitter* pMsgTransmitter) P_OVERRIDE;
-
-    LSRError dynamicDataResponseHandler(InputStream& stream);
+        const DataStatus status) P_OVERRIDE;
 
 private:
-    DynamicDataEntry* find(const FUClassId fu, const DataId data);
-    const DynamicDataEntry* find(const FUClassId fu, const DataId data) const;
+    DynamicDataEntry* find(const DynamicData& data);
+    const DynamicDataEntry* find(const DynamicData& data) const;
 
     DynamicDataEntry m_dataEntries[MAX_DYNAMIC_DATA];
     size_t m_numDataEntries;

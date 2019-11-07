@@ -41,12 +41,12 @@ Texture* TextureCache::load(const StaticBitmap& bmp)
 {
     Texture* texture = NULL;
     const U16 id = bmp.getId();
-    if (id > 0 && id <= MAX_TEXTURES)
+    if ((id > 0U) && (id <= MAX_TEXTURES))
     {
-        texture = &m_textures[id - 1];
+        texture = &m_textures[id - 1U];
         if (!texture->isLoaded())
         {
-            texture->load(m_displayManager.getContext(), bmp.getData(), false); // no copy for static bitmap
+            texture->load(m_displayManager.getContext(), bmp.getData());
         }
     }
     return texture;

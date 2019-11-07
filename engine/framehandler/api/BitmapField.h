@@ -36,10 +36,6 @@ namespace lsr
 {
 
 struct StaticBitmapFieldType;
-struct ExpressionTermType;
-class Database;
-class DataContext;
-class WidgetPool;
 
 /**
  * Class provides functionality to draw Bitmap on some canvas.
@@ -64,8 +60,8 @@ public:
      */
     static BitmapField* create(WidgetPool& widgetPool,
                                const Database& db,
-                               const StaticBitmapFieldType* pDdh,
-                               DataContext* pContext,
+                               const StaticBitmapFieldType* const pDdh,
+                               DataContext* const pContext,
                                LSRErrorCollector& error);
 
 private:
@@ -86,7 +82,7 @@ private:
      *
      * @return @c true if object initialization succeeded, @c false otherwise.
      */
-    bool setup(DataContext* pContext, LSRErrorCollector& error);
+    bool setup(DataContext* const pContext, LSRErrorCollector& error);
 
     /**
      * Method updates internal variables (evaluates value of bitmap ID).
@@ -120,8 +116,8 @@ private:
      */
     virtual Widget::WidgetType getType() const P_OVERRIDE;
 
-    bool setupVisibilityExpr(DataContext* pContext);
-    bool setupBitmapExr(DataContext* pContext);
+    bool setupVisibilityExpr(DataContext* const pContext);
+    bool setupBitmapExr(DataContext* const pContext);
 
     const StaticBitmapFieldType* m_pDdh;
     const Database& m_db;

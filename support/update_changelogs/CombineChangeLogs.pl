@@ -6,23 +6,23 @@
   Script for merging changelogs.
 
 =head1 USAGE
-  perl CombineChangeLogs.pl [--help] [--verbose] [--populus-path path]
+  perl CombineChangeLogs.pl [--help] [--verbose] [--repo-path path]
 
   If the script is run without parameters, default values are used:
     --verbose      = 0 (disabled)
-    --populus-path = ../..
+    --repo-path = ../..
 
   Optional parameters:
     --help                  Show this help message and exit
     --verbose               Verbose output
-    --populus-path  path    Path to main Populus repository folder
+    --repo-path  path       Path to main repository folder
 
 =head1 ALGORITHM
 0. Done outside this script
-  * Update 'PopulusSC/config/DocBookConfig.ent' (set common variables: data, version, and issuer)
+  * Update 'config/DocBookConfig.ent' (set common variables: data, version, and issuer)
 
 The following steps (1-5) are executed for the following folder:
-  * PopulusSC/doc/changelog
+  * doc/changelog
 
 1. Load and initialize template
   * load 'releases/release_X.XX.X.xml' template
@@ -78,11 +78,11 @@ sub ChdirHelper {
 }
 
 sub GetVariables () {
-    # precondition: current folder is PopulusSC
+    # precondition: current folder is repo root
 
     # read parameters into hash
     my %vars = ();
-    open(my $fh, '<', 'config/DocBookConfig.ent') or die("Can't open 'PopulusSC/config/DocBookConfig.ent' for reading: $!\n");
+    open(my $fh, '<', 'config/DocBookConfig.ent') or die("Can't open 'config/DocBookConfig.ent' for reading: $!\n");
     while (my $line = <$fh>) {
         if ($line =~ /^\s*<!ENTITY\s+(\S+)\s+"(\S+)">/) {
             $vars{$1} = $2;
@@ -95,7 +95,7 @@ sub GetVariables () {
         'ChangeLogDate',
         'ChangeLogRelease',
         'ChangeLogIssuer',
-        'ChangeLogProduct_PopulusSC',
+        'ChangeLogProduct_LSR',
         'CopyrightYear',
     );
     my %validNames = map { $_ => 1 } @validNames;
@@ -494,12 +494,12 @@ my $scriptDir = abs_path(dirname($0));
 # parse parameters
 my $help        = undef;
 my $verbose     = undef;
-my $populusPath = "$scriptDir/../.."; # assume that the script is in PopulusSC/support/UpdateChangeLogs
+my $repoPath = "$scriptDir/../.."; # assume that the script is in support/UpdateChangeLogs
 
 GetOptions(
     "help"           => \$help,
     "verbose"        => \$verbose,
-    "populus-path=s" => \$populusPath,
+    "repo-path=s" => \$repoPath,
 ) or die("error in command line parameters.\nUse '$script --help' for help\n");
 
 # show help and exit
@@ -516,7 +516,7 @@ if ($help) {
     exit(0);
 }
 
-unless (ChdirHelper($populusPath)) {
+unless (ChdirHelper($repoPath)) {
     exit(1);
 }
 

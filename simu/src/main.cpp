@@ -24,10 +24,8 @@
 **
 ******************************************************************************/
 
-#include "FrameHandler.h"
-#include "DataHandler.h"
-#include "DisplayManager.h"
-#include "Database.h"
+#include "Telltales.hpp"
+#include "Engine.h"
 #include "FUBridge.h"
 #include "OdiTypes.h"
 #include "DDHType.h"
@@ -45,16 +43,6 @@
 #include <algorithm>
 
 #include <imx6_rendering_configuration.h>
-
-struct DBConfig
-{
-    std::string ddhbin;
-    std::string imgbin;
-
-    DBConfig()
-    :   ddhbin(""), imgbin("")
-    {}
-};
 
 struct TCPConfig
 {
@@ -86,7 +74,6 @@ struct RenderConfig
 
 struct LSRConfiguration
 {
-    DBConfig dbConfig;
     TCPConfig tcpConfig;
     VideoCheckerConfig vcConfig;
     RenderConfig renderConfig;
@@ -204,86 +191,55 @@ namespace
         return res;
     }
 
-    bool parseDBConfiguration(std::ifstream& cfgFile, DBConfig& config)
-    {
-        if (!parseConfig(cfgFile, "ddhbin", config.ddhbin))
-        {
-            return false;
-        }
-
-        if (!parseConfig(cfgFile, "imgbin", config.imgbin))
-        {
-            return false;
-        }
-        std::cout << "DB configuration: ddhbin: " << config.ddhbin << std::endl;
-        std::cout << "DB configuration: imgbin: " << config.imgbin << std::endl;
-
-        return true;
-    }
-
     bool parseTCPConfiguration(std::ifstream& cfgFile, TCPConfig& config)
     {
-        bool res = false;
-
         std::string tmp = "";
-        if (!parseConfig(cfgFile, "port", tmp))
+        config.port = 29101;
+        config.hostname = "127.0.0.1";
+        if (parseConfig(cfgFile, "port", tmp))
         {
-            std::cerr << "Can't get \"port\" field." << std::endl;
-            return false;
+            config.port = atoi(tmp.c_str());
         }
 
-        config.port = atoi(tmp.c_str());
         if (parseConfig(cfgFile, "hostname", tmp))
         {
             config.hostname = tmp;
-            res = true;
         }
 
         std::cout << "TCP configuration: " << config.hostname << ":" <<
            config.port << std::endl;
 
-        return res;
+        return true;
     }
 
     bool parseRenderConfiguration(std::ifstream& cfgFile, RenderConfig& config)
     {
-        bool res = false;
-
         std::string tmp = "";
         if (parseConfig(cfgFile, "win_device", tmp))
         {
             config.fbDevice = atoi(tmp.c_str());
-            res = true;
         }
 
         std::cout << "Render configuration: win_device: " << config.fbDevice << std::endl;
 
-        return res;
+        return true;
     }
 
     bool parseVideoCheckerConfiguration(std::ifstream& cfgFile, VideoCheckerConfig& config)
     {
-        bool res = false;
-
         std::string tmp = "";
         if (parseConfig(cfgFile, "check_device", tmp))
         {
             config.checkDev = tmp;
-            res = true;
         }
 
         std::cout << "VideoChecker configuration: device to check: " << config.checkDev << std::endl;
 
-        return res;
+        return true;
     }
 
     bool parseConfiguration(std::ifstream& cfgFile, LSRConfiguration& config)
     {
-        if (!parseDBConfiguration(cfgFile, config.dbConfig))
-        {
-            return false;
-        }
-
         if (!parseTCPConfiguration(cfgFile, config.tcpConfig))
         {
             return false;
@@ -300,47 +256,6 @@ namespace
         }
 
         return true;
-    }
-
-    // opens the database files from the file system and stores them in ddhbin, imgbin
-    bool openDatabase(const DBConfig& config, const std::string& fileName, std::string& ddhbin, std::string& imgbin)
-    {
-        std::string ddhBinFile = config.ddhbin;
-        std::string imgBinFile = config.imgbin;
-
-    #ifdef WIN32
-        size_t offset = fileName.find_last_of("\\/");
-    #else
-        size_t offset = fileName.find_last_of(L'/');
-    #endif
-
-        std::string filePath;
-        if (offset != std::string::npos)
-        {
-            filePath = fileName.substr(0, offset + 1); // Include the \ at the end
-        }
-
-        makeAbsolutePath(ddhBinFile, filePath);
-        makeAbsolutePath(imgBinFile, filePath);
-
-        std::ifstream ddhifs(ddhBinFile.c_str(), std::ios::binary);
-        if (!ddhifs)
-        {
-            std::cerr << "Could not open DDHBIN:" << ddhBinFile << std::endl;
-        }
-        std::ifstream imgifs(imgBinFile.c_str(), std::ios::binary);
-        if (!imgifs)
-        {
-            std::cerr << "Could not open IMGBIN:" << imgBinFile << std::endl;
-        }
-        bool ret = false;
-        if (ddhifs && imgifs)
-        {
-            ddhbin.assign((std::istreambuf_iterator<char>(ddhifs)), (std::istreambuf_iterator<char>()));
-            imgbin.assign((std::istreambuf_iterator<char>(imgifs)), (std::istreambuf_iterator<char>()));
-            ret = true;
-        }
-        return ret;
     }
 
     bool isErrorCritical(const LSRError& error)
@@ -368,14 +283,13 @@ namespace
 
 int main(int argc, char* argv[])
 {
-    std::string fileName = "default.cfg";
+    std::string fileName;
     parseOptions(argc, argv, fileName);
 
     std::ifstream cfgFile(fileName.c_str());
-    if (!cfgFile)
+    if (!cfgFile && !fileName.empty())
     {
         std::cerr << "Configuration file not found: " << fileName << std::endl;
-        return 1;
     }
 
     LSRConfiguration configuration;
@@ -385,9 +299,6 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    std::string ddhbin = "";
-    std::string imgbin = "";
-    if (openDatabase(configuration.dbConfig, fileName, ddhbin, imgbin))
     {
         struct gil_config_t config;
         config.renderDevice = configuration.renderConfig.fbDevice;
@@ -396,32 +307,25 @@ int main(int argc, char* argv[])
                 std::min(sizeof(config.checkDevice), configuration.vcConfig.checkDev.size()));
 
         gilInit(&config);
-        const lsr::ResourceBuffer ddh(ddhbin.c_str(), ddhbin.size());
-        const lsr::ResourceBuffer img(imgbin.c_str(), imgbin.size());
-        lsr::Database db(ddh, img);
-        lsr::LSRErrorCollector err = db.getError();
-        lsr::DataHandler dataHandler(db);
-        lsr::FUBridge bridge(db.getDdh()->GetFUDatabase(),
-                             configuration.tcpConfig.port,
-                             configuration.tcpConfig.hostname,
-                             dataHandler);
-        lsr::DisplayManager dsp;
-        lsr::FrameHandler frameHandler(db, dataHandler, dsp);
-        if (!frameHandler.start())
+        lsr::Engine engine(Telltales::getDDH());
+        lsr::LSRErrorCollector err = engine.getError();
+        // Database errors are fatal (may yield undefined behaviour)
+        if (err.get() == LSR_NO_ERROR)
         {
-            err = LSR_UNKNOWN_ERROR;
-        }
+            lsr::FUBridge bridge(Telltales::getDDH(),
+                configuration.tcpConfig.port,
+                configuration.tcpConfig.hostname,
+                engine);
 
-        while (!isErrorCritical(err.get()) && frameHandler.handleWindowEvents() == false)
-        {
-            err = bridge.handleIncomingData(30); //receive from Editor
-            const U32 monotonicTime = pilGetMonotonicTime();
-            frameHandler.update(monotonicTime);
-            frameHandler.render();
-            err = frameHandler.getError();
-            if(!frameHandler.verify())
+            while (!isErrorCritical(err.get()) && engine.handleWindowEvents() == false)
             {
-                // error handling
+                err = bridge.handleIncomingData(30); //receive from Editor
+                engine.render();
+                err = engine.getError();
+                if (!engine.verify())
+                {
+                    // error handling
+                }
             }
         }
         gilUninit();

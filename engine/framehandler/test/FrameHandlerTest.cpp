@@ -33,6 +33,18 @@
 #include <DynamicDataType.h>
 
 #include <gtest/gtest.h>
+#include <PageType.h>
+#include <PanelType.h>
+#include <BaseFieldChoiceType.h>
+#include <StaticBitmapFieldType.h>
+#include <ReferenceBitmapFieldType.h>
+#include <PageDatabaseType.h>
+#include <PanelDatabaseType.h>
+#include <HMIGlobalSettingsType.h>
+#include <DDHType.h>
+#include <Telltales.hpp>
+
+using namespace lsr;
 
 class FrameHandlerTest: public WidgetTestBase
 {
@@ -43,20 +55,16 @@ protected:
 
 TEST_F(FrameHandlerTest, CreateTest)
 {
-    initNormalDb();
-
-    lsr::FrameHandler fh(*m_pDb, m_dataHandler, m_dsp);
-
+    lsr::Database db(Telltales::getDDH());
+    lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
     EXPECT_TRUE(fh.start());
     EXPECT_EQ(LSR_NO_ERROR, fh.getError());
 }
 
 TEST_F(FrameHandlerTest, CreateTwiceTest)
 {
-    initNormalDb();
-
-    lsr::FrameHandler fh(*m_pDb, m_dataHandler, m_dsp);
-
+    lsr::Database db(Telltales::getDDH());
+    lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
     EXPECT_TRUE(fh.start());
     EXPECT_TRUE(fh.start());
     EXPECT_EQ(LSR_NO_ERROR, fh.getError());
@@ -64,31 +72,68 @@ TEST_F(FrameHandlerTest, CreateTwiceTest)
 
 TEST_F(FrameHandlerTest, GetErrorTest)
 {
-    initNormalDb();
-
-    lsr::FrameHandler fh(*m_pDb, m_dataHandler, m_dsp);
+    lsr::Database db(Telltales::getDDH());
+    lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
     EXPECT_TRUE(fh.start());
-
     EXPECT_EQ(LSR_NO_ERROR, fh.getError());
+}
+
+namespace testdb
+{
+    PanelId panelIds[] = { 1U };
+    PageType page = { panelIds, 1, NULL, NULL };
+    PageType* pages[] = { &page };
+    PageDatabaseType pageDB = { pages, 1 };
+
+    AreaType area = { 0U, 0U, 0U, 0U };
+    DynamicDataType dataType = { 0U, DATATYPE_INTEGER };
+    ExpressionTermType visible = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    ExpressionTermType bitmap1 = {ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType};
+    StaticBitmapFieldType p1_bitmapField1 = { &area, &visible, &bitmap1 };
+    StaticBitmapFieldType p1_bitmapField2 = { &area, &visible, &bitmap1 };
+    BaseFieldChoiceType p1_field1 = { BaseFieldChoiceType::STATICBITMAPFIELD_CHOICE, &p1_bitmapField1 };
+    BaseFieldChoiceType p1_field2 = { BaseFieldChoiceType::STATICBITMAPFIELD_CHOICE, &p1_bitmapField2 };
+    const BaseFieldChoiceType* p1_fields[] = {&p1_field1, &p1_field2};
+    PanelType p1 = {&area, &visible, p1_fields, 2};
+    PanelType* panels1[] = { &p1 };
+    PanelDatabaseType panelDB1 = {panels1, 1};
+
+    ExpressionTermType bitmap2 = { ExpressionTermType::BITMAPID_CHOICE, 1U, NULL };
+    ReferenceBitmapFieldType p2_refBitmapField1 = { 1, &area, &visible, &bitmap2 };
+    ReferenceBitmapFieldType p2_refBitmapField2 = { 1, &area, &visible, &bitmap2 };
+    BaseFieldChoiceType p2_field1 = { BaseFieldChoiceType::REFERENCEBITMAPFIELD_CHOICE, &p2_refBitmapField1 };
+    BaseFieldChoiceType p2_field2 = { BaseFieldChoiceType::REFERENCEBITMAPFIELD_CHOICE, &p2_refBitmapField2 };
+    const BaseFieldChoiceType* p2_fields[] = {&p2_field1, &p2_field2};
+    PanelType p2 = {&area, &visible, p2_fields, 2};
+    PanelType* panels2[] = { &p2 };
+    PanelDatabaseType panelDB2 = {panels2, 1};
+
+    DisplaySizeType displaySize = { 0U, 0U };
+    HMIGlobalSettingsType globalSettings = { &displaySize, NULL };
 }
 
 TEST_F(FrameHandlerTest, GetErrorWithErrorInWidgetTest)
 {
-    lsr::AreaType area;
-    lsr::DisplaySizeType displaySize;
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
-
-    lsr::DynamicDataType dataType;
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.create(area, true, 2U, &dataType);
-
-    initDb(pageBuilder, panelBuilder, displaySize);
+    const DDHType ddh = {
+        0U,
+        DDHType::SCHEMA_CHECKSUM,
+        DDHType::SCHEMA_VERSION,
+        DDHType::SERIALIZER_VERSION,
+        &testdb::pageDB,
+        &testdb::panelDB1,
+        &testdb::globalSettings,
+        NULL,
+        NULL,
+        NULL,
+        0U
+    };
 
     lsr::Number num(5U, lsr::DATATYPE_INTEGER);
     m_dataHandler.setOutDatedNumber(num);
 
-    lsr::FrameHandler fh(*m_pDb, m_dataHandler, m_dsp);
+    lsr::Database db(&ddh);
+
+    lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
     EXPECT_TRUE(fh.start());
 
     fh.update(0U);
@@ -96,21 +141,37 @@ TEST_F(FrameHandlerTest, GetErrorWithErrorInWidgetTest)
     EXPECT_EQ(LSR_DATASTATUS_NOT_AVAIABLE, fh.getError());
 }
 
+
 TEST_F(FrameHandlerTest, GetErrorWithErrorInWidgetSetupTest)
 {
-    lsr::AreaType area;
-    lsr::DisplaySizeType displaySize;
+    EXPECT_EQ(2, MAX_PANELS_COUNT); // assumption for the test
     const U32 panelCount = MAX_PANELS_COUNT + 1U;
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(panelCount, 1U);
+    // Create too many panels for the page
 
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    // Create too many fields on the panel
-    panelBuilder.create(area, true, panelCount);
+    PanelId panelIds[] = { 1U, 2U, 3U };
+    PageType page = { panelIds, panelCount, NULL, NULL };
+    PageType* pages[] = { &page };
+    PageDatabaseType pageDB = { pages, 1 };
 
-    initDbWithManyPanels(pageBuilder, panelBuilder, displaySize, panelCount);
+    PanelType* panels[] = { &testdb::p1, &testdb::p1, &testdb::p1 };
+    PanelDatabaseType panelDB = {panels, panelCount};
 
-    lsr::FrameHandler fh(*m_pDb, m_dataHandler, m_dsp);
+    const DDHType ddh = {
+        0U,
+        DDHType::SCHEMA_CHECKSUM,
+        DDHType::SCHEMA_VERSION,
+        DDHType::SERIALIZER_VERSION,
+        &pageDB,
+        &panelDB,
+        &testdb::globalSettings,
+        NULL,
+        NULL,
+        NULL,
+        0U
+    };
+
+    lsr::Database db(&ddh);
+    lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
     EXPECT_FALSE(fh.start());
 
     EXPECT_EQ(LSR_POOL_IS_FULL, fh.getError());
@@ -118,9 +179,8 @@ TEST_F(FrameHandlerTest, GetErrorWithErrorInWidgetSetupTest)
 
 TEST_F(FrameHandlerTest, GetErrorWithErrorInWidgetPoolTest)
 {
-    initNormalDb();
-
-    lsr::FrameHandler fh(*m_pDb, m_dataHandler, m_dsp);
+    lsr::Database db(Telltales::getDDH());
+    lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
     EXPECT_TRUE(fh.start());
 
     FrameHandlerCorrupter corrupter(fh);
@@ -131,18 +191,22 @@ TEST_F(FrameHandlerTest, GetErrorWithErrorInWidgetPoolTest)
 
 TEST_F(FrameHandlerTest, VerifyTest)
 {
-    lsr::AreaType areaType;
+    const DDHType ddh = {
+        0U,
+        DDHType::SCHEMA_CHECKSUM,
+        DDHType::SCHEMA_VERSION,
+        DDHType::SERIALIZER_VERSION,
+        &testdb::pageDB,
+        &testdb::panelDB2,
+        &testdb::globalSettings,
+        NULL,
+        NULL,
+        NULL,
+        0U
+    };
 
-    lsr::DisplaySizeType displaySize;
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
-
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.createWithRefBitmaps(areaType, true, 2U);
-
-    initDb(pageBuilder, panelBuilder, displaySize);
-
-    lsr::FrameHandler fh(*m_pDb, m_dataHandler, m_dsp);
+    lsr::Database db(&ddh);
+    lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
 
     EXPECT_TRUE(fh.start());
     EXPECT_EQ(LSR_NO_ERROR, fh.getError());
@@ -156,9 +220,9 @@ TEST_F(FrameHandlerTest, VerifyTest)
 
 TEST_F(FrameHandlerTest, DrawTest)
 {
-    initNormalDb();
+    lsr::Database db(Telltales::getDDH());
 
-    lsr::FrameHandler fh(*m_pDb, m_dataHandler, m_dsp);
+    lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
 
     EXPECT_TRUE(fh.start());
     EXPECT_EQ(LSR_NO_ERROR, fh.getError());
@@ -172,9 +236,9 @@ TEST_F(FrameHandlerTest, DrawTest)
 
 TEST_F(FrameHandlerTest, RenderWithNotInvalidatedStateTest)
 {
-    initNormalDb();
+    lsr::Database db(Telltales::getDDH());
 
-    lsr::FrameHandler fh(*m_pDb, m_dataHandler, m_dsp);
+    lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
 
     EXPECT_TRUE(fh.start());
     EXPECT_EQ(LSR_NO_ERROR, fh.getError());
@@ -193,9 +257,9 @@ TEST_F(FrameHandlerTest, RenderWithNotInvalidatedStateTest)
 // test to fulfill coverage
 TEST_F(FrameHandlerTest, HandleWindowEventsTest)
 {
-    initNormalDb();
+    lsr::Database db(Telltales::getDDH());
 
-    lsr::FrameHandler fh(*m_pDb, m_dataHandler, m_dsp);
+    lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
 
     EXPECT_TRUE(fh.start());
     EXPECT_EQ(LSR_NO_ERROR, fh.getError());
@@ -204,3 +268,4 @@ TEST_F(FrameHandlerTest, HandleWindowEventsTest)
 
     EXPECT_FALSE(lsr::DisplayAccessor::instance().wasDrawBitmapExecuted());
 }
+

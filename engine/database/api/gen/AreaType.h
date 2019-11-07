@@ -1,5 +1,5 @@
-#ifndef _AREATYPE_H_
-#define _AREATYPE_H_
+#ifndef _LSR_AREATYPE_H_
+#define _LSR_AREATYPE_H_
 
 /******************************************************************************
 **
@@ -8,9 +8,9 @@
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
-**   This file is part of Safe Renderer.
+**   This file is part of Luxoft Safe Renderer.
 **
-**   Safe Renderer is free software: you can redistribute it and/or
+**   Luxoft Safe Renderer is free software: you can redistribute it and/or
 **   modify it under the terms of the GNU Lesser General Public
 **   License as published by the Free Software Foundation.
 **
@@ -28,81 +28,52 @@
 ******************************************************************************/
 
 #include "ddh_defs.h"
-#include "LsrTypes.h"  // for P_STATIC_ASSERT
-
 
 namespace lsr
 {
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(push)
-#pragma pack(1)
-#endif
-
 struct AreaType
 {
-public:
-    //----------------------------------------------------------------
-    /**
-     * This is the ROM structure for the AreaType.
-     * Each element of this type has this exact image in ROM memory.
-     */
-    U16 xCoord :16;
-    U16 yCoord :16;
-    U16 width :16;
-    U16 height :16;
-    //----------------------------------------------------------------
+    const I16 xCoord;
+    const I16 yCoord;
+    const I16 width;
+    const I16 height;
 
-public:
 
     /**
      * Returns the value of the xCoord attribute
      */
-    I16 GetXCoord() const;
+    I16 GetXCoord() const
+    {
+        return xCoord;
+    }
 
     /**
      * Returns the value of the yCoord attribute
      */
-    I16 GetYCoord() const;
+    I16 GetYCoord() const
+    {
+        return yCoord;
+    }
 
     /**
      * Returns the value of the width attribute
      */
-    I16 GetWidth() const;
+    I16 GetWidth() const
+    {
+        return width;
+    }
 
     /**
      * Returns the value of the height attribute
      */
-    I16 GetHeight() const;
+    I16 GetHeight() const
+    {
+        return height;
+    }
+
 };
-
-P_STATIC_ASSERT((sizeof(AreaType)) == 8, "AreaType size")
-
-
-inline I16 AreaType::GetXCoord() const
-{
-    return xCoord;
-}
-
-inline I16 AreaType::GetYCoord() const
-{
-    return yCoord;
-}
-
-inline I16 AreaType::GetWidth() const
-{
-    return width;
-}
-
-inline I16 AreaType::GetHeight() const
-{
-    return height;
-}
 
 } // namespace lsr
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(pop)
-#endif
-
-#endif  // #ifndef _AREATYPE_H_
+#endif // #ifndef _LSR_AREATYPE_H_

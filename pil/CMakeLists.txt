@@ -16,7 +16,53 @@ if(NOT DEFINED PIL_BASE)
     set(PIL_BASE "${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
-include(Pil.cmake)
+if(NOT DEFINED LSRENGINE)
+    set(LSRENGINE "${CMAKE_CURRENT_SOURCE_DIR}/..")
+    message(STATUS "--> LSRENGINE: ${LSRENGINE}")
+endif()
+
+include_directories(
+    ${PIL_BASE}/api
+)
+
+if(SIMULATION OR UNIT_TESTS)
+    set(PIL_HEADERS
+        ${PIL_BASE}/api/pil.h
+    )
+
+    set(PIL_SOURCES
+        ${PIL_BASE}/src/sample/pil.cpp
+    )
+
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        set(PIL_SOURCES
+            ${PIL_SOURCES}
+            ${PIL_BASE}/src/sample/pil_platform_win32.c
+        )
+        set(PIL_LIBS
+            winmm
+        )
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "ARP")
+        set(PIL_SOURCES
+            ${PIL_SOURCES}
+            ${PIL_BASE}/src/sample/pil_platform_arp.c
+        )
+        set(PIL_LIBS
+            winmm
+        )
+    else()
+        set(PIL_SOURCES
+            ${PIL_SOURCES}
+            ${PIL_BASE}/src/sample/pil_platform_linux.c
+        )
+    endif()
+elseif()
+    # in case of release installation
+    set(PIL_HEADERS
+        ${PIL_BASE}/api/pil.h
+    )
+endif()
+
 
 if(SIMULATION OR UNIT_TESTS)
     add_library(${PROJECT_NAME}
@@ -25,10 +71,6 @@ if(SIMULATION OR UNIT_TESTS)
     )
 
     target_link_libraries(${PROJECT_NAME} ${PIL_LIBS})
-
-    install(FILES Pil.cmake
-        DESTINATION "${PIL_PREFIX}"
-    )
 
     install(DIRECTORY api
         DESTINATION "${PIL_PREFIX}"

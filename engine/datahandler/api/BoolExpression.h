@@ -53,10 +53,10 @@ public:
      * Initializes the object and registers data subscriptions in the @c lsr::DataHandler
      * without listener (see @c lsr::IListener).
      *
-     * @param[in] pExpr    expression configuration from database.
+     * @param[in] pTerm    expression configuration from database.
      * @param[in] pContext data context, which shall be used for evaluation.
      */
-    void setup(const lsr::ExpressionTermType* pExpr, DataContext* pContext);
+    void setup(const ExpressionTermType* const pTerm, DataContext* const pContext);
 
     /**
      * Returns the current value.
@@ -77,8 +77,6 @@ public:
 private:
     BoolExpression(const BoolExpression&);
     BoolExpression& operator=(const BoolExpression&);
-
-    virtual void update() P_OVERRIDE;
 
     const lsr::ExpressionTermType* m_pTerm;
     DataContext* m_pContext;

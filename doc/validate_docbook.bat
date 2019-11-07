@@ -4,10 +4,10 @@ setlocal enableextensions enabledelayedexpansion
 pushd "%~dp0"
 set EXIT_CODE=0
 
-call :PROCESS_DIR sug_populussc_build_configuration
-call :PROCESS_DIR sug_populussc_editor_user_manual
-call :PROCESS_DIR sug_populussc_hardware_requirements
-call :PROCESS_DIR sug_populussc_safety_notes
+call :PROCESS_DIR sug_lsr_build_configuration
+call :PROCESS_DIR sug_lsr_editor_user_manual
+call :PROCESS_DIR sug_lsr_hardware_requirements
+call :PROCESS_DIR sug_lsr_safety_notes
 call :PROCESS_DIR changelog
 call :PROCESS_DIR gi_common_files
 popd

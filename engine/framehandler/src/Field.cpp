@@ -28,21 +28,21 @@
 #include "BitmapField.h"
 #include "ReferenceBitmapField.h"
 
-#include <FieldType.h>
+#include <BaseFieldChoiceType.h>
 
 namespace lsr
 {
 
 Field* Field::create(WidgetPool& widgetPool,
                      const Database& db,
-                     const FieldType* pDdh,
-                     DataContext* pContext,
+                     const BaseFieldChoiceType* const pDdh,
+                     DataContext* const pContext,
                      LSRErrorCollector& error)
 {
     Field* field = NULL;
-    switch (pDdh->GetFieldTypeChoice())
+    switch (pDdh->GetBaseFieldChoiceTypeChoice())
     {
-    case FieldType::STATICBITMAPFIELD_CHOICE:
+    case BaseFieldChoiceType::STATICBITMAPFIELD_CHOICE:
     {
         field = BitmapField::create(widgetPool,
                                     db,
@@ -51,7 +51,7 @@ Field* Field::create(WidgetPool& widgetPool,
                                     error);
         break;
     }
-    case FieldType::REFERENCEBITMAPFIELD_CHOICE:
+    case BaseFieldChoiceType::REFERENCEBITMAPFIELD_CHOICE:
     {
         field = ReferenceBitmapField::create(widgetPool,
                                              db,
@@ -70,6 +70,7 @@ Field* Field::create(WidgetPool& widgetPool,
 }
 
 Field::Field()
+: Widget()
 {}
 
 } // namespace lsr

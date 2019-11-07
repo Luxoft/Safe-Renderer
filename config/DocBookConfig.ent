@@ -6,5 +6,5 @@
 <!ENTITY ChangeLogIssuer "Arwed Richert">
 <!ENTITY CopyrightYear "2017">
 
-<!-- Luxoft Populus Safety Critical -->
-<!ENTITY ChangeLogProduct_PopulusSC "Luxoft Populus Safety Critical">
+<!-- Luxoft Safe Renderer -->
+<!ENTITY ChangeLogProduct_LSR "Luxoft Safe Renderer">

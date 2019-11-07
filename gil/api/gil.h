@@ -43,7 +43,7 @@
 #ifndef GIL_H
 #define GIL_H
 
-#include <stdint.h>
+#include <stdint.h>  // <cstdint> cannot be used (C++11)
 
 #ifdef WIN32
 #define GIL_API extern __declspec(dllexport)
@@ -56,7 +56,7 @@ extern "C"
 {
 #endif
 
-typedef int GILBoolean;
+typedef int32_t GILBoolean;
 typedef struct gil_config_t* GILConfig;
 typedef struct gil_surface_t* GILSurface;
 typedef struct gil_context_t* GILContext;
@@ -67,31 +67,39 @@ typedef struct gil_texture_t* GILTexture;
 
 typedef enum
 {
+    GIL_FORMAT_INVALID,
     GIL_FORMAT_A_8,           ///< alpha only
+    GIL_FORMAT_P_2_ARGB_8888, ///< 2 bit palette with 32 bit colors
+    GIL_FORMAT_P_2_BGRA_8888, ///< 2 bit palette with 32 bit colors
+    GIL_FORMAT_P_2_RGBA_8888, ///< 2 bit palette with 32 bit colors
+    GIL_FORMAT_P_2_RGB_888,   ///< 2 bit palette with 24 bit colors
+    GIL_FORMAT_P_2_RGB_565,   ///< 2 bit palette with 16 bit colors
+    GIL_FORMAT_P_4_ARGB_8888, ///< 4 bit palette with 32 bit colors
+    GIL_FORMAT_P_4_BGRA_8888, ///< 4 bit palette with 32 bit colors
+    GIL_FORMAT_P_4_RGBA_8888, ///< 4 bit palette with 32 bit colors
+    GIL_FORMAT_P_4_RGB_888,   ///< 4 bit palette with 24 bit colors
+    GIL_FORMAT_P_4_RGB_565,   ///< 4 bit palette with 16 bit colors
     GIL_FORMAT_P_8_ARGB_8888, ///< 8 bit palette with 32 bit colors
     GIL_FORMAT_P_8_BGRA_8888, ///< 8 bit palette with 32 bit colors
     GIL_FORMAT_P_8_RGBA_8888, ///< 8 bit palette with 32 bit colors
     GIL_FORMAT_P_8_RGB_888,   ///< 8 bit palette with 24 bit colors
     GIL_FORMAT_P_8_RGB_565,   ///< 8 bit palette with 16 bit colors
-    GIL_FORMAT_1_BPP,         ///< all formats before use 1 byte per pixel
     GIL_FORMAT_RGB_565,
     GIL_FORMAT_BGR_565,
-    GIL_FORMAT_2_BPP,         ///< all formats before use less than 2 byte per pixel
     GIL_FORMAT_RGB_888,
     GIL_FORMAT_BGR_888,
-    GIL_FORMAT_3_BPP,         ///< all formats before use less than 3 byte per pixel
     GIL_FORMAT_ARGB_8888,
     GIL_FORMAT_BGRA_8888,
     GIL_FORMAT_RGBA_8888,
-    GIL_FORMAT_4_BPP,         ///< all formats before use less than 4 byte per pixel
-    GIL_FORMAT_INVALID
 } GILFormat;
 
-typedef enum
-{
-    GIL_NO_ERROR = 0,
-    GIL_INVALID_OPERATION
-} GILError;
+typedef uint32_t GILError;
+
+#define GIL_NO_ERROR            0
+#define GIL_INVALID_CONTEXT     0x200
+#define GIL_INVALID_OPERATION   0x201
+#define GIL_INVALID_SURFACE     0x202
+#define GIL_INVALID_VALUE       0x203
 
 /**
  * Initializes the library.
@@ -140,16 +148,39 @@ GIL_API GILBoolean gilSetColor(GILContext context, uint8_t red, uint8_t green, u
  */
 GIL_API GILTexture gilCreateTexture(GILContext context);
 
+
+#if 0
+// Could be used to enable texture copies - if required in future
+typedef enum
+{
+    GL_TEXTURE_COPY
+} GILParam;
+GIL_API void gilTexParameteri(GILTexture t, GILParam name, uint32_t value);
+#endif
+
 /**
  * Loads pixel data into the texture
  * @param t texture
  * @param width width in pixels
  * @param height height in pixels
  * @param format color format
- * @param copy indicates if the data needs to be copied. If set to false the client guarantees that data pointer is valid until shutdown (e.g. textures in ROM)
- * @param data pixel data
+ * @param data pixel data. Data pointer is required to be valid until shutdown
+ * @return GIL_TRUE on success GIL_FALSE on error
  */
-GIL_API GILBoolean gilLoadTexture(GILTexture, uint32_t width, uint32_t height, GILFormat format, GILBoolean copy, const void* data);
+GIL_API GILBoolean gilTexPixels(GILTexture t, uint32_t width, uint32_t height, GILFormat format, const void* data);
+
+/**
+ * Loads palette data into the texture
+ * Will return an error code if the palette does not match with the pixel data format
+ * Pixel data must be set in advance (see gilTexPixels())
+ * @param t texture
+ * @param palette table of colors. Color format is specified in gilTexPixels. Data pointer is required to be valid until shutdown
+ * @param size number of colors in the palette
+ * @return GIL_TRUE on success GIL_FALSE on error
+ */
+GIL_API GILBoolean gilTexPalette4(GILTexture t, const void* palette, uint32_t size); // 4 byte color values
+GIL_API GILBoolean gilTexPalette3(GILTexture t, const void* palette, uint32_t size);  // 3 byte color values
+GIL_API GILBoolean gilTexPalette2(GILTexture t, const void* palette, uint32_t size); // 2 byte color values
 
 /**
  * Assigns a texture to the context
@@ -227,6 +258,11 @@ GIL_API GILError gilGetError(GILContext context);
  * @return true indicates that the window has been closed by the window manager
  */
 GIL_API GILBoolean gilHandleWindowEvents(GILContext context);
+
+/**
+ * Marks the end of one render/verify iteration
+ */
+GIL_API void gilSync(GILContext context);
 
 #ifdef __cplusplus
 }

@@ -32,8 +32,10 @@ namespace lsr
 {
 
 BoolExpression::BoolExpression()
-    : m_pTerm(NULL)
+    : Expression()
+    , m_pTerm(NULL)
     , m_pContext(NULL)
+    , m_value(false)
 {
 }
 
@@ -42,40 +44,27 @@ BoolExpression::~BoolExpression()
     dispose();
 }
 
-void BoolExpression::setup(const ExpressionTermType* pTerm, DataContext* pContext)
+void BoolExpression::setup(const ExpressionTermType* const pTerm, DataContext* const pContext)
 {
     dispose();
-
     ASSERT(NULL != pTerm);
-
     m_pTerm = pTerm;
     m_pContext = pContext;
-    Expression::subscribe(pTerm, m_pContext, NULL);
 }
 
 void BoolExpression::dispose()
 {
-    if (m_pTerm)
-    {
-        Expression::unsubscribe(m_pTerm, m_pContext, NULL);
-        m_pTerm = NULL;
-    }
+    m_pTerm = NULL;
 }
 
 DataStatus BoolExpression::getValue(bool& value) const
 {
-    DataStatus status = getBool(m_pTerm, m_pContext, m_value);
-
+    const DataStatus status = getBool(m_pTerm, m_pContext, m_value);
     if (DataStatus::VALID == status)
     {
         value = m_value;
     }
-
     return status;
-}
-
-void BoolExpression::update()
-{
 }
 
 } // namespace lsr

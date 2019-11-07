@@ -25,41 +25,30 @@
 ******************************************************************************/
 
 #include "Engine.h"
-#include "OdiTypes.h"
 #include <pil.h>
 
 namespace lsr
 {
 
-Engine::Engine(const Database& db, IMsgDispatcher& msgDispatcher)
-: m_msgDispatcher(msgDispatcher)
-, m_db(db)
+Engine::Engine(const DDHType* ddh)
+: m_db(ddh)
 , m_display()
-, m_dataHandler(db)
+, m_dataHandler(m_db)
 , m_frameHandler(m_db, m_dataHandler, m_display)
-, m_error(db.getError())
+, m_error(m_db.getError())
 {
-    if (LSR_NO_ERROR == m_error)
-    {
-        m_error = m_msgDispatcher.registerMsgReceiver(&m_dataHandler, MessageTypes::REGISTRATION);
-    }
-    if (LSR_NO_ERROR == m_error)
-    {
-        m_error = m_msgDispatcher.registerMsgReceiver(&m_dataHandler, MessageTypes::ODI);
-    }
     if (LSR_NO_ERROR == m_error)
     {
         const bool success = m_frameHandler.start();
         if (!success)
         {
-            m_error = m_frameHandler.getError();;
+            m_error = m_frameHandler.getError();
         }
     }
 }
 
 bool Engine::render()
 {
-    m_error = m_msgDispatcher.handleIncomingData(0);
     const U32 monotonicTime = pilGetMonotonicTime();
     m_frameHandler.update(monotonicTime);
     return m_frameHandler.render();
@@ -70,12 +59,21 @@ bool Engine::verify()
     return m_frameHandler.verify();
 }
 
-bool Engine::setData(FUClassId fuClassId,
-                     DataId dataId,
+bool Engine::setData(const DynamicData& dataId,
                      const Number& value,
-                     DataStatus status)
+                     const DataStatus status)
 {
-    return m_dataHandler.setData(fuClassId, dataId, value, status);
+    return m_dataHandler.setData(dataId, value, status);
+}
+
+DataStatus Engine::getData(const DynamicData& dataId, Number &value) const
+{
+    return m_dataHandler.getNumber(dataId, value);
+}
+
+bool Engine::handleWindowEvents()
+{
+    return m_frameHandler.handleWindowEvents();
 }
 
 LSRError Engine::getError()

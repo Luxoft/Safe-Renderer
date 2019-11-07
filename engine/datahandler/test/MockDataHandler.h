@@ -91,6 +91,12 @@ inline bool operator==(const DataValue& lhs, const DataValue& rhs)
             lhs.number == rhs.number);
 }
 
+
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable : 4373)  // Google Mock drops the const/volatile qualifiers of virtual functions
+#endif
+
 class MockDataHandler: public lsr::IDataHandler
 {
 public:
@@ -102,11 +108,7 @@ public:
         setNumber(number);
     }
 
-    MOCK_METHOD3(subscribeData, bool (FUClassId, DataId, lsr::IDataHandler::IListener*));
-    MOCK_METHOD3(subscribeIndication, bool (FUClassId, IndicationId, lsr::IDataHandler::IListener*));
-    MOCK_METHOD3(unsubscribeData, void (FUClassId, DataId, lsr::IDataHandler::IListener*));
-    MOCK_METHOD3(unsubscribeIndication, void (FUClassId, IndicationId, lsr::IDataHandler::IListener*));
-    MOCK_METHOD4(setData, bool(FUClassId, DataId, const lsr::Number&, lsr::DataStatus));
+    MOCK_METHOD3(setData, bool(const lsr::DynamicData&, const lsr::Number&, const lsr::DataStatus));
 
     void setNumber(const lsr::Number& number)
     {
@@ -115,11 +117,10 @@ public:
     }
 
     void setNumber(const lsr::Number& number,
-                   FUClassId fuClassId,
-                   DataId dataId,
+                   const lsr::DynamicData& dataId,
                    lsr::DataStatus status)
     {
-        DataEntrance de(fuClassId, dataId);
+        DataEntrance de(dataId.getFUClassId(), dataId.getDataId());
         DataValue dv(status, number);
         m_data[de] = dv;
     }
@@ -136,16 +137,15 @@ public:
         m_commonData.status = lsr::DataStatus::INVALID;
     }
 
-    virtual lsr::DataStatus getNumber(FUClassId fuClassId,
-                                      DataId dataId,
+    virtual lsr::DataStatus getNumber(const lsr::DynamicData& dataId,
                                       lsr::Number &value) const P_OVERRIDE
     {
         lsr::DataStatus status;
 
-        m_lastFuId = fuClassId;
-        m_lastDataId = dataId;
+        m_lastFuId = dataId.getFUClassId();
+        m_lastDataId = dataId.getDataId();
 
-        DataEntrance de(fuClassId, dataId);
+        DataEntrance de(dataId.getFUClassId(), dataId.getDataId());
 
         std::map<DataEntrance, DataValue>::const_iterator it = m_data.find(de);
 
@@ -161,17 +161,6 @@ public:
         }
 
         return status;
-    }
-
-    virtual lsr::DataStatus getIndication(FUClassId fuClassId,
-                                          IndicationId indicationId,
-                                          bool& value) const P_OVERRIDE
-    {
-        m_lastFuId = fuClassId;
-        m_lastIndicationId = indicationId;
-        value = true;
-
-        return lsr::DataStatus::VALID;
     }
 
     FUClassId getLastFuId() const
@@ -197,6 +186,10 @@ private:
     std::map<DataEntrance, DataValue> m_data;
     DataValue m_commonData;
 };
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 
 
 #endif // LUXOFTSAFERENDERER_MOCKDATAHANDLER_H

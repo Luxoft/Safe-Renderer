@@ -36,7 +36,6 @@
 #include <ExpressionTermType.h>
 #include <BitmapIdTableType.h>
 #include <EnumerationBitmapMapType.h>
-#include <EnumerationValueType.h>
 
 namespace lsr
 {
@@ -66,8 +65,8 @@ namespace expressionoperators
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus minMax(const ExpressionType* pExpression,
-                  DataContext* pContext,
+DataStatus minMax(const ExpressionType* const pExpression,
+                  DataContext* const pContext,
                   Number& value);
 
 /**
@@ -84,8 +83,8 @@ DataStatus minMax(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus equals(const ExpressionType* pExpression,
-                  DataContext* pContext,
+DataStatus equals(const ExpressionType* const pExpression,
+                  DataContext* const pContext,
                   Number& value);
 
 /**
@@ -102,8 +101,8 @@ DataStatus equals(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus notEquals(const ExpressionType* pExpression,
-                     DataContext* pContext,
+DataStatus notEquals(const ExpressionType* const pExpression,
+                     DataContext* const pContext,
                      Number& value);
 
 /**
@@ -120,8 +119,8 @@ DataStatus notEquals(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus lessThan(const ExpressionType* pExpression,
-                    DataContext* pContext,
+DataStatus lessThan(const ExpressionType* const pExpression,
+                    DataContext* const pContext,
                     Number& value);
 
 /**
@@ -139,8 +138,8 @@ DataStatus lessThan(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus lessThanOrEquals(const ExpressionType* pExpression,
-                            DataContext* pContext,
+DataStatus lessThanOrEquals(const ExpressionType* const pExpression,
+                            DataContext* const pContext,
                             Number& value);
 
 /**
@@ -157,8 +156,8 @@ DataStatus lessThanOrEquals(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus greaterThan(const ExpressionType* pExpression,
-                       DataContext* pContext,
+DataStatus greaterThan(const ExpressionType* const pExpression,
+                       DataContext* const pContext,
                        Number& value);
 
 /**
@@ -176,8 +175,8 @@ DataStatus greaterThan(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus greaterThanOrEquals(const ExpressionType* pExpression,
-                               DataContext* pContext,
+DataStatus greaterThanOrEquals(const ExpressionType* const pExpression,
+                               DataContext* const pContext,
                                Number& value);
 
 /**
@@ -199,8 +198,8 @@ DataStatus greaterThanOrEquals(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus itemAt(const ExpressionType* pExpression,
-                  DataContext* pContext,
+DataStatus itemAt(const ExpressionType* const pExpression,
+                  DataContext* const pContext,
                   Number& value);
 
 /**
@@ -219,8 +218,8 @@ DataStatus itemAt(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus booleanAnd(const ExpressionType* pExpression,
-                      DataContext* pContext,
+DataStatus booleanAnd(const ExpressionType* const pExpression,
+                      DataContext* const pContext,
                       Number& value);
 
 /**
@@ -239,8 +238,8 @@ DataStatus booleanAnd(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus booleanOr(const ExpressionType* pExpression,
-                     DataContext* pContext,
+DataStatus booleanOr(const ExpressionType* const pExpression,
+                     DataContext* const pContext,
                      Number& value);
 
 /**
@@ -259,8 +258,8 @@ DataStatus booleanOr(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus booleanNot(const ExpressionType* pExpression,
-                      DataContext* pContext,
+DataStatus booleanNot(const ExpressionType* const pExpression,
+                      DataContext* const pContext,
                       Number& value);
 
 /**
@@ -278,8 +277,8 @@ DataStatus booleanNot(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus fallback(const ExpressionType* pExpression,
-                    DataContext* pContext,
+DataStatus fallback(const ExpressionType* const pExpression,
+                    DataContext* const pContext,
                     Number& value);
 
 /**
@@ -300,8 +299,8 @@ DataStatus fallback(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus fallback2(const ExpressionType* pExpression,
-                     DataContext* pContext,
+DataStatus fallback2(const ExpressionType* const pExpression,
+                     DataContext* const pContext,
                      Number& value);
 
 /**
@@ -324,8 +323,8 @@ DataStatus fallback2(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus fallback3(const ExpressionType* pExpression,
-                     DataContext* pContext,
+DataStatus fallback3(const ExpressionType* const pExpression,
+                     DataContext* const pContext,
                      Number& value);
 
 /**
@@ -357,8 +356,8 @@ DataStatus fallback3(const ExpressionType* pExpression,
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus redundancy(const ExpressionType* pExpression,
-                      DataContext* pContext,
+DataStatus redundancy(const ExpressionType* const pExpression,
+                      DataContext* const pContext,
                       Number& value);
 
 } // namespace expressionoperators

@@ -32,8 +32,8 @@ namespace lsr
 {
 
 NumberExpression::NumberExpression()
-    : m_pTerm(NULL)
-    , m_pListener(NULL)
+    : Expression()
+    , m_pTerm(NULL)
     , m_pContext(NULL)
     , m_status(DataStatus::NOT_AVAILABLE)
 {
@@ -44,49 +44,25 @@ NumberExpression::~NumberExpression()
     dispose();
 }
 
-void NumberExpression::setup(const ExpressionTermType *pTerm,
-                             DataContext* pContext,
-                             Expression::IListener* pListener)
+void NumberExpression::setup(const ExpressionTermType* const pTerm,
+                             DataContext* const pContext)
 {
     dispose();
-
     ASSERT(NULL != pTerm);
-
     m_pTerm = pTerm;
-    m_pListener = pListener;
     m_pContext = pContext;
-    Expression::subscribe(pTerm, m_pContext, (pListener != NULL) ? this : NULL);
 }
 
 void NumberExpression::dispose()
 {
-    if (NULL != m_pTerm)
-    {
-        Expression::unsubscribe(m_pTerm, m_pContext, (m_pListener != NULL) ? this : NULL);
-        m_pTerm = NULL;
-    }
-    m_pListener = NULL;
+    m_pTerm = NULL;
 }
 
 DataStatus NumberExpression::getValue(Number& value) const
 {
-    if (NULL == m_pListener)
-    {
-        m_status = getNumber(m_pTerm, m_pContext, m_value);
-    }
-
+    m_status = getNumber(m_pTerm, m_pContext, m_value);
     value = m_value;
     return m_status;
-}
-
-void NumberExpression::update()
-{
-    if (NULL != m_pListener)
-    {
-        m_status = getNumber(m_pTerm, m_pContext, m_value);
-
-        m_pListener->notifyDataChange(*this);
-    }
 }
 
 } // namespace lsr

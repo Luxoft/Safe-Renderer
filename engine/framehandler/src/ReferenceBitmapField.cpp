@@ -40,16 +40,16 @@ namespace lsr
 
 ReferenceBitmapField* ReferenceBitmapField::create(WidgetPool& widgetPool,
                                  const Database& db,
-                                 const ReferenceBitmapFieldType* pDdh,
-                                 DataContext* pContext,
+                                 const ReferenceBitmapFieldType* const pDdh,
+                                 DataContext* const pContext,
                                  LSRErrorCollector& error)
 {
     LSRError tmpError = LSR_NO_ERROR;
-    void* pRawMemory = widgetPool.referenceBitmapFieldPool().allocate(tmpError);
+    void* const pRawMemory = widgetPool.referenceBitmapFieldPool().allocate(tmpError);
     error = tmpError;
 
     ReferenceBitmapField* pField = new (pRawMemory)ReferenceBitmapField(db, pDdh);
-    if (NULL != pField && !pField->setup(pContext, error))
+    if ((NULL != pField) && (!pField->setup(pContext, error)))
     {
         pField->~ReferenceBitmapField();
         error = widgetPool.referenceBitmapFieldPool().deallocate(pRawMemory);
@@ -59,21 +59,23 @@ ReferenceBitmapField* ReferenceBitmapField::create(WidgetPool& widgetPool,
     return pField;
 }
 
-ReferenceBitmapField::ReferenceBitmapField(const Database& db, const ReferenceBitmapFieldType* pDdh)
-    : m_pDdh(pDdh)
+ReferenceBitmapField::ReferenceBitmapField(const Database& db, const ReferenceBitmapFieldType* const pDdh)
+    : Field()
+    , m_pDdh(pDdh)
     , m_db(db)
     , m_pContext(NULL)
+    , m_bitmapId(0U)
 {
     ASSERT(NULL != m_pDdh);
 }
 
-bool ReferenceBitmapField::setup(DataContext* pContext, LSRErrorCollector& error)
+bool ReferenceBitmapField::setup(DataContext* const pContext, LSRErrorCollector& error)
 {
     ASSERT(NULL != pContext);
     ASSERT(NULL != m_pDdh);
     m_pContext = pContext;
     bool res = true;
-    if (!setArea(m_pDdh->GetArea()) || !setupVisibilityExpr(pContext) || !setupBitmapExr(pContext))
+    if ((!setArea(m_pDdh->GetArea())) || (!setupVisibilityExpr(pContext)) || (!setupBitmapExr(pContext)))
     {
         error = LSR_DB_INCONSISTENT;
         res = false;
@@ -82,10 +84,10 @@ bool ReferenceBitmapField::setup(DataContext* pContext, LSRErrorCollector& error
     return res;
 }
 
-bool ReferenceBitmapField::setupVisibilityExpr(DataContext* pContext)
+bool ReferenceBitmapField::setupVisibilityExpr(DataContext* const pContext)
 {
     bool res = false;
-    const ExpressionTermType* pType = m_pDdh->GetVisible();
+    const ExpressionTermType* const pType = m_pDdh->GetVisible();
     if (NULL != pType)
     {
         m_visibilityExpr.setup(pType, pContext);
@@ -95,20 +97,22 @@ bool ReferenceBitmapField::setupVisibilityExpr(DataContext* pContext)
     return res;
 }
 
-bool ReferenceBitmapField::setupBitmapExr(DataContext* pContext)
+bool ReferenceBitmapField::setupBitmapExr(DataContext* const pContext)
 {
     bool res = false;
-    const ExpressionTermType* pType = m_pDdh->GetBitmap();
+    const ExpressionTermType* const pType = m_pDdh->GetBitmap();
     if (NULL != pType)
     {
-        m_bitmapExpr.setup(pType, pContext, NULL);
+        m_bitmapExpr.setup(pType, pContext);
         res = true;
     }
     return res;
 }
 
-void ReferenceBitmapField::onUpdate(const U32 /* monotonicTimeMs */)
+void ReferenceBitmapField::onUpdate(const U32 monotonicTimeMs)
 {
+    static_cast<void>(monotonicTimeMs);  // ignore unused variable
+
     BitmapId tmpValue;
     if (tryToUpdateValue(m_bitmapExpr, tmpValue))
     {
@@ -130,7 +134,7 @@ bool ReferenceBitmapField::onVerify(Canvas& canvas, const Area& area)
     if (isVisible())
     {
         verified = false;
-        StaticBitmap bitmap = m_db.getBitmap(m_bitmapId);
+        const StaticBitmap bitmap = m_db.getBitmap(m_bitmapId);
         verified = canvas.verify(bitmap, area);
 
         if (!verified)
@@ -148,16 +152,13 @@ bool ReferenceBitmapField::onVerify(Canvas& canvas, const Area& area)
 
 void ReferenceBitmapField::incrementErrorCounter()
 {
-    IDataHandler* pDataHandler = m_pContext->getDataHandler();
-    ASSERT(pDataHandler);
+    IDataHandler& dh = m_pContext->getDataHandler();
 
-    // TODO: move to some static variable
-    const FUClassId internalFU = 255U;
-    const DataId dataId = m_pDdh->GetErrorCounter();
+    const DynamicData dataId = DynamicData(m_pDdh->GetErrorCounterFUDataId());
 
     bool errorCounterIsCorrect = true;
     Number errorCounter;
-    DataStatus status = pDataHandler->getNumber(internalFU, dataId, errorCounter);
+    const DataStatus status = dh.getNumber(dataId, errorCounter);
     if (DataStatus::VALID != status)
     {
         setError(status.convertToLSRError());
@@ -172,13 +173,13 @@ void ReferenceBitmapField::incrementErrorCounter()
 
     if (errorCounterIsCorrect)
     {
-        U32 counterValue = errorCounter.getU32();
+        const U32 counterValue = errorCounter.getU32();
         if (counterValue != U32_MAX)
         {
             errorCounter = Number(counterValue + 1U, DATATYPE_INTEGER);
         }
 
-        bool result = pDataHandler->setData(internalFU, dataId, errorCounter, status);
+        const bool result = dh.setData(dataId, errorCounter, status);
         if (!result)
         {
             setError(LSR_DH_INVALID_DATA_ID);
@@ -188,16 +189,13 @@ void ReferenceBitmapField::incrementErrorCounter()
 
 void ReferenceBitmapField::resetErrorCounter()
 {
-    IDataHandler* pDataHandler = m_pContext->getDataHandler();
-    ASSERT(pDataHandler);
+    IDataHandler& dh = m_pContext->getDataHandler();
 
-    // TODO: move to some static variable
-    const FUClassId internalFU = 255U;
-    const DataId dataId = m_pDdh->GetErrorCounter();
+    const DynamicData dataId = DynamicData(m_pDdh->GetErrorCounterFUDataId());
 
     bool errorCounterIsCorrect = true;
     Number prevCounterValue;
-    DataStatus status = pDataHandler->getNumber(internalFU, dataId, prevCounterValue);
+    const DataStatus status = dh.getNumber(dataId, prevCounterValue);
     if (DataStatus::VALID != status)
     {
         setError(status.convertToLSRError());
@@ -210,10 +208,10 @@ void ReferenceBitmapField::resetErrorCounter()
         errorCounterIsCorrect = false;
     }
 
-    if (errorCounterIsCorrect && prevCounterValue.getU32() > 0U)
+    if (errorCounterIsCorrect && (prevCounterValue.getU32() > 0U))
     {
         const Number errorCounter = Number(0U, DATATYPE_INTEGER);
-        bool result = pDataHandler->setData(internalFU, dataId, errorCounter, status);
+        const bool result = dh.setData(dataId, errorCounter, status);
         if (!result)
         {
             setError(LSR_DH_INVALID_DATA_ID);

@@ -1,5 +1,5 @@
-#ifndef _DYNAMICDATAENTRYTYPE_H_
-#define _DYNAMICDATAENTRYTYPE_H_
+#ifndef _LSR_DYNAMICDATAENTRYTYPE_H_
+#define _LSR_DYNAMICDATAENTRYTYPE_H_
 
 /******************************************************************************
 **
@@ -8,9 +8,9 @@
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
-**   This file is part of Safe Renderer.
+**   This file is part of Luxoft Safe Renderer.
 **
-**   Safe Renderer is free software: you can redistribute it and/or
+**   Luxoft Safe Renderer is free software: you can redistribute it and/or
 **   modify it under the terms of the GNU Lesser General Public
 **   License as published by the Free Software Foundation.
 **
@@ -28,120 +28,61 @@
 ******************************************************************************/
 
 #include "ddh_defs.h"
-#include "LsrTypes.h"  // for P_STATIC_ASSERT
-
 
 namespace lsr
 {
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(push)
-#pragma pack(1)
-#endif
-
 struct DynamicDataEntryType
 {
-public:
-    //----------------------------------------------------------------
-    /**
-     * This is the ROM structure for the DynamicDataEntryType.
-     * Each element of this type has this exact image in ROM memory.
-     */
-    U8  minimumSet :8;
-    U8  maximumSet :8;
-    U16 dataId :16;
-    U16 dataType :16;
-    U8  PADDING1 :8;
-    U8  PADDING2 :8;
-    U32 minimum :32;
-    U32 maximum :32;
-    U16 repeatTimeout :16;
-    U8  PADDING3 :8;
-    U8  PADDING4 :8;
-    //----------------------------------------------------------------
+    const U16 dataId;
+    const DynamicDataTypeEnumeration dataType;
+    const I32 minimum;
+    const I32 maximum;
+    const U16 repeatTimeout;
 
-public:
 
     /**
      * Returns the value of the dataId attribute
      */
-    U16 GetDataId() const;
+    U16 GetDataId() const
+    {
+        return dataId;
+    }
 
     /**
      * Returns the value of the dataType attribute
      */
-    DynamicDataTypeEnumeration GetDataType() const;
-
-    /**
-     * Returns >0 if the minimum attribute has been set,
-     * returns 0 if minimum has not been set on this instance.
-     */
-    bool IsMinimumSet() const;
+    DynamicDataTypeEnumeration GetDataType() const
+    {
+        return dataType;
+    }
 
     /**
      * Returns the value of the minimum attribute
      */
-    I32 GetMinimum() const;
-
-    /**
-     * Returns >0 if the maximum attribute has been set,
-     * returns 0 if maximum has not been set on this instance.
-     */
-    bool IsMaximumSet() const;
+    I32 GetMinimum() const
+    {
+        return minimum;
+    }
 
     /**
      * Returns the value of the maximum attribute
      */
-    I32 GetMaximum() const;
+    I32 GetMaximum() const
+    {
+        return maximum;
+    }
 
     /**
      * Returns the value of the repeatTimeout attribute
      */
-    U16 GetRepeatTimeout() const;
+    U16 GetRepeatTimeout() const
+    {
+        return repeatTimeout;
+    }
+
 };
-
-P_STATIC_ASSERT((sizeof(DynamicDataEntryType)) == 20, "DynamicDataEntryType size")
-
-
-inline U16 DynamicDataEntryType::GetDataId() const
-{
-    return dataId;
-}
-
-inline DynamicDataTypeEnumeration DynamicDataEntryType::GetDataType() const
-{
-    return static_cast<DynamicDataTypeEnumeration>(dataType);
-}
-
-inline bool DynamicDataEntryType::IsMinimumSet() const
-{
-    return minimumSet != 0U;
-}
-
-inline I32 DynamicDataEntryType::GetMinimum() const
-{
-    return minimum;
-}
-
-inline bool DynamicDataEntryType::IsMaximumSet() const
-{
-    return maximumSet != 0U;
-}
-
-inline I32 DynamicDataEntryType::GetMaximum() const
-{
-    return maximum;
-}
-
-inline U16 DynamicDataEntryType::GetRepeatTimeout() const
-{
-    return repeatTimeout;
-}
 
 } // namespace lsr
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(pop)
-#endif
-
-#endif  // #ifndef _DYNAMICDATAENTRYTYPE_H_
+#endif // #ifndef _LSR_DYNAMICDATAENTRYTYPE_H_

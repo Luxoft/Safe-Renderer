@@ -57,20 +57,44 @@ static void checkPreconditions(const GIL_SW_Surface* surf, const uint8_t bpp)
 // --> A Glue piece which combines windowing system with renderer
 // --> Windows implementation which get Windows and memory pointer in RAM
 
+// TODO: should return bits per pixel
 uint8_t gil_helper_getbpp(GILFormat format)
 {
-    // check that format is supported
-    uint8_t bpp = 0u;
-    if (format < GIL_FORMAT_1_BPP)
-        bpp = 1u;
-    else if (format < GIL_FORMAT_2_BPP)
-        bpp = 2u;
-    else if (format < GIL_FORMAT_3_BPP)
-        bpp = 3u;
-    else if (format < GIL_FORMAT_4_BPP)
-        bpp = 4u;
-
-    return bpp;
+    switch (format)
+    {
+    case GIL_FORMAT_P_2_ARGB_8888:
+    case GIL_FORMAT_P_2_BGRA_8888:
+    case GIL_FORMAT_P_2_RGBA_8888:
+    case GIL_FORMAT_P_2_RGB_888:
+    case GIL_FORMAT_P_2_RGB_565:
+        return 1; // TODO:
+    case GIL_FORMAT_P_4_ARGB_8888:
+    case GIL_FORMAT_P_4_BGRA_8888:
+    case GIL_FORMAT_P_4_RGBA_8888:
+    case GIL_FORMAT_P_4_RGB_888:
+    case GIL_FORMAT_P_4_RGB_565:
+        return 1; // TODO:
+    case GIL_FORMAT_P_8_ARGB_8888:
+    case GIL_FORMAT_P_8_BGRA_8888:
+    case GIL_FORMAT_P_8_RGBA_8888:
+    case GIL_FORMAT_P_8_RGB_888:
+    case GIL_FORMAT_P_8_RGB_565:
+    case GIL_FORMAT_A_8:
+        return 1;
+    case GIL_FORMAT_RGB_565:
+    case GIL_FORMAT_BGR_565:
+        return 2;
+    case GIL_FORMAT_RGB_888:
+    case GIL_FORMAT_BGR_888:
+        return 3;
+    case GIL_FORMAT_ARGB_8888:
+    case GIL_FORMAT_BGRA_8888:
+    case GIL_FORMAT_RGBA_8888:
+    case GIL_FORMAT_INVALID:
+        break;
+        //no default clause to cause compiler warning if new format is added
+    }
+    return 4;
 }
 
 void gil_helper_set_8_color(GIL_SW_Pointer dest, const GIL_SW_Color* color, GILFormat format)

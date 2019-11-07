@@ -31,14 +31,13 @@
 
 #include <DDHType.h>
 #include <PanelType.h>
-#include <FieldsType.h>
 
 #include <new>
 
 namespace lsr
 {
 
-Panel::Panel(const PanelType* pDdh)
+Panel::Panel(const PanelType* const pDdh)
     : Widget()
     , m_pDdh(pDdh)
 {
@@ -46,26 +45,22 @@ Panel::Panel(const PanelType* pDdh)
 
 bool Panel::setup(WidgetPool& widgetPool,
                   const Database& db,
-                  DataContext* pContext,
+                  DataContext* const pContext,
                   LSRErrorCollector& error)
 {
     bool success = setArea(m_pDdh->GetArea()) && setupVisibilityExpr(pContext);
 
     if (success)
     {
-        const FieldsType* pFields = m_pDdh->GetFields();
-        if (NULL != pFields)
+        const U16 numFields = m_pDdh->GetFieldCount();
+        for (U16 i = 0U; i < numFields; ++i)
         {
-            const U16 numFields = pFields->GetFieldCount();
-            for (U16 i = 0U; i < numFields; ++i)
+            const BaseFieldChoiceType* pFieldType = m_pDdh->GetField(i);
+            Field* const pField = Field::create(widgetPool, db, pFieldType, pContext, error);
+            if ((NULL == pField) || (!addChild(pField)))
             {
-                const FieldType* pFieldType = pFields->GetField(i);
-                Field* pField = Field::create(widgetPool, db, pFieldType, pContext, error);
-                if (NULL == pField || !addChild(pField))
-                {
-                    success = false;
-                    break;
-                }
+                success = false;
+                break;
             }
         }
     }
@@ -79,15 +74,15 @@ bool Panel::setup(WidgetPool& widgetPool,
 
 Panel* Panel::create(WidgetPool& widgetPool,
                      const Database& db,
-                     const PanelType* pDdhPanel,
-                     DataContext* pContext,
+                     const PanelType* const pDdhPanel,
+                     DataContext* const pContext,
                      LSRErrorCollector& error)
 {
 
     ASSERT(NULL != pDdhPanel);
 
     LSRError tmpError = LSR_NO_ERROR;
-    void* pRawMemory = widgetPool.panelPool().allocate(tmpError);
+    void* const pRawMemory = widgetPool.panelPool().allocate(tmpError);
     error = tmpError;
 
     Panel* pPanel = new(pRawMemory)Panel(pDdhPanel);
@@ -104,10 +99,10 @@ Panel* Panel::create(WidgetPool& widgetPool,
     return pPanel;
 }
 
-bool Panel::setupVisibilityExpr(DataContext* pContext)
+bool Panel::setupVisibilityExpr(DataContext* const pContext)
 {
     bool res = false;
-    const ExpressionTermType* pType = m_pDdh->GetVisible();
+    const ExpressionTermType* const pType = m_pDdh->GetVisible();
     if (NULL != pType)
     {
         m_visibilityExpr.setup(pType, pContext);
@@ -117,8 +112,10 @@ bool Panel::setupVisibilityExpr(DataContext* pContext)
     return res;
 }
 
-void Panel::onUpdate(const U32 /* monotonicTimeMs */)
-{}
+void Panel::onUpdate(const U32 monotonicTimeMs)
+{
+    static_cast<void>(monotonicTimeMs);  // ignore unused variable
+}
 
 void Panel::onDraw(Canvas& /* canvas */, const Area& /* area */)
 {}

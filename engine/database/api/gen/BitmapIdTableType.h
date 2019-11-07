@@ -1,5 +1,5 @@
-#ifndef _BITMAPIDTABLETYPE_H_
-#define _BITMAPIDTABLETYPE_H_
+#ifndef _LSR_BITMAPIDTABLETYPE_H_
+#define _LSR_BITMAPIDTABLETYPE_H_
 
 /******************************************************************************
 **
@@ -8,9 +8,9 @@
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
-**   This file is part of Safe Renderer.
+**   This file is part of Luxoft Safe Renderer.
 **
-**   Safe Renderer is free software: you can redistribute it and/or
+**   Luxoft Safe Renderer is free software: you can redistribute it and/or
 **   modify it under the terms of the GNU Lesser General Public
 **   License as published by the Free Software Foundation.
 **
@@ -28,70 +28,37 @@
 ******************************************************************************/
 
 #include "ddh_defs.h"
-#include "LsrTypes.h"  // for P_STATIC_ASSERT
-
 
 namespace lsr
 {
 struct EnumerationBitmapMapType;
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(push)
-#pragma pack(1)
-#endif
-
 struct BitmapIdTableType
 {
-public:
-    //----------------------------------------------------------------
-    /**
-     * This is the ROM structure for the BitmapIdTableType.
-     * Each element of this type has this exact image in ROM memory.
-     */
-    U16 itemCount :16;
-    U16 itemOffset :16;
-    //----------------------------------------------------------------
+    const EnumerationBitmapMapType* const *item;
+    const U16 itemCount;
 
-public:
 
     /**
-     * Returns the number of item child elements.
+     * Returns the number of item elements.
      */
-    U16 GetItemCount() const;
-
-    /**
-     * Returns a pointer to the item child reference at index item.
-     * This method checks the index and returns null if there are no
-     * EnumerationBitmapMapType elements or the 'item' index exceeds the
-     * element count.
-     */
-    const EnumerationBitmapMapType* GetItem(const U16 item) const;
-};
-
-P_STATIC_ASSERT((sizeof(BitmapIdTableType)) == 4, "BitmapIdTableType size")
-
-
-inline U16 BitmapIdTableType::GetItemCount() const
-{
-    return itemCount;
-}
-
-inline const EnumerationBitmapMapType* BitmapIdTableType::GetItem(const U16 item) const
-{
-    const EnumerationBitmapMapType* pResult = NULL;
-    if (item < GetItemCount())
+    U16 GetItemCount() const
     {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        const U16* childRefROMPtr = reinterpret_cast<const U16*>(pThis + itemOffset);
-        pResult = reinterpret_cast<const EnumerationBitmapMapType*>(pThis + childRefROMPtr[item] * 4);
+        return itemCount;
     }
-    return pResult;
-}
+
+    /**
+     * Returns a pointer to the item child reference at index i.
+     * This method checks the index and returns NULL if the item index exceeds the element count.
+     *
+     */
+    const EnumerationBitmapMapType* GetItem(const U16 i) const
+    {
+        return (i < itemCount) ? item[i] : NULL;
+    }
+
+};
 
 } // namespace lsr
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(pop)
-#endif
-
-#endif  // #ifndef _BITMAPIDTABLETYPE_H_
+#endif // #ifndef _LSR_BITMAPIDTABLETYPE_H_

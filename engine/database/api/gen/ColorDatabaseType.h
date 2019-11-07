@@ -1,5 +1,5 @@
-#ifndef _COLORDATABASETYPE_H_
-#define _COLORDATABASETYPE_H_
+#ifndef _LSR_COLORDATABASETYPE_H_
+#define _LSR_COLORDATABASETYPE_H_
 
 /******************************************************************************
 **
@@ -8,9 +8,9 @@
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
-**   This file is part of Safe Renderer.
+**   This file is part of Luxoft Safe Renderer.
 **
-**   Safe Renderer is free software: you can redistribute it and/or
+**   Luxoft Safe Renderer is free software: you can redistribute it and/or
 **   modify it under the terms of the GNU Lesser General Public
 **   License as published by the Free Software Foundation.
 **
@@ -28,37 +28,16 @@
 ******************************************************************************/
 
 #include "ddh_defs.h"
-#include "LsrTypes.h"  // for P_STATIC_ASSERT
-
 
 namespace lsr
 {
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(push)
-#pragma pack(1)
-#endif
-
 struct ColorDatabaseType
 {
-public:
-    //----------------------------------------------------------------
-    /**
-     * This is the ROM structure for the ColorDatabaseType.
-     * Each element of this type has this exact image in ROM memory.
-     */
-    //----------------------------------------------------------------
 
-public:
+
 };
-
-P_STATIC_ASSERT((sizeof(ColorDatabaseType)) == 0, "ColorDatabaseType size")
-
 
 } // namespace lsr
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(pop)
-#endif
-
-#endif  // #ifndef _COLORDATABASETYPE_H_
+#endif // #ifndef _LSR_COLORDATABASETYPE_H_

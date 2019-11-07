@@ -30,6 +30,7 @@
 #include <Expression.h>
 
 #include <gtest/gtest.h>
+using namespace lsr;
 
 class ExpressionFallbackTest : public ExpressionTestFixture
 {
@@ -41,26 +42,15 @@ protected:
 
 TEST_F(ExpressionFallbackTest, FallbackReturnValidValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK, 2U);
+    ExpressionTermType t1 = {ExpressionTermType::INTEGER_CHOICE, 10U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK, parameters, 2 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
-    ExpressionTermTypeFactory term1;
-    term1.createIntegerExprTerm(10U);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    const lsr::Number expectedValue(10U, lsr::DATATYPE_INTEGER);
-    lsr::Number actualValue;
-    lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+    const Number expectedValue(10U, DATATYPE_INTEGER);
+    Number actualValue;
+    DataStatus actualStatus = Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -68,29 +58,19 @@ TEST_F(ExpressionFallbackTest, FallbackReturnValidValueTest)
 
 TEST_F(ExpressionFallbackTest, FallbackReturnInValidValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK, 2U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    const ExpressionTermType t1 = {ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData};
+    const ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK, parameters, 2 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     m_dataHandler.setInvalidNumber(lsr::Number(10U, lsr::DATATYPE_INTEGER));
-
-    lsr::DynamicDataType type;
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
 
     const lsr::Number expectedValue(5U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -98,29 +78,19 @@ TEST_F(ExpressionFallbackTest, FallbackReturnInValidValueTest)
 
 TEST_F(ExpressionFallbackTest, FallbackReturnOtherCasesValueTest1)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK, 2U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    const ExpressionTermType t1 = {ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData};
+    const ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK, parameters, 2 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     m_dataHandler.setOutDatedNumber(lsr::Number(10U, lsr::DATATYPE_INTEGER));
-
-    lsr::DynamicDataType type;
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
 
     const lsr::Number expectedValue(5U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -128,26 +98,16 @@ TEST_F(ExpressionFallbackTest, FallbackReturnOtherCasesValueTest1)
 
 TEST_F(ExpressionFallbackTest, FallbackReturnOtherCasesValueTest2)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK, 2U);
-
-    ExpressionTermTypeFactory term1;
-    term1.createWrongExprTerm(7U);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    ExpressionTermType t1 = {ExpressionTermType::NONE, 7U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK, parameters, 2 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     const lsr::Number expectedValue(5U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -156,30 +116,17 @@ TEST_F(ExpressionFallbackTest, FallbackReturnOtherCasesValueTest2)
 
 TEST_F(ExpressionFallbackTest, Fallback2ReturnValidValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK2, 3U);
-
-    ExpressionTermTypeFactory term1;
-    term1.createIntegerExprTerm(10U);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(7U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    ExpressionTermType t1 = {ExpressionTermType::INTEGER_CHOICE, 10U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    ExpressionTermType t3 = {ExpressionTermType::INTEGER_CHOICE, 7U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK2, parameters, 3 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     const lsr::Number expectedValue(10U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -187,33 +134,20 @@ TEST_F(ExpressionFallbackTest, Fallback2ReturnValidValueTest)
 
 TEST_F(ExpressionFallbackTest, Fallback2ReturnInValidValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK2, 3U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    const ExpressionTermType t1 = {ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData};
+    const ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    const ExpressionTermType t3 = {ExpressionTermType::INTEGER_CHOICE, 7U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK2, parameters, 3 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     m_dataHandler.setInvalidNumber(lsr::Number(10U, lsr::DATATYPE_INTEGER));
-
-    lsr::DynamicDataType type;
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(7U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
 
     const lsr::Number expectedValue(5U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -221,33 +155,20 @@ TEST_F(ExpressionFallbackTest, Fallback2ReturnInValidValueTest)
 
 TEST_F(ExpressionFallbackTest, Fallback2ReturnNotAvailableValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK2, 3U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    const ExpressionTermType t1 = {ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData};
+    const ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    const ExpressionTermType t3 = {ExpressionTermType::INTEGER_CHOICE, 7U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK2, parameters, 3 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     m_dataHandler.setOutDatedNumber(lsr::Number(10U, lsr::DATATYPE_INTEGER));
-
-    lsr::DynamicDataType type;
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(7U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
 
     const lsr::Number expectedValue(7U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -255,30 +176,17 @@ TEST_F(ExpressionFallbackTest, Fallback2ReturnNotAvailableValueTest)
 
 TEST_F(ExpressionFallbackTest, Fallback2ReturnOtherCasesValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK2, 3U);
-
-    ExpressionTermTypeFactory term1;
-    term1.createWrongExprTerm(3U);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(7U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    ExpressionTermType t1 = {ExpressionTermType::NONE, 3U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    ExpressionTermType t3 = {ExpressionTermType::INTEGER_CHOICE, 7U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK2, parameters, 3 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     const lsr::Number expectedValue(7U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -286,34 +194,18 @@ TEST_F(ExpressionFallbackTest, Fallback2ReturnOtherCasesValueTest)
 
 TEST_F(ExpressionFallbackTest, Fallback3ReturnValidValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK3, 4U);
-
-    ExpressionTermTypeFactory term1;
-    term1.createIntegerExprTerm(10U);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(7U);
-
-    ExpressionTermTypeFactory term4;
-    term4.createIntegerExprTerm(9U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-    exprFactory.addExprTerm(term4.getDdh(), term4.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    ExpressionTermType t1 = {ExpressionTermType::INTEGER_CHOICE, 10U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    ExpressionTermType t3 = {ExpressionTermType::INTEGER_CHOICE, 7U, NULL};
+    ExpressionTermType t4 = {ExpressionTermType::INTEGER_CHOICE, 9U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3, &t4 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK3, parameters, 4 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     const lsr::Number expectedValue(10U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -321,37 +213,21 @@ TEST_F(ExpressionFallbackTest, Fallback3ReturnValidValueTest)
 
 TEST_F(ExpressionFallbackTest, Fallback3ReturnInValidValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK3, 4U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    const ExpressionTermType t1 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    const ExpressionTermType t2 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    const ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 7U, NULL };
+    const ExpressionTermType t4 = { ExpressionTermType::INTEGER_CHOICE, 9U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3, &t4 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK3, parameters, 4 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     m_dataHandler.setInvalidNumber(lsr::Number(10U, lsr::DATATYPE_INTEGER));
-
-    lsr::DynamicDataType type;
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(7U);
-
-    ExpressionTermTypeFactory term4;
-    term4.createIntegerExprTerm(7U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-    exprFactory.addExprTerm(term4.getDdh(), term4.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
 
     const lsr::Number expectedValue(5U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -359,37 +235,21 @@ TEST_F(ExpressionFallbackTest, Fallback3ReturnInValidValueTest)
 
 TEST_F(ExpressionFallbackTest, Fallback3ReturnNotAvailableValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK3, 4U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    const ExpressionTermType t1 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    const ExpressionTermType t2 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    const ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 7U, NULL };
+    const ExpressionTermType t4 = { ExpressionTermType::INTEGER_CHOICE, 9U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3, &t4 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK3, parameters, 4 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     m_dataHandler.setOutDatedNumber(lsr::Number(10U, lsr::DATATYPE_INTEGER));
-
-    lsr::DynamicDataType type;
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(7U);
-
-    ExpressionTermTypeFactory term4;
-    term4.createIntegerExprTerm(9U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-    exprFactory.addExprTerm(term4.getDdh(), term4.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
 
     const lsr::Number expectedValue(7U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -397,34 +257,18 @@ TEST_F(ExpressionFallbackTest, Fallback3ReturnNotAvailableValueTest)
 
 TEST_F(ExpressionFallbackTest, Fallback3ReturnInconsistentValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_FALLBACK3, 4U);
-
-    ExpressionTermTypeFactory term1;
-    term1.createWrongExprTerm(3U);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(7U);
-
-    ExpressionTermTypeFactory term4;
-    term4.createIntegerExprTerm(9U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-    exprFactory.addExprTerm(term4.getDdh(), term4.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    ExpressionTermType t1 = { ExpressionTermType::NONE, 3U, NULL };
+    ExpressionTermType t2 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 7U, NULL };
+    ExpressionTermType t4 = { ExpressionTermType::INTEGER_CHOICE, 9U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3, &t4 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_FALLBACK3, parameters, 4 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     const lsr::Number expectedValue(9U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);

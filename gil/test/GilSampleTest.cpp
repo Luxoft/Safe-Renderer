@@ -72,7 +72,7 @@ TEST(gilSample, drawBitmap)
     gilDrawArea(context, 10<<4, 20<<4, 400<<4, 240<<4);
     GILTexture texture = gilCreateTexture(context);
     gilBindTexture(context, texture);
-    EXPECT_EQ(GIL_TRUE, gilLoadTexture(texture, 41, 15, GIL_FORMAT_BGRA_8888, GIL_FALSE, image_data_0026indicator_oil));
+    EXPECT_EQ(GIL_TRUE, gilTexPixels(texture, 41, 15, GIL_FORMAT_BGRA_8888, image_data_0026indicator_oil));
     int x1 = 20;
     int x2 = x1 + 41 -1;
     int y1 = 30;

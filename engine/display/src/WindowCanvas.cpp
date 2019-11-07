@@ -32,19 +32,24 @@ namespace lsr
 {
 
 WindowCanvas::WindowCanvas(DisplayManager& dsp, const WindowDefinition& config)
-: Canvas(dsp, config.width, config.height)
+: Canvas(dsp, static_cast<U16>(config.width), static_cast<U16>(config.height))
 {
     m_surface = gilCreateWindow(config.id, config.xPos, config.yPos, config.width, config.height);
 }
 
 void WindowCanvas::makeCurrent()
 {
-    gilSetSurface(getDisplayManager().getContext(), m_surface);
+    static_cast<void>(gilSetSurface(getDisplayManager().getContext(), m_surface));  // ignore return value
 }
 
 void WindowCanvas::swapBuffers()
 {
-    gilSwapBuffers(m_surface);
+    static_cast<void>(gilSwapBuffers(m_surface));  // ignore return value
+}
+
+void WindowCanvas::sync()
+{
+    gilSync(getDisplayManager().getContext());
 }
 
 bool WindowCanvas::handleWindowEvents()
@@ -52,4 +57,4 @@ bool WindowCanvas::handleWindowEvents()
     return (gilHandleWindowEvents(getDisplayManager().getContext()) == GIL_TRUE);
 }
 
-}
+} // namespace lsr

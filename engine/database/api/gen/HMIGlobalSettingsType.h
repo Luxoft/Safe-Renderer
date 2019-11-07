@@ -1,5 +1,5 @@
-#ifndef _HMIGLOBALSETTINGSTYPE_H_
-#define _HMIGLOBALSETTINGSTYPE_H_
+#ifndef _LSR_HMIGLOBALSETTINGSTYPE_H_
+#define _LSR_HMIGLOBALSETTINGSTYPE_H_
 
 /******************************************************************************
 **
@@ -8,9 +8,9 @@
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
-**   This file is part of Safe Renderer.
+**   This file is part of Luxoft Safe Renderer.
 **
-**   Safe Renderer is free software: you can redistribute it and/or
+**   Luxoft Safe Renderer is free software: you can redistribute it and/or
 **   modify it under the terms of the GNU Lesser General Public
 **   License as published by the Free Software Foundation.
 **
@@ -28,76 +28,38 @@
 ******************************************************************************/
 
 #include "ddh_defs.h"
-#include "LsrTypes.h"  // for P_STATIC_ASSERT
-
 
 namespace lsr
 {
 struct DisplaySizeType;
 struct ColorSetType;
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(push)
-#pragma pack(1)
-#endif
-
 struct HMIGlobalSettingsType
 {
-public:
-    //----------------------------------------------------------------
-    /**
-     * This is the ROM structure for the HMIGlobalSettingsType.
-     * Each element of this type has this exact image in ROM memory.
-     */
-    U16 displaySizeOffset :16;
-    U16 colorSetOffset :16;
-    //----------------------------------------------------------------
+    const DisplaySizeType* const displaySize;
+    const ColorSetType* const colorSet;
 
-public:
 
     /**
      * Returns a pointer to the displaySize child reference.
      * The size of the display in pixels
      */
-    const DisplaySizeType* GetDisplaySize() const;
+    const DisplaySizeType* GetDisplaySize() const
+    {
+        return displaySize;
+    }
 
     /**
      * Returns a pointer to the colorSet child reference.
-     * Defines which colors shall be used for backgrounds, field types, specific
-     * fields, etc.
+     * Defines which colors shall be used for backgrounds, field types, specific fields, etc.
      */
-    const ColorSetType* GetColorSet() const;
+    const ColorSetType* GetColorSet() const
+    {
+        return colorSet;
+    }
+
 };
-
-P_STATIC_ASSERT((sizeof(HMIGlobalSettingsType)) == 4, "HMIGlobalSettingsType size")
-
-
-inline const DisplaySizeType* HMIGlobalSettingsType::GetDisplaySize() const
-{
-    const DisplaySizeType* pResult = NULL;
-    if (displaySizeOffset != 0U)
-    {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const DisplaySizeType*>(pThis + displaySizeOffset * 4);
-    }
-    return pResult;
-}
-
-inline const ColorSetType* HMIGlobalSettingsType::GetColorSet() const
-{
-    const ColorSetType* pResult = NULL;
-    if (colorSetOffset != 0U)
-    {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const ColorSetType*>(pThis + colorSetOffset * 4);
-    }
-    return pResult;
-}
 
 } // namespace lsr
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(pop)
-#endif
-
-#endif  // #ifndef _HMIGLOBALSETTINGSTYPE_H_
+#endif // #ifndef _LSR_HMIGLOBALSETTINGSTYPE_H_

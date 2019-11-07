@@ -44,8 +44,7 @@ ODIComSession::ODIComSession(IODIComSessionMutexDelegate* pODIComSessionMutexDel
     m_fdMax(0),
     m_pODIComSessionMutexDelegate(pODIComSessionMutexDelegate),
     m_debugSocket(static_cast<Socket>(-1)),
-    m_timeout(0u),
-    m_pODIRecorder(0)
+    m_timeout(0u)
 {
     FD_ZERO(&m_fdConnectedSet);     // Clear the master set
     FD_ZERO(&m_fdWaitConnectSet);   // Clear the master set
@@ -54,7 +53,6 @@ ODIComSession::ODIComSession(IODIComSessionMutexDelegate* pODIComSessionMutexDel
 ODIComSession::~ODIComSession()
 {
     Reset();
-    //delete m_pODIRecorder;
 }
 
 void ODIComSession::Reset()
@@ -77,20 +75,6 @@ void ODIComSession::Reset()
     m_connectionsDisconnectedList.clear();
 
     m_debugSocket = static_cast<Socket>(-1);
-}
-
-bool ODIComSession::SetODIRecorder(ODIRecorder* pRecorder)
-{
-    if (0 == m_pODIRecorder)
-    {
-        m_pODIRecorder = pRecorder;
-        return true;
-    }
-    else
-    {
-        LOG_ERR(("ODIComSession::SetODIRecorder tried to replace existing ODIRecorder"));
-        return false;
-    }
 }
 
 LSRError ODIComSession::handleIncomingData(U32 msTimeout)
@@ -339,7 +323,7 @@ void ODIComSession::unregisterAllMsgReceivers()
 
 bool ODIComSession::Listen(const std::string& hostname, U16 portNo)
 {
-    MsgTransceiverTCP* pMsgTransceiverTCP = new MsgTransceiverTCP(0, m_pODIRecorder);
+    MsgTransceiverTCP* pMsgTransceiverTCP = new MsgTransceiverTCP(0U);
     pMsgTransceiverTCP->SetMsgTransceiverTCPObserver(this);
 
     if (pMsgTransceiverTCP->Listen(hostname, portNo))
@@ -374,7 +358,7 @@ bool ODIComSession::Listen(const std::string& hostname, U16 portNo)
 
 MsgTransceiverTCP* ODIComSession::Connect(const std::string& hostname, U16 portNo)
 {
-    MsgTransceiverTCP* pMsgTransceiverTCP = new MsgTransceiverTCP(0, m_pODIRecorder);
+    MsgTransceiverTCP* pMsgTransceiverTCP = new MsgTransceiverTCP(0U);
     pMsgTransceiverTCP->SetMsgTransceiverTCPObserver(this);
 
     if ( pMsgTransceiverTCP->Connect(hostname, portNo) )

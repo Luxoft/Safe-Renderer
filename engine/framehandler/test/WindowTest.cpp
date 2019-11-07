@@ -30,13 +30,17 @@
 #include <WindowDefinition.h>
 
 #include <LSRErrorCollector.h>
+#include <Telltales.hpp>
 
 #include <gtest/gtest.h>
+
+using namespace lsr;
 
 class WindowTest: public WidgetTestBase
 {
 protected:
     WindowTest()
+        : m_db(Telltales::getDDH())
     {}
 
     lsr::Window* createWindow()
@@ -45,7 +49,7 @@ protected:
 
         lsr::LSRErrorCollector error(LSR_NO_ERROR);
         lsr::Window* window = lsr::Window::create(m_widgetPool,
-                                                  *m_pDb,
+                                                  m_db,
                                                   m_dsp,
                                                   winDef,
                                                   &m_context,
@@ -54,33 +58,50 @@ protected:
 
         return window;
     }
+
+    lsr::Database m_db;
 };
 
 TEST_F(WindowTest, CreateWindowTest)
 {
-    initNormalDb();
-
     lsr::Window* window = createWindow();
-
     EXPECT_TRUE(NULL != window);
 }
 
 TEST_F(WindowTest, CreateWindowWithWrongPanelsTest)
 {
-    lsr::AreaType area;
-    lsr::DisplaySizeType displaySize;
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
+    PanelId panelIds[] = { 1U };
+    PageType page = { panelIds, 1, NULL, NULL };
+    PageType* pages[] = { &page };
+    PageDatabaseType pageDB = { pages, 1 };
 
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.createWithoutVisibility(area, true, 2U);
+    AreaType area = { 0U, 0U, 0U, 0U };
+    PanelType p1 = {&area, NULL, NULL, 0U}; // broken panel (without visibility set)
+    PanelType* panels1[] = { &p1 };
+    PanelDatabaseType panelDB1 = {panels1, 1};
 
-    initDb(pageBuilder, panelBuilder, displaySize);
+    DisplaySizeType displaySize = { 0U, 0U };
+    HMIGlobalSettingsType globalSettings = { &displaySize, NULL };
+
+    const DDHType ddh = {
+        0U,
+        DDHType::SCHEMA_CHECKSUM,
+        DDHType::SCHEMA_VERSION,
+        DDHType::SERIALIZER_VERSION,
+        &pageDB,
+        &panelDB1,
+        &globalSettings,
+        NULL,
+        NULL,
+        NULL,
+        0U
+    };
+    Database db(&ddh);
 
     lsr::LSRErrorCollector error(LSR_NO_ERROR);
     lsr::WindowDefinition winDef;
     lsr::Window* window = lsr::Window::create(m_widgetPool,
-                                              *m_pDb,
+                                              db,
                                               m_dsp,
                                               winDef,
                                               &m_context,
@@ -94,17 +115,6 @@ TEST_F(WindowTest, CreateWindowWithWrongPanelsTest)
 
 TEST_F(WindowTest, VerifyTest)
 {
-    lsr::AreaType areaType;
-
-    lsr::DisplaySizeType displaySize;
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
-
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.createWithRefBitmaps(areaType, true, 2U);
-
-    initDb(pageBuilder, panelBuilder, displaySize);
-
     lsr::Window* window = createWindow();
 
     EXPECT_TRUE(NULL != window);
@@ -118,8 +128,6 @@ TEST_F(WindowTest, VerifyTest)
 
 TEST_F(WindowTest, DrawTest)
 {
-    initNormalDb();
-
     lsr::Window* window = createWindow();
 
     EXPECT_TRUE(NULL != window);
@@ -135,8 +143,6 @@ TEST_F(WindowTest, DrawTest)
 
 TEST_F(WindowTest, RenderTest)
 {
-    initNormalDb();
-
     lsr::Window* window = createWindow();
 
     EXPECT_TRUE(NULL != window);
@@ -152,8 +158,6 @@ TEST_F(WindowTest, RenderTest)
 
 TEST_F(WindowTest, RenderWithNotInvalidatedStateTest)
 {
-    initNormalDb();
-
     lsr::Window* window = createWindow();
 
     EXPECT_TRUE(NULL != window);
@@ -174,8 +178,6 @@ TEST_F(WindowTest, RenderWithNotInvalidatedStateTest)
 // test to fulfill coverage
 TEST_F(WindowTest, HandleWindowEventsTest)
 {
-    initNormalDb();
-
     lsr::Window* window = createWindow();
 
     EXPECT_TRUE(NULL != window);

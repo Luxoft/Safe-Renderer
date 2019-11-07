@@ -95,7 +95,7 @@ public:
      * @return @c LSR_NO_ERROR if deallocation was successful, and other values of
      *         @c LSRError in other cases.
      */
-    LSRError deallocate(void* ptr);
+    LSRError deallocate(void* const ptr);
 
     /**
      * Method checks if @c ptr is a pointer to a valid object inside internal storage.
@@ -168,23 +168,25 @@ private:
 };
 
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
-Pool<T, PoolSize, AlignValue>::Pool()
+inline Pool<T, PoolSize, AlignValue>::Pool()
     : m_pFreeList(NULL)
     , m_markerFree(MARKER_FREE_CHAR)
     , m_markerBusy(MARKER_BUSY_CHAR)
 {
+    static const std::size_t lastIndex = (PoolSize - 1U);
+
     m_pFreeList = reinterpret_cast<Node*>(m_storage);
-    for (std::size_t i = 0U; i < (PoolSize-1U); ++i)
+    for (std::size_t i = 0U; i < lastIndex; ++i)
     {
         m_pFreeList[i].body.next = &m_pFreeList[i+1U];
         m_pFreeList[i].marker = m_markerFree;
     }
-    m_pFreeList[PoolSize-1U].body.next = NULL;
-    m_pFreeList[PoolSize-1U].marker = m_markerFree;
+    m_pFreeList[lastIndex].body.next = NULL;
+    m_pFreeList[lastIndex].marker = m_markerFree;
 }
 
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
-void* Pool<T, PoolSize, AlignValue>::allocate(LSRError& error)
+inline void* Pool<T, PoolSize, AlignValue>::allocate(LSRError& error)
 {
     void* pData = NULL;
     if (checkPool())
@@ -209,19 +211,19 @@ void* Pool<T, PoolSize, AlignValue>::allocate(LSRError& error)
 }
 
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
-LSRError Pool<T, PoolSize, AlignValue>::deallocate(void* ptr)
+inline LSRError Pool<T, PoolSize, AlignValue>::deallocate(void* const ptr)
 {
     LSRError res = LSR_NO_ERROR;
     if (checkPool())
     {
         // Check if ptr points inside the storage and to the beginning of the Node.
-        if (ptr != NULL && isAllocated(ptr))
+        if ((ptr != NULL) && isAllocated(ptr))
         {
             // Check if this is not double deallocation
             if (!checkObjectIsFree(ptr))
             {
-                Node* pNode = static_cast<Node*>(ptr);
-                memset(pNode->body.data, 0U, sizeof(T));
+                Node* const pNode = static_cast<Node*>(ptr);
+                static_cast<void>(std::memset(pNode->body.data, 0, sizeof(T)));  // ignore return value
                 pNode->body.next = m_pFreeList;
                 pNode->marker = m_markerFree;
                 m_pFreeList = pNode;
@@ -244,19 +246,19 @@ LSRError Pool<T, PoolSize, AlignValue>::deallocate(void* ptr)
 }
 
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
-bool Pool<T, PoolSize, AlignValue>::checkPool() const
+inline bool Pool<T, PoolSize, AlignValue>::checkPool() const
 {
-    bool res = checkStandardMarkers();
-    res &= checkStorage();
-    if (NULL != m_pFreeList)
+    bool res = checkStandardMarkers()
+            && checkStorage();
+    if ((NULL != m_pFreeList) && res)
     {
-        res &= checkFreeList();
+        res = checkFreeList();
     }
     return res;
 }
 
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
-bool Pool<T, PoolSize, AlignValue>::isAllocated(const void* const ptr) const
+inline bool Pool<T, PoolSize, AlignValue>::isAllocated(const void* const ptr) const
 {
     return checkObjectIsInsideStorage(ptr) && checkBeginningOfObject(ptr) && checkMarker(ptr);
 }
@@ -264,23 +266,23 @@ bool Pool<T, PoolSize, AlignValue>::isAllocated(const void* const ptr) const
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
 inline bool Pool<T, PoolSize, AlignValue>::checkObjectIsInsideStorage(const void* const ptr) const
 {
-    const U8* tmpPtr = reinterpret_cast<const U8*>(ptr);
+    const U8* const tmpPtr = reinterpret_cast<const U8* const>(ptr);
     return (tmpPtr >= m_storage) && (tmpPtr < (m_storage + sizeof(m_storage)));
 }
 
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
 inline bool Pool<T, PoolSize, AlignValue>::checkBeginningOfObject(const void* const ptr) const
 {
-    const U8* tmpPtr = reinterpret_cast<const U8*>(ptr);
-    std::size_t length = tmpPtr - m_storage;
+    const U8* const tmpPtr = reinterpret_cast<const U8* const>(ptr);
+    const std::size_t length = tmpPtr - m_storage;
 
-    return ((length == 0U) || ((length >= sizeof(Node)) && (length % sizeof(Node) == 0U)));
+    return ((length == 0U) || ((length >= sizeof(Node)) && ((length % sizeof(Node)) == 0U)));
 }
 
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
 inline bool Pool<T, PoolSize, AlignValue>::checkMarker(const void* const ptr) const
 {
-    const Node* pNode = reinterpret_cast<const Node*>(ptr);
+    const Node* const pNode = reinterpret_cast<const Node* const>(ptr);
     return (pNode->marker == m_markerBusy) || (pNode->marker == m_markerFree);
 }
 
@@ -288,7 +290,7 @@ template<class T, std::size_t PoolSize, std::size_t AlignValue>
 inline bool Pool<T, PoolSize, AlignValue>::checkStorage() const
 {
     bool res = true;
-    for (std::size_t idx = 0; idx < sizeof(m_storage); idx += sizeof(Node))
+    for (std::size_t idx = 0U; idx < sizeof(m_storage); idx += sizeof(Node))
     {
         if (!checkMarker(&m_storage[idx]))
         {
@@ -309,7 +311,7 @@ inline bool Pool<T, PoolSize, AlignValue>::checkStandardMarkers() const
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
 inline bool Pool<T, PoolSize, AlignValue>::checkObjectIsFree(const void* const ptr) const
 {
-    const Node* pNode = static_cast<const Node*>(ptr);
+    const Node* const pNode = static_cast<const Node* const>(ptr);
     return pNode->marker == m_markerFree;
 }
 
@@ -327,11 +329,11 @@ inline bool Pool<T, PoolSize, AlignValue>::checkFreeList() const
      * For this purpose we can use @c PoolSize value and counter of checked nodes.
      */
     std::size_t nodeCounter = 0U;
-    while (NULL != ptr && res && nodeCounter <= PoolSize)
+    while ((NULL != ptr) && res && (nodeCounter <= PoolSize))
     {
-        res &= checkObjectIsInsideStorage(ptr);
-        res &= checkBeginningOfObject(ptr);
-        res &= checkObjectIsFree(ptr);
+        res = checkObjectIsInsideStorage(ptr)
+           && checkBeginningOfObject(ptr)
+           && checkObjectIsFree(ptr);
 
         const Node* pNode = static_cast<const Node*>(ptr);
         ptr = pNode->body.next;

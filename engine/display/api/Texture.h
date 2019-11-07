@@ -32,7 +32,7 @@
 
 namespace lsr
 {
-class ResourceBuffer;
+struct LsrImage;
 
 class Texture
 {
@@ -42,9 +42,9 @@ public:
     bool isLoaded() const;
 
     /**
-     * data contains an image in POI format (lsr image)
+     * img contains an image in POI format (lsr image)
      */
-    void load(GILContext ctx, const ResourceBuffer& data, const bool needsCopy);
+    void load(const GILContext ctx, const LsrImage* const img);
 
     /**
      * Bind the texture to the context
@@ -55,6 +55,16 @@ public:
     U16 getHeight() const;
 
 private:
+    /**
+     * Converts the LsrImage format to the GILFormat
+     */
+    static GILFormat convertFormat(const LsrImage* const img);
+
+    /**
+     * Returns the size (in bytes) for a single color value in the palette
+     */
+    static U8 getPaletteColorSize(const LsrImage* const img);
+
     GILTexture m_texture;
     GILFormat m_format;
     U16 m_width;

@@ -19,4 +19,17 @@ endfunction()
 GUNITTEST_APP(
     NAME EngineAppTest
     FILES EngineAppTest.cpp
+    ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
+)
+
+add_executable(
+    lsr_simu_capi_test
+    lsr_simu_capi.c
+    ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
+)
+
+target_link_libraries(lsr_simu_capi_test
+    engine
+    pilSample
+    gilSample
 )

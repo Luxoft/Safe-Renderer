@@ -52,9 +52,9 @@ To do it, run ..\titlepage_bat\ChangeLogTitlepage.bat.
             keep-with-next.within-column="always"
             font-size="&hsize6;"
             font-weight="bold"
-            space-before="2.5in"/>
+            space-before="2in"/>
 
-        <subtitle font-size="&hsize3;" space-before="0.7in" space-after="3.5in"/>
+        <subtitle font-size="&hsize3;" space-before="0.7in" space-after="2.5in"/>
 
         <pubdate text-align="left"/>
 

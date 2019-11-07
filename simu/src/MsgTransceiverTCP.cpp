@@ -58,7 +58,7 @@ static const int socketSendFlags = 0;
 static const int socketSendFlags = MSG_NOSIGNAL;
 #endif
 
-MsgTransceiverTCP::MsgTransceiverTCP(U32 dataBufferSize, ODIRecorder* pODIRecorder) :
+MsgTransceiverTCP::MsgTransceiverTCP(U32 dataBufferSize) :
     m_pMsgTransceiverTCPObserver(0),
     m_port(0),
     m_socket(static_cast<Socket>(-1)),
@@ -363,7 +363,7 @@ void MsgTransceiverTCP::HandleData(bool readStatus,bool writeStatus,bool exceptS
                     AcceptSocket=accept(m_socket,0,0);
                     if(AcceptSocket!=SOCKET_ERROR)
                     {
-                        MsgTransceiverTCP *pMsgTransceiverTCP = new MsgTransceiverTCP(0, NULL);
+                        MsgTransceiverTCP *pMsgTransceiverTCP = new MsgTransceiverTCP(0);
                         pMsgTransceiverTCP->m_port=m_port;
                         pMsgTransceiverTCP->m_pMsgTransceiverTCPObserver=m_pMsgTransceiverTCPObserver;
                         pMsgTransceiverTCP->m_socket=AcceptSocket;

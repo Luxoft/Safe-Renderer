@@ -26,42 +26,39 @@
 
 #include "WidgetTestBase.h"
 #include "WidgetPoolHelper.h"
-#include "DdhStaticBitmapFieldBuilder.h"
-#include "DdhReferenceBitmapFieldBuilder.h"
-
-#include <FieldTypeFactory.h>
 
 #include <LSRErrorCollector.h>
+#include <Telltales.hpp>
 
 #include <gtest/gtest.h>
+using namespace lsr;
 
 class FieldTest: public WidgetTestBase
 {
 protected:
     FieldTest()
         : m_helper(m_widgetPool)
+        , m_db(Telltales::getDDH())
     {}
 
     WidgetPoolHelper m_helper;
-    FieldTypeFactory m_factory;
+    lsr::Database m_db;
 };
 
 TEST_F(FieldTest, CreateBitmapFieldTest)
 {
-    m_factory.create(lsr::FieldType::STATICBITMAPFIELD_CHOICE);
-
-    framehandlertests::DdhStaticBitmapFieldBuilder bmpBuilder;
-    lsr::AreaType area;
-    bmpBuilder.create(area, true, 23U);
-
-    m_factory.addBitmap(bmpBuilder.getDdh(), bmpBuilder.getSize());
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    const StaticBitmapFieldType bmpField = { &area, &visible, &bmp };
+    const BaseFieldChoiceType fieldChoice = { BaseFieldChoiceType::STATICBITMAPFIELD_CHOICE, &bmpField };
 
     lsr::LSRErrorCollector error(LSR_NO_ERROR);
     for (U8 i = 0U; i < MAX_BITMAPS_COUNT; ++i)
     {
         lsr:: Field* field = lsr::Field::create(m_widgetPool,
-                                                *m_pDb,
-                                                m_factory.getDdh(),
+                                                m_db,
+                                                &fieldChoice,
                                                 &m_context,
                                                 error);
         EXPECT_EQ(LSR_NO_ERROR, error.get());
@@ -73,21 +70,19 @@ TEST_F(FieldTest, CreateBitmapFieldTest)
 
 TEST_F(FieldTest, CreateRefsBitmapFieldTest)
 {
-    m_factory.create(lsr::FieldType::REFERENCEBITMAPFIELD_CHOICE);
-
-    framehandlertests::DdhReferenceBitmapFieldBuilder bmpBuilder;
-    lsr::AreaType area;
     U16 errorCounter = 0U;
-    bmpBuilder.create(errorCounter, area, true, 23U);
-
-    m_factory.addBitmap(bmpBuilder.getDdh(), bmpBuilder.getSize());
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    const ReferenceBitmapFieldType bmpField = { errorCounter, &area, &visible, &bmp };
+    const BaseFieldChoiceType fieldChoice = { BaseFieldChoiceType::REFERENCEBITMAPFIELD_CHOICE, &bmpField };
 
     lsr::LSRErrorCollector error(LSR_NO_ERROR);
     for (U8 i = 0U; i < MAX_REFERENCE_BITMAPS_COUNT; ++i)
     {
         lsr:: Field* field = lsr::Field::create(m_widgetPool,
-                                                *m_pDb,
-                                                m_factory.getDdh(),
+                                                m_db,
+                                                &fieldChoice,
                                                 &m_context,
                                                 error);
         EXPECT_EQ(LSR_NO_ERROR, error.get());
@@ -99,18 +94,16 @@ TEST_F(FieldTest, CreateRefsBitmapFieldTest)
 
 TEST_F(FieldTest, CreateWrongFieldTest)
 {
-    m_factory.create(lsr::FieldType::STATICBITMAPFIELD_CHOICE + 2U);
-
-    framehandlertests::DdhStaticBitmapFieldBuilder bmpBuilder;
-    lsr::AreaType area;
-    bmpBuilder.create(area, true, 23U);
-
-    m_factory.addBitmap(bmpBuilder.getDdh(), bmpBuilder.getSize());
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    const StaticBitmapFieldType bmpField = { &area, &visible, &bmp };
+    const BaseFieldChoiceType fieldChoice = { BaseFieldChoiceType::NONE, &bmpField };
 
     lsr::LSRErrorCollector error(LSR_NO_ERROR);
     lsr:: Field* field = lsr::Field::create(m_widgetPool,
-                                            *m_pDb,
-                                            m_factory.getDdh(),
+                                            m_db,
+                                            &fieldChoice,
                                             &m_context,
                                             error);
     EXPECT_EQ(LSR_DB_INCONSISTENT, error.get());

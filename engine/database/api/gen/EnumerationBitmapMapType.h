@@ -1,5 +1,5 @@
-#ifndef _ENUMERATIONBITMAPMAPTYPE_H_
-#define _ENUMERATIONBITMAPMAPTYPE_H_
+#ifndef _LSR_ENUMERATIONBITMAPMAPTYPE_H_
+#define _LSR_ENUMERATIONBITMAPMAPTYPE_H_
 
 /******************************************************************************
 **
@@ -8,9 +8,9 @@
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
-**   This file is part of Safe Renderer.
+**   This file is part of Luxoft Safe Renderer.
 **
-**   Safe Renderer is free software: you can redistribute it and/or
+**   Luxoft Safe Renderer is free software: you can redistribute it and/or
 **   modify it under the terms of the GNU Lesser General Public
 **   License as published by the Free Software Foundation.
 **
@@ -28,66 +28,34 @@
 ******************************************************************************/
 
 #include "ddh_defs.h"
-#include "LsrTypes.h"  // for P_STATIC_ASSERT
-
 
 namespace lsr
 {
-struct EnumerationValueType;
-
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(push)
-#pragma pack(1)
-#endif
 
 struct EnumerationBitmapMapType
 {
-public:
-    //----------------------------------------------------------------
-    /**
-     * This is the ROM structure for the EnumerationBitmapMapType.
-     * Each element of this type has this exact image in ROM memory.
-     */
-    U16 bitmapId :16;
-    U16 enumerationValueOffset :16;
-    //----------------------------------------------------------------
+    const U16 key;
+    const U16 bitmapId;
 
-public:
+
+    /**
+     * Returns the value of the key attribute
+     */
+    U16 GetKey() const
+    {
+        return key;
+    }
 
     /**
      * Returns the value of the bitmapId attribute
      */
-    U16 GetBitmapId() const;
-
-    /**
-     * Returns a pointer to the enumerationValue child reference.
-     */
-    const EnumerationValueType* GetEnumerationValue() const;
-};
-
-P_STATIC_ASSERT((sizeof(EnumerationBitmapMapType)) == 4, "EnumerationBitmapMapType size")
-
-
-inline U16 EnumerationBitmapMapType::GetBitmapId() const
-{
-    return bitmapId;
-}
-
-inline const EnumerationValueType* EnumerationBitmapMapType::GetEnumerationValue() const
-{
-    const EnumerationValueType* pResult = NULL;
-    if (enumerationValueOffset != 0U)
+    U16 GetBitmapId() const
     {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const EnumerationValueType*>(pThis + enumerationValueOffset * 4);
+        return bitmapId;
     }
-    return pResult;
-}
+
+};
 
 } // namespace lsr
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(pop)
-#endif
-
-#endif  // #ifndef _ENUMERATIONBITMAPMAPTYPE_H_
+#endif // #ifndef _LSR_ENUMERATIONBITMAPMAPTYPE_H_

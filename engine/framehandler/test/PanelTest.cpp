@@ -29,21 +29,24 @@
 #include <Panel.h>
 
 #include <LSRErrorCollector.h>
+#include <Telltales.hpp>
 
 #include <gtest/gtest.h>
+using namespace lsr;
 
 class PanelTest: public WidgetTestBase
 {
 protected:
     PanelTest()
+        : m_db(Telltales::getDDH())
     {}
 
-    lsr::Panel* createPanel(framehandlertests::DdhPanelBuilder& builder)
+    lsr::Panel* createPanel(const PanelType* ddh)
     {
         lsr::LSRErrorCollector error(LSR_NO_ERROR);
         lsr::Panel* panel = lsr::Panel::create(m_widgetPool,
-                                               *m_pDb,
-                                               builder.getDdh(),
+                                               m_db,
+                                               ddh,
                                                &m_context,
                                                error);
 
@@ -52,12 +55,12 @@ protected:
         return panel;
     }
 
-    lsr::Panel* createWrongPanel(framehandlertests::DdhPanelBuilder& builder)
+    lsr::Panel* createWrongPanel(const PanelType* ddh)
     {
         lsr::LSRErrorCollector error(LSR_NO_ERROR);
         lsr::Panel* panel = lsr::Panel::create(m_widgetPool,
-                                               *m_pDb,
-                                               builder.getDdh(),
+                                               m_db,
+                                               ddh,
                                                &m_context,
                                                error);
 
@@ -66,82 +69,94 @@ protected:
         return panel;
     }
 
-    framehandlertests::DdhPanelBuilder m_builder;
+    Database m_db;
 };
 
 TEST_F(PanelTest, CreatePanelTest)
 {
-    lsr::AreaType area;
-    m_builder.create(area, true, 2U);
-
-    lsr::Panel* panel = createPanel(m_builder);
-
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    PanelType panelType = { &area, &visible, NULL, 0 };
+    lsr::Panel* panel = createPanel(&panelType);
     EXPECT_TRUE(NULL != panel);
 }
 
 TEST_F(PanelTest, CreatePanelWithoutAreaTest)
 {
-    lsr::AreaType area;
-    m_builder.createWithoutArea(area, true, 2U);
-
-    lsr::Panel* panel = createWrongPanel(m_builder);
-
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    PanelType panelType = { NULL, &visible, NULL, 0 };
+    lsr::Panel* panel = createWrongPanel(&panelType);
     EXPECT_TRUE(NULL == panel);
 }
 
 TEST_F(PanelTest, CreatePanelWithoutVisibilityTest)
 {
-    lsr::AreaType area;
-    m_builder.createWithoutVisibility(area, true, 2U);
-
-    lsr::Panel* panel = createWrongPanel(m_builder);
-
+    AreaType area = { 0U, 0U, 0U, 0U };
+    PanelType panelType = { &area, NULL, NULL, 0 };
+    lsr::Panel* panel = createWrongPanel(&panelType);
     EXPECT_TRUE(NULL == panel);
 }
 
 TEST_F(PanelTest, CreatePanelWithoutFieldsTest)
 {
-    lsr::AreaType area;
-    m_builder.createWithoutFields(area, true);
-
-    lsr::Panel* panel = createPanel(m_builder);
-
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    PanelType panelType = { &area, &visible, NULL, 0 };
+    lsr::Panel* panel = createPanel(&panelType);
     EXPECT_TRUE(NULL != panel);
 }
 
 TEST_F(PanelTest, CreatePanelWithFieldWithWrongTypeTest)
 {
-    lsr::AreaType area;
-    m_builder.createWithFieldWithWrongType(area, true, 2U);
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    ExpressionTermType bitmap1 = {ExpressionTermType::BITMAPID_CHOICE, 1U, NULL};
+    StaticBitmapFieldType p1_bitmapField1 = { &area, &visible, &bitmap1 };
+    BaseFieldChoiceType p1_field1 = { BaseFieldChoiceType::NONE, &p1_bitmapField1 };
+    const BaseFieldChoiceType* p1_fields[] = {&p1_field1, &p1_field1};
+    PanelType panelType = { &area, &visible, p1_fields, 2 };
 
-    lsr::Panel* panel = createWrongPanel(m_builder);
-
+    lsr::Panel* panel = createWrongPanel(&panelType);
     EXPECT_TRUE(NULL == panel);
 }
 
 TEST_F(PanelTest, CreatePanelWithWrongFieldTest)
 {
-    lsr::AreaType area;
-    m_builder.createWithWrongField(area, true, 2U);
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    ExpressionTermType bitmap1 = {ExpressionTermType::BITMAPID_CHOICE, 1U, NULL};
+    StaticBitmapFieldType p1_bitmapField1 = { &area, NULL, &bitmap1 }; // broken field
+    BaseFieldChoiceType p1_field1 = { BaseFieldChoiceType::STATICBITMAPFIELD_CHOICE, &p1_bitmapField1 };
+    const BaseFieldChoiceType* p1_fields[] = {&p1_field1, &p1_field1};
+    PanelType panelType = { &area, &visible, p1_fields, 2 };
 
-    lsr::Panel* panel = createWrongPanel(m_builder);
-
+    lsr::Panel* panel = createWrongPanel(&panelType);
     EXPECT_TRUE(NULL == panel);
 }
 
 TEST_F(PanelTest, CreatePanelWithTooManyFieldsTest)
 {
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    ExpressionTermType bitmap1 = {ExpressionTermType::BITMAPID_CHOICE, 1U, NULL};
+    StaticBitmapFieldType p1_bitmapField1 = { &area, &visible, &bitmap1 };
+    BaseFieldChoiceType p1_field1 = { BaseFieldChoiceType::STATICBITMAPFIELD_CHOICE, &p1_bitmapField1 };
+    const BaseFieldChoiceType* p1_fields[] = {
+        &p1_field1, &p1_field1, &p1_field1, &p1_field1, &p1_field1,
+        &p1_field1, &p1_field1, &p1_field1, &p1_field1, &p1_field1,
+        &p1_field1, &p1_field1, &p1_field1, &p1_field1, &p1_field1,
+        &p1_field1, &p1_field1, &p1_field1, &p1_field1, &p1_field1,
+        &p1_field1, 
+    };
+    PanelType panelType = { &area, &visible, p1_fields, 21 };
     /**
      * To make this test successful, statement should be true
      * MAX_BITMAPS_COUNT > MAX_WIDGET_CHILDREN_COUNT
      */
-    lsr::AreaType area;
-    m_builder.createWithTooManyFields(area, true);
-
     lsr::LSRErrorCollector error(LSR_NO_ERROR);
     lsr::Panel* panel = lsr::Panel::create(m_widgetPool,
-                                           *m_pDb,
-                                           m_builder.getDdh(),
+                                           m_db,
+                                           &panelType,
                                            &m_context,
                                            error);
 
@@ -152,15 +167,14 @@ TEST_F(PanelTest, CreatePanelWithTooManyFieldsTest)
 
 TEST_F(PanelTest, VerifyTest)
 {
-    lsr::AreaType areaType;
-    lsr::Area area(&areaType);
-    m_builder.create(areaType, true, 2U);
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    PanelType panelType = { &area, &visible, NULL, 0 };
 
-    lsr::Panel* panel = createPanel(m_builder);
-
+    lsr::Panel* panel = createPanel(&panelType);
     EXPECT_TRUE(NULL != panel);
 
     lsr::DisplayManager dsp;
     TestCanvas canvas(dsp, 640U, 480U);
-    EXPECT_TRUE(panel->verify(canvas, area));
+    EXPECT_TRUE(panel->verify(canvas, Area()));
 }

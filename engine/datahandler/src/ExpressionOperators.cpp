@@ -52,17 +52,19 @@ namespace
  * an array of @c Number objects and its size.
  */
 template <std::size_t ListSize>
-class NumberList: private std::pair<std::size_t, Number[ListSize]>
+class NumberList: private std::pair<std::size_t, lsr::Number[ListSize]>
 {
 public:
     inline NumberList()
+    : std::pair<std::size_t, lsr::Number[ListSize]>()
     {}
 
-    inline void addItem(Number item)
+    inline void addItem(const lsr::Number item)
     {
         if (this->first < ListSize)
         {
-            this->second[this->first++] = item;
+            this->second[this->first] = item;
+            ++this->first;
         }
     }
 
@@ -76,10 +78,10 @@ public:
         return this->first == 0U;
     }
 
-    inline Number item(std::size_t itemIndex) const
+    inline lsr::Number item(const std::size_t itemIndex) const
     {
-        Number res;
-        if (this->first > 0U && itemIndex < this->first)
+        lsr::Number res;
+        if ((this->first > 0U) && (itemIndex < this->first))
         {
             res = this->second[itemIndex];
         }
@@ -100,8 +102,8 @@ public:
  *
  * @return status of @c value, see @c DataStatus.
  */
-DataStatus getTerms(const ExpressionType* pExpression,
-                    DataContext* pContext,
+DataStatus getTerms(const ExpressionType* const pExpression,
+                    DataContext* const pContext,
                     Number& value1,
                     Number& value2)
 {
@@ -144,8 +146,8 @@ DataStatus getTerms(const ExpressionType* pExpression,
  * @param[out] inconsistentList list with @c DataStatus::INCONSISTENT status
  */
 template <std::size_t ExpressionsCount>
-void sortExpressionsResults(const ExpressionType* pExpression,
-                            DataContext* pContext,
+void sortExpressionsResults(const ExpressionType* const pExpression,
+                            DataContext* const pContext,
                             NumberList<ExpressionsCount>& validList,
                             NumberList<ExpressionsCount>& invalidList,
                             NumberList<ExpressionsCount>& inconsistentList)
@@ -153,7 +155,8 @@ void sortExpressionsResults(const ExpressionType* pExpression,
     ASSERT(pExpression->GetTermCount() == ExpressionsCount);
 
     DynamicDataTypeEnumeration type = DATATYPE_ENUM_SIZE;
-    for (std::size_t i = 0U; i < ExpressionsCount; ++i)
+    const U16 termCount = static_cast<U16>(ExpressionsCount);
+    for (U16 i = 0U; i < termCount; ++i)
     {
         DataStatus status = DataStatus::INCONSISTENT;
 
@@ -212,7 +215,7 @@ std::size_t getMajorValue(const NumberList<ListSize>& list, std::size_t& repeate
     for (std::size_t i = 0U; i < list.itemsCount(); ++i)
     {
         std::size_t count = 1U;
-        for (std::size_t j = i+1; j <  list.itemsCount(); ++j)
+        for (std::size_t j = i + 1U; j <  list.itemsCount(); ++j)
         {
             if (list.item(i) == list.item(j))
             {
@@ -239,7 +242,7 @@ std::size_t getMajorValue(const NumberList<ListSize>& list, std::size_t& repeate
  *
  * @return value from the pair key-value, where key is equal to @c key.
  */
-BitmapId searchInTable(const BitmapIdTableType* pTable, const Number& key, DataStatus& status)
+BitmapId searchInTable(const BitmapIdTableType* const pTable, const Number& key, DataStatus& status)
 {
     BitmapId ret = 0U;
     status = DataStatus::INVALID;
@@ -248,24 +251,14 @@ BitmapId searchInTable(const BitmapIdTableType* pTable, const Number& key, DataS
     // TODO: check if binary search is possible
     for (U16 i = 0U; i < pTable->GetItemCount(); ++i)
     {
-        const EnumerationBitmapMapType* pItem = pTable->GetItem(i);
+        const EnumerationBitmapMapType* const pItem = pTable->GetItem(i);
         ASSERT(NULL != pItem);
 
-        const EnumerationValueType* valueType = pItem->GetEnumerationValue();
-        ASSERT(NULL != valueType);
-
-        if (valueType->IsValueSet())
+        if (pItem->GetKey() == key.getU32())
         {
-            if (valueType->GetValue() == key.getU32())
-            {
-                ret = pItem->GetBitmapId();
-                status = DataStatus::VALID;
-                break;
-            }
-        }
-        else
-        {
-            status = DataStatus::INCONSISTENT;
+            ret = pItem->GetBitmapId();
+            status = DataStatus::VALID;
+            break;
         }
     }
 
@@ -274,8 +267,8 @@ BitmapId searchInTable(const BitmapIdTableType* pTable, const Number& key, DataS
 
 } // anonymous namespace
 
-DataStatus minMax(const ExpressionType* pExpression,
-                  DataContext* pContext,
+DataStatus minMax(const ExpressionType* const pExpression,
+                  DataContext* const pContext,
                   Number& value)
 {
     DataStatus status = DataStatus::INCONSISTENT;
@@ -318,16 +311,16 @@ DataStatus minMax(const ExpressionType* pExpression,
     return status;
 }
 
-DataStatus equals(const ExpressionType* pExpression,
-                  DataContext* pContext,
+DataStatus equals(const ExpressionType* const pExpression,
+                  DataContext* const pContext,
                   Number& value)
 {
     Number term0;
     Number term1;
-    DataStatus status = getTerms(pExpression,
-                                 pContext,
-                                 term0,
-                                 term1);
+    const DataStatus status = getTerms(pExpression,
+                                       pContext,
+                                       term0,
+                                       term1);
 
     if (DataStatus::VALID == status)
     {
@@ -337,27 +330,27 @@ DataStatus equals(const ExpressionType* pExpression,
     return status;
 }
 
-DataStatus notEquals(const ExpressionType* pExpression,
-                     DataContext* pContext,
+DataStatus notEquals(const ExpressionType* const pExpression,
+                     DataContext* const pContext,
                      Number& value)
 {
-    DataStatus status = equals(pExpression, pContext, value);
+    const DataStatus status = equals(pExpression, pContext, value);
 
     value = Number(!value.getBool());
 
     return status;
 }
 
-DataStatus lessThan(const ExpressionType* pExpression,
-                    DataContext* pContext,
+DataStatus lessThan(const ExpressionType* const pExpression,
+                    DataContext* const pContext,
                     Number& value)
 {
     Number term0;
     Number term1;
-    DataStatus status = getTerms(pExpression,
-                                 pContext,
-                                 term0,
-                                 term1);
+    const DataStatus status = getTerms(pExpression,
+                                       pContext,
+                                       term0,
+                                       term1);
 
     if (DataStatus::VALID == status)
     {
@@ -367,27 +360,27 @@ DataStatus lessThan(const ExpressionType* pExpression,
     return status;
 }
 
-DataStatus lessThanOrEquals(const ExpressionType* pExpression,
-                            DataContext* pContext,
+DataStatus lessThanOrEquals(const ExpressionType* const pExpression,
+                            DataContext* const pContext,
                             Number& value)
 {
-    DataStatus status = greaterThan(pExpression, pContext, value);
+    const DataStatus status = greaterThan(pExpression, pContext, value);
 
     value = Number(!value.getBool());
 
     return status;
 }
 
-DataStatus greaterThan(const ExpressionType* pExpression,
-                       DataContext* pContext,
+DataStatus greaterThan(const ExpressionType* const pExpression,
+                       DataContext* const pContext,
                        Number& value)
 {
     Number term0;
     Number term1;
-    DataStatus status = getTerms(pExpression,
-                                 pContext,
-                                 term0,
-                                 term1);
+    const DataStatus status = getTerms(pExpression,
+                                       pContext,
+                                       term0,
+                                       term1);
 
     if (DataStatus::VALID == status)
     {
@@ -397,19 +390,19 @@ DataStatus greaterThan(const ExpressionType* pExpression,
     return status;
 }
 
-DataStatus greaterThanOrEquals(const ExpressionType* pExpression,
-                               DataContext* pContext,
+DataStatus greaterThanOrEquals(const ExpressionType* const pExpression,
+                               DataContext* const pContext,
                                Number& value)
 {
-    DataStatus status = lessThan(pExpression, pContext, value);
+    const DataStatus status = lessThan(pExpression, pContext, value);
 
     value = Number(!value.getBool());
 
     return status;
 }
 
-DataStatus itemAt(const ExpressionType* pExpression,
-                        DataContext* pContext,
+DataStatus itemAt(const ExpressionType* const pExpression,
+                        DataContext* const pContext,
                         Number& value)
 {
     DataStatus status = DataStatus::INCONSISTENT;
@@ -423,12 +416,12 @@ DataStatus itemAt(const ExpressionType* pExpression,
                                    valueToSearch);
     if (DataStatus::VALID == status)
     {
-        const ExpressionTermType* exprWithTable = pExpression->GetTerm(1U);
+        const ExpressionTermType* const exprWithTable = pExpression->GetTerm(1U);
         ASSERT(NULL != exprWithTable);
 
-        BitmapId id = searchInTable(exprWithTable->GetBitmapIdTable(),
-                                    valueToSearch,
-                                    status);
+        const BitmapId id = searchInTable(exprWithTable->GetBitmapIdTable(),
+                                          valueToSearch,
+                                          status);
         switch (status.getValue())
         {
         case DataStatus::VALID:
@@ -438,7 +431,7 @@ DataStatus itemAt(const ExpressionType* pExpression,
         }
         case DataStatus::INVALID:
         {
-            if (pExpression->GetTermCount() > 2)
+            if (pExpression->GetTermCount() > 2U)
             {
                 Number defaultValue;
                 // coverity[stack_use_unknown]
@@ -462,8 +455,8 @@ DataStatus itemAt(const ExpressionType* pExpression,
     return status;
 }
 
-DataStatus booleanAnd(const ExpressionType* pExpression,
-                      DataContext* pContext,
+DataStatus booleanAnd(const ExpressionType* const pExpression,
+                      DataContext* const pContext,
                       Number& value)
 {
     Number term0;
@@ -475,8 +468,8 @@ DataStatus booleanAnd(const ExpressionType* pExpression,
 
     if (DataStatus::VALID == status)
     {
-        if (term0.getType() == DATATYPE_BOOLEAN &&
-            term1.getType() == DATATYPE_BOOLEAN)
+        if ((term0.getType() == DATATYPE_BOOLEAN) &&
+            (term1.getType() == DATATYPE_BOOLEAN))
         {
             value = Number(term0.getBool() && term1.getBool());
         }
@@ -489,8 +482,8 @@ DataStatus booleanAnd(const ExpressionType* pExpression,
     return status;
 }
 
-DataStatus booleanOr(const ExpressionType* pExpression,
-                     DataContext* pContext,
+DataStatus booleanOr(const ExpressionType* const pExpression,
+                     DataContext* const pContext,
                      Number& value)
 {
     Number term0;
@@ -502,12 +495,12 @@ DataStatus booleanOr(const ExpressionType* pExpression,
 
     if (DataStatus::VALID == status)
     {
-        if (term0.getType() == DATATYPE_BOOLEAN &&
-            term1.getType() == DATATYPE_BOOLEAN)
+        if ((term0.getType() == DATATYPE_BOOLEAN) &&
+            (term1.getType() == DATATYPE_BOOLEAN))
         {
             // We have branch coverage gap here because of:
             // according to ISO/IEC 14882:2003,
-            // §5.15 Unlike |, || guarantees left-to-right evaluation;
+            // section 5.15 Unlike |, || guarantees left-to-right evaluation;
             // moreover, the second operand is not evaluated
             // if the first operand evaluates to true.
             value = Number(term0.getBool() || term1.getBool());
@@ -521,8 +514,8 @@ DataStatus booleanOr(const ExpressionType* pExpression,
     return status;
 }
 
-DataStatus booleanNot(const ExpressionType* pExpression,
-                      DataContext* pContext,
+DataStatus booleanNot(const ExpressionType* const pExpression,
+                      DataContext* const pContext,
                       Number& value)
 {
     DataStatus status = DataStatus::INCONSISTENT;
@@ -550,8 +543,8 @@ DataStatus booleanNot(const ExpressionType* pExpression,
     return status;
 }
 
-DataStatus fallback(const ExpressionType* pExpression,
-                    DataContext* pContext,
+DataStatus fallback(const ExpressionType* const pExpression,
+                    DataContext* const pContext,
                     Number& value)
 {
     DataStatus status = DataStatus::INCONSISTENT;
@@ -574,8 +567,8 @@ DataStatus fallback(const ExpressionType* pExpression,
     return status;
 }
 
-DataStatus fallback2(const ExpressionType* pExpression,
-                     DataContext* pContext,
+DataStatus fallback2(const ExpressionType* const pExpression,
+                     DataContext* const pContext,
                      Number& value)
 {
     DataStatus status = DataStatus::INCONSISTENT;
@@ -601,12 +594,16 @@ DataStatus fallback2(const ExpressionType* pExpression,
                                        pContext,
                                        value);
     }
+    else
+    {
+        // ignore other data status
+    }
 
     return status;
 }
 
-DataStatus fallback3(const ExpressionType* pExpression,
-                     DataContext* pContext,
+DataStatus fallback3(const ExpressionType* const pExpression,
+                     DataContext* const pContext,
                      Number& value)
 {
     DataStatus status = DataStatus::INCONSISTENT;
@@ -639,12 +636,16 @@ DataStatus fallback3(const ExpressionType* pExpression,
                                        pContext,
                                        value);
     }
+    else
+    {
+        // ignore other data status
+    }
 
     return status;
 }
 
-DataStatus redundancy(const ExpressionType* pExpression,
-                      DataContext* pContext,
+DataStatus redundancy(const ExpressionType* const pExpression,
+                      DataContext* const pContext,
                       Number& value)
 {
     DataStatus status = DataStatus::INCONSISTENT;
@@ -664,14 +665,14 @@ DataStatus redundancy(const ExpressionType* pExpression,
         if (invalidList.itemsCount() >= validList.itemsCount())
         {
             std::size_t repeated = 0U;
-            std::size_t idx = getMajorValue(invalidList, repeated);
+            const std::size_t idx = getMajorValue(invalidList, repeated);
             value = (1U < repeated) ? invalidList.item(idx) : invalidList.item(0U);
             status = DataStatus::INVALID;
         }
         else
         {
             std::size_t repeated = 0U;
-            std::size_t idx = getMajorValue(validList, repeated);
+            const std::size_t idx = getMajorValue(validList, repeated);
             if (expressionsCount == repeated)
             {
                 value = validList.item(idx);

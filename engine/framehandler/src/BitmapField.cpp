@@ -40,16 +40,16 @@ namespace lsr
 
 BitmapField* BitmapField::create(WidgetPool& widgetPool,
                                  const Database& db,
-                                 const StaticBitmapFieldType* pDdh,
-                                 DataContext* pContext,
+                                 const StaticBitmapFieldType* const pDdh,
+                                 DataContext* const pContext,
                                  LSRErrorCollector& error)
 {
     LSRError tmpError = LSR_NO_ERROR;
-    void* pRawMemory = widgetPool.bitmapFieldPool().allocate(tmpError);
+    void* const pRawMemory = widgetPool.bitmapFieldPool().allocate(tmpError);
     error = tmpError;
 
     BitmapField* pField = new (pRawMemory)BitmapField(db, pDdh);
-    if (NULL != pField && !pField->setup(pContext, error))
+    if ((NULL != pField) && (!pField->setup(pContext, error)))
     {
         pField->~BitmapField();
         error = widgetPool.bitmapFieldPool().deallocate(pRawMemory);
@@ -60,7 +60,8 @@ BitmapField* BitmapField::create(WidgetPool& widgetPool,
 }
 
 BitmapField::BitmapField(const Database& db, const StaticBitmapFieldType* const pDdh)
-    : m_pDdh(pDdh)
+    : Field()
+    , m_pDdh(pDdh)
     , m_db(db)
     , m_bitmapExpr()
     , m_bitmapId(0U)
@@ -68,13 +69,13 @@ BitmapField::BitmapField(const Database& db, const StaticBitmapFieldType* const 
     ASSERT(NULL != m_pDdh);
 }
 
-bool BitmapField::setup(DataContext* pContext, LSRErrorCollector& error)
+bool BitmapField::setup(DataContext* const pContext, LSRErrorCollector& error)
 {
     ASSERT(NULL != pContext);
     ASSERT(NULL != m_pDdh);
 
     bool res = true;
-    if (!setArea(m_pDdh->GetArea()) || !setupVisibilityExpr(pContext) || !setupBitmapExr(pContext))
+    if ((!setArea(m_pDdh->GetArea())) || (!setupVisibilityExpr(pContext)) || (!setupBitmapExr(pContext)))
     {
         error = LSR_DB_INCONSISTENT;
         res = false;
@@ -83,10 +84,10 @@ bool BitmapField::setup(DataContext* pContext, LSRErrorCollector& error)
     return res;
 }
 
-bool BitmapField::setupVisibilityExpr(DataContext* pContext)
+bool BitmapField::setupVisibilityExpr(DataContext* const pContext)
 {
     bool res = false;
-    const ExpressionTermType* pType = m_pDdh->GetVisible();
+    const ExpressionTermType* const pType = m_pDdh->GetVisible();
     if (NULL != pType)
     {
         m_visibilityExpr.setup(pType, pContext);
@@ -96,20 +97,22 @@ bool BitmapField::setupVisibilityExpr(DataContext* pContext)
     return res;
 }
 
-bool BitmapField::setupBitmapExr(DataContext* pContext)
+bool BitmapField::setupBitmapExr(DataContext* const pContext)
 {
     bool res = false;
-    const ExpressionTermType* pType = m_pDdh->GetBitmap();
+    const ExpressionTermType* const pType = m_pDdh->GetBitmap();
     if (NULL != pType)
     {
-        m_bitmapExpr.setup(pType, pContext, NULL);
+        m_bitmapExpr.setup(pType, pContext);
         res = true;
     }
     return res;
 }
 
-void BitmapField::onUpdate(const U32 /* monotonicTimeMs */)
+void BitmapField::onUpdate(const U32 monotonicTimeMs)
 {
+    static_cast<void>(monotonicTimeMs);  // ignore unused variable
+
     BitmapId tmpValue;
     if (tryToUpdateValue(m_bitmapExpr, tmpValue))
     {
@@ -123,7 +126,7 @@ void BitmapField::onUpdate(const U32 /* monotonicTimeMs */)
 
 void BitmapField::onDraw(Canvas& canvas, const Area& area)
 {
-    StaticBitmap bitmap = m_db.getBitmap(m_bitmapId);
+    const StaticBitmap bitmap = m_db.getBitmap(m_bitmapId);
 
     canvas.drawBitmap(bitmap, area);
 }

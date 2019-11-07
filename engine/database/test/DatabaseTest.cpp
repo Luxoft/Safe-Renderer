@@ -33,15 +33,13 @@
 #include "ResourceBuffer.h"
 #include "LsrImage.h"
 #include "DDHType.h"
-#include "FUDatabaseType.h"
 #include "FUClassType.h"
 #include "DynamicDataEntryType.h"
 #include "PageDatabaseType.h"
 #include "PageType.h"
 #include "PanelDatabaseType.h"
 #include "PanelType.h"
-#include "FieldType.h"
-#include "FieldsType.h"
+#include "BaseFieldChoiceType.h"
 #include "Area.h"
 #include "ExpressionTermType.h"
 #include "StaticBitmapFieldType.h"
@@ -49,30 +47,20 @@
 #include "ExpressionType.h"
 #include "ExpressionTermType.h"
 #include "DynamicDataType.h"
+#include "BitmapIdTableType.h"
+#include "EnumerationBitmapMapType.h"
+#include "Telltales.hpp"
 
 using namespace lsr;
-
-const char* ddhbin = ROOT_PATH "/test/database/Telltales/Output/Telltales.ddhbin";
-const char* imgbin = ROOT_PATH "/test/database/Telltales/Output/Telltales.imgbin";
 
 class DatabaseTest : public ::testing::Test
 {
     void SetUp() P_OVERRIDE
     {
-        std::ifstream ifs1(ddhbin, std::ios::binary);
-        m_ddhbinData.assign ((std::istreambuf_iterator<char>(ifs1)), (std::istreambuf_iterator<char>()));
-        m_ddhbin = ResourceBuffer(m_ddhbinData.c_str(), m_ddhbinData.size());
-        std::ifstream ifs2(imgbin, std::ios::binary);
-        m_imgbinData.assign ((std::istreambuf_iterator<char>(ifs2)), (std::istreambuf_iterator<char>()));
-        m_imgbin = ResourceBuffer(m_imgbinData.c_str(), m_imgbinData.size());
+        m_ddh = Telltales::getDDH();
     }
-
-    std::string m_ddhbinData;
-    std::string m_imgbinData;
-
 protected:
-    ResourceBuffer m_ddhbin;
-    ResourceBuffer m_imgbin;
+    const DDHType* m_ddh;
 };
 
 class BitmapAccessTest : public DatabaseTest
@@ -81,47 +69,39 @@ class BitmapAccessTest : public DatabaseTest
 
 TEST_F(BitmapAccessTest, BitmapAccess)
 {
-    ResourceBuffer imgbin;
-    const DDHType* ddh = static_cast<const DDHType*>(m_ddhbin.getData());
+    const DDHType* ddh = m_ddh;
     {
-        BitmapAccess access(NULL, imgbin);
-        EXPECT_EQ(LSR_DB_IMGBIN_VERSION_MISMATCH, access.getError());
+        BitmapAccess access(NULL);
+        EXPECT_EQ(LSR_DB_DDHBIN_EMPTY, access.getError());
     }
     {
-        BitmapAccess access(ddh, imgbin);
-        EXPECT_EQ(LSR_DB_IMGBIN_VERSION_MISMATCH, access.getError());
-    }
-    {
-        BitmapAccess access(ddh, m_imgbin);
+        BitmapAccess access(ddh);
         EXPECT_EQ(LSR_NO_ERROR, access.getError());
     }
 }
 
 TEST_F(BitmapAccessTest, getBitmap)
 {
-    const DDHType* ddh = static_cast<const DDHType*>(m_ddhbin.getData());
-    BitmapAccess access(ddh, m_imgbin);
+    const DDHType* ddh = m_ddh;
+    BitmapAccess access(ddh);
     {
         StaticBitmap bmp = access.getBitmap(0, 0);
         EXPECT_EQ(0, bmp.getId());
-        EXPECT_EQ(0u, bmp.getData().getSize());
-        EXPECT_EQ(NULL, bmp.getData().getData());
+        EXPECT_EQ(NULL, bmp.getData());
         EXPECT_EQ(LSR_NO_ERROR, access.getError());
     }
     {
         // bitmapId out of bounds
         StaticBitmap bmp = access.getBitmap(0x1fff, 0);
         EXPECT_EQ(0, bmp.getId());
-        EXPECT_EQ(0u, bmp.getData().getSize());
-        EXPECT_EQ(NULL, bmp.getData().getData());
+        EXPECT_EQ(NULL, bmp.getData());
         EXPECT_EQ(LSR_NO_ERROR, access.getError());
     }
     {
         // bitmapId out of bounds - skin fallback
         StaticBitmap bmp = access.getBitmap(0x1fff, 1);
         EXPECT_EQ(0, bmp.getId());
-        EXPECT_EQ(0u, bmp.getData().getSize());
-        EXPECT_EQ(NULL, bmp.getData().getData());
+        EXPECT_EQ(NULL, bmp.getData());
         EXPECT_EQ(LSR_NO_ERROR, access.getError());
     }
 }
@@ -131,54 +111,36 @@ TEST_F(DatabaseTest, Database)
 {
     // empty ddhbin
     {
-        ResourceBuffer ddhbin;
-        ResourceBuffer imgbin;
-        Database db(ddhbin, imgbin);
+        Database db(NULL);
         EXPECT_EQ(LSRError(LSR_DB_DDHBIN_EMPTY), db.getError());
     }
     // invalid ddhbin
     {
         U8 buf[] = { 1, 4, 55 };
-        ResourceBuffer ddhbin(buf, sizeof(buf));
-        ResourceBuffer imgbin;
-        Database db(ddhbin, imgbin);
+        Database db(reinterpret_cast<DDHType*>(&buf));
         EXPECT_EQ(LSRError(LSR_DB_DDHBIN_VERSION_MISMATCH), db.getError());
-    }
-    // empty imgbin
-    {
-        ResourceBuffer imgbin;
-        Database db(m_ddhbin, imgbin);
-        EXPECT_EQ(LSRError(LSR_DB_IMGBIN_VERSION_MISMATCH), db.getError());
-    }
-    // invalid imgbin
-    {
-        U8 buf[] = { 1, 4, 55 };
-        ResourceBuffer imgbin(buf, sizeof(buf));
-        Database db(m_ddhbin, imgbin);
-        EXPECT_EQ(LSRError(LSR_DB_IMGBIN_VERSION_MISMATCH), db.getError());
     }
 }
 
 TEST_F(DatabaseTest, getBitmap)
 {
-    Database db(m_ddhbin, m_imgbin);
+    Database db(m_ddh);
     EXPECT_EQ(LSRError(LSR_NO_ERROR), db.getError());
-    ResourceBuffer buf = db.getBitmap(1).getData();
-    EXPECT_EQ(27800u, buf.getSize());
-    LsrImage image(buf);
-    EXPECT_EQ(102u, image.getWidth());
-    EXPECT_EQ(68u, image.getHeight());
-    EXPECT_EQ(LsrImage::PIXEL_FORMAT_BGRA8888, image.getPixelFormat());
-    const U8* pixelData = static_cast<const U8*>(image.getPixelData());
+    const LsrImage* image = db.getBitmap(1).getData();
+    ASSERT_TRUE(image != NULL);
+    EXPECT_EQ(102u, image->getWidth());
+    EXPECT_EQ(68u, image->getHeight());
+    EXPECT_EQ(LsrImageTypes::PIXEL_FORMAT_BGRA8888, image->getPixelFormat());
+    const U8* pixelData = static_cast<const U8*>(image->getPixelData());
     const U8 expect[] = { 0x00, 0xff, 0xff, 0xff, 0x00, 0xff, 0xff, 0xff };
-    ASSERT_THAT(std::vector<uint8_t>(pixelData, pixelData + sizeof(expect)),
+    ASSERT_THAT(std::vector<U8>(pixelData, pixelData + sizeof(expect)),
         ::testing::ElementsAreArray(expect));
     EXPECT_TRUE(pixelData != NULL);
 }
 
 TEST_F(DatabaseTest, pageDatabase)
 {
-    Database db(m_ddhbin, m_imgbin);
+    Database db(m_ddh);
     EXPECT_EQ(LSRError(LSR_NO_ERROR), db.getError());
 
     const PageDatabaseType* pageDB = db.getDdh()->GetPageDatabase();
@@ -188,13 +150,15 @@ TEST_F(DatabaseTest, pageDatabase)
     EXPECT_EQ(2, page->GetSizeOfPanelIdList());
     EXPECT_EQ(1, page->GetPanelIdItem(0)); // panelId
     EXPECT_EQ(2, page->GetPanelIdItem(1)); // panelId
+    EXPECT_TRUE(NULL == pageDB->GetPage(1U));
+    EXPECT_EQ(0U, page->GetPanelIdItem(2U));
 }
 
 TEST_F(DatabaseTest, panelDatabase)
 {
     const Area panelArea(10, 153, 380, 224);
     const Area breakArea(20, 2, 119, 70);
-    Database db(m_ddhbin, m_imgbin);
+    Database db(m_ddh);
     EXPECT_EQ(LSRError(LSR_NO_ERROR), db.getError());
 
     const PanelDatabaseType* panelDB = db.getDdh()->GetPanelDatabase();
@@ -204,24 +168,26 @@ TEST_F(DatabaseTest, panelDatabase)
     EXPECT_TRUE(contentPanel != NULL);
     EXPECT_EQ(panelArea, Area(contentPanel->GetArea()));
     EXPECT_TRUE(contentPanel->GetVisible()->GetBoolean());
-    EXPECT_EQ(2u, contentPanel->GetFields()->GetFieldCount());
+    EXPECT_EQ(2u, contentPanel->GetFieldCount());
 
     // Icon1
-    const StaticBitmapFieldType* field1 = contentPanel->GetFields()->GetField(0)->GetStaticBitmapField();
+    const StaticBitmapFieldType* field1 = contentPanel->GetField(0)->GetStaticBitmapField();
+    EXPECT_TRUE(NULL == contentPanel->GetField(0)->GetReferenceBitmapField());
     EXPECT_TRUE(field1 != NULL);
     EXPECT_TRUE(NULL != field1->GetVisible()->GetExpression());
     EXPECT_EQ(breakArea, Area(field1->GetArea()));
-    EXPECT_EQ(2u, field1->GetBitmap()->GetBitmapId());
+    EXPECT_EQ(3u, field1->GetBitmap()->GetBitmapId());
 
     // Reference Panel
     const PanelType* referencePanel = panelDB->GetPanel(1);
     EXPECT_TRUE(referencePanel != NULL);
     EXPECT_EQ(panelArea, Area(referencePanel->GetArea()));
     EXPECT_TRUE(referencePanel->GetVisible()->GetBoolean());
-    EXPECT_EQ(2u, referencePanel->GetFields()->GetFieldCount());
+    EXPECT_EQ(2u, referencePanel->GetFieldCount());
 
     // Break
-    const ReferenceBitmapFieldType* refBreak = referencePanel->GetFields()->GetField(0)->GetReferenceBitmapField();
+    const ReferenceBitmapFieldType* refBreak = referencePanel->GetField(0)->GetReferenceBitmapField();
+    EXPECT_TRUE(NULL == referencePanel->GetField(0)->GetStaticBitmapField()); // bad type
     EXPECT_TRUE(refBreak != NULL);
     const ExpressionType* visible = refBreak->GetVisible()->GetExpression();
     EXPECT_TRUE(visible != NULL);
@@ -229,28 +195,30 @@ TEST_F(DatabaseTest, panelDatabase)
     EXPECT_EQ(2, visible->GetTermCount());
     const ExpressionType* orExpression = visible->GetTerm(0)->GetExpression();
     EXPECT_EQ(EXPRESSION_OPERATOR_OR, orExpression->GetOperator());
-    EXPECT_EQ(42u, orExpression->GetTerm(0)->GetDynamicData()->GetFUClassId());
-    EXPECT_EQ(1u, orExpression->GetTerm(0)->GetDynamicData()->GetDataId());
+    EXPECT_EQ(0x2A0001u, orExpression->GetTerm(0)->GetDynamicData()->GetFUDataId());
     const ExpressionType* notExpression = orExpression->GetTerm(1)->GetExpression();
     EXPECT_EQ(EXPRESSION_OPERATOR_NOT, notExpression->GetOperator());
-    EXPECT_EQ(42u, notExpression->GetTerm(0)->GetDynamicData()->GetFUClassId());
-    EXPECT_EQ(2u, notExpression->GetTerm(0)->GetDynamicData()->GetDataId());
+    EXPECT_EQ(0x2A0002u, notExpression->GetTerm(0)->GetDynamicData()->GetFUDataId());
     EXPECT_TRUE(visible->GetTerm(1)->GetBoolean());
     EXPECT_EQ(breakArea, Area(refBreak->GetArea()));
-    EXPECT_EQ(2u, refBreak->GetBitmap()->GetBitmapId());
-    EXPECT_EQ(1u, refBreak->GetErrorCounter());
+    EXPECT_EQ(4U, refBreak->GetBitmap()->GetBitmapId());
+    EXPECT_EQ(0xff0001u, refBreak->GetErrorCounterFUDataId());
+    EXPECT_TRUE(NULL == visible->GetTerm(2));
 
     // Airbag
-    const ReferenceBitmapFieldType* refAirbag = referencePanel->GetFields()->GetField(1)->GetReferenceBitmapField();
-    EXPECT_EQ(2u, refAirbag->GetErrorCounter());
+    const ReferenceBitmapFieldType* refAirbag = referencePanel->GetField(1)->GetReferenceBitmapField();
+    EXPECT_EQ(0xff0002u, refAirbag->GetErrorCounterFUDataId());
+
+    EXPECT_TRUE(NULL == panelDB->GetPanel(2U));
+    EXPECT_TRUE(NULL == referencePanel->GetField(2U));
 }
 
 TEST_F(DatabaseTest, fuDatabase)
 {
-    Database db(m_ddhbin, m_imgbin);
+    Database db(m_ddh);
     EXPECT_EQ(LSRError(LSR_NO_ERROR), db.getError());
 
-    const FUDatabaseType* fudb =  db.getDdh()->GetFUDatabase();
+    const DDHType* fudb = db.getDdh();
     EXPECT_EQ(4u, fudb->GetFUCount());
     // Internal FU 0
     const FUClassType* fu0 = fudb->GetFU(0);
@@ -263,8 +231,6 @@ TEST_F(DatabaseTest, fuDatabase)
     const DynamicDataEntryType* data = fu1->GetDynamicDataEntry(5);
     EXPECT_EQ(6u, data->GetDataId());
     EXPECT_EQ(DATATYPE_DATE, data->GetDataType());
-    EXPECT_FALSE(data->IsMaximumSet());
-    EXPECT_FALSE(data->IsMinimumSet());
     // External FU 42
     const FUClassType* fu42 = fudb->GetFU(2);
     EXPECT_EQ(42u, fu42->GetFUClassId());
@@ -279,4 +245,40 @@ TEST_F(DatabaseTest, fuDatabase)
     const FUClassType* fu255 = fudb->GetFU(3);
     EXPECT_EQ(255u, fu255->GetFUClassId());
     EXPECT_TRUE(NULL == fudb->GetFU(fudb->GetFUCount()));
+}
+
+TEST_F(DatabaseTest, ExpressionTermType_none)
+{
+    const ExpressionTermType term = {
+        ExpressionTermType::NONE,
+        0,
+        NULL
+    };
+
+    EXPECT_EQ(0U, term.GetBitmapId());
+    EXPECT_EQ(NULL, term.GetBitmapIdTable());
+    EXPECT_FALSE(term.GetBoolean());
+    EXPECT_EQ(NULL, term.GetDynamicData());
+    EXPECT_EQ(NULL, term.GetExpression());
+    EXPECT_EQ(0, term.GetInteger());
+}
+
+TEST_F(DatabaseTest, bitmapTable)
+{
+    const EnumerationBitmapMapType entry0 = {1, 42};
+    const EnumerationBitmapMapType entry1 = {2, 178};
+    const EnumerationBitmapMapType* const entries[] = {
+        &entry0,
+        &entry1
+    };
+    const BitmapIdTableType table = {
+        entries,
+        2
+    };
+
+    EXPECT_EQ(2, table.GetItemCount());
+    EXPECT_EQ(&entry0, table.GetItem(0));
+    EXPECT_EQ(&entry1, table.GetItem(1));
+    EXPECT_EQ(NULL, table.GetItem(2));
+    EXPECT_EQ(NULL, table.GetItem(-1));
 }

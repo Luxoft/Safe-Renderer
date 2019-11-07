@@ -30,7 +30,7 @@
 namespace lsr
 {
 
-ResourceBuffer StaticBitmap::getData() const
+const LsrImage* StaticBitmap::getData() const
 {
     return m_db.getBitmapBuffer(*this);
 }

@@ -16,22 +16,49 @@ function(GUNITTEST_DATABASE)
     )
 endfunction()
 
+
+# add library with mock implementation.
+# will be used in other components tests
+
+include_directories(
+    ${LSRROOT}/pil/api
+    ${LSRENGINE}/common/api
+    ${LSRENGINE}/lsr/api
+    ${DATABASE_BASE}/api
+    ${DATABASE_BASE}/api/gen
+    ${DATABASE_BASE}/src
+)
+
+set(DATABASEMOCK_HEADERS
+    ${DATABASE_HEADERS}
+    ${DATABASE_BASE}/test/DatabaseAccessor.h
+)
+
+set(DATABASEMOCK_SOURCES
+    ${DATABASE_BASE}/src/Area.cpp
+    ${DATABASE_BASE}/src/BitmapAccess.cpp
+    ${DATABASE_BASE}/src/LsrImage.cpp
+    ${DATABASE_BASE}/src/StaticBitmap.cpp
+    ${DATABASE_BASE}/test/DatabaseMock.cpp
+)
+
+add_library(databasemock OBJECT
+    ${DATABASEMOCK_HEADERS}
+    ${DATABASEMOCK_SOURCES}
+)
+
 set(TEST_SOURCES
     AreaTest.cpp
     ColorTest.cpp
     DatabaseTest.cpp
-    FonBinReaderTest.cpp
     LsrImageTest.cpp
     DDHTypeTest.cpp
     pil.cpp
-)
-
-set(TEST_HEADERS
-    FonBinWriter.h
+    ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
 )
 
 
 GUNITTEST_DATABASE(
     NAME DatabaseTest
-    FILES ${TEST_SOURCES} ${TEST_HEADERS}
+    FILES ${TEST_SOURCES}
 )

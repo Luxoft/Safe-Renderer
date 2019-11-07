@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<fuclass:FUClass xmlns:fuclass="http://www.populus.luxoft.com/fuclass" fuclass:FUSchemaVersion="4.0.0" fuclass:Name="FUTelltales">
+<?xml version="1.1" encoding="UTF-8"?>
+<fuclass:FUClass xmlns:fuclass="http://www.populus.luxoft.com/fuclass" fuclass:FUSchemaVersion="4.0.0">
   <VersionData>
     <CurrentVersion>0.0</CurrentVersion>
     <ReleaseDate>TBD</ReleaseDate>
@@ -7,6 +7,7 @@
     <ReleaseDescription>None</ReleaseDescription>
   </VersionData>
   <FUClassId>42</FUClassId>
+  <InternalFlag>false</InternalFlag>
   <DynamicDataEntry fuclass:Name="BreakOn">
     <DataId>1</DataId>
     <DataType>Boolean</DataType>

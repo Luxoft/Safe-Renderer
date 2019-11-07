@@ -108,7 +108,7 @@ inline Number::Number()
 {}
 
 inline Number::Number(const bool value)
-    : m_value((value) ? 1U : 0U)
+    : m_value((value) ? static_cast<U32>(1U) : static_cast<U32>(0U))
     , m_type(DATATYPE_BOOLEAN)
 {}
 
@@ -157,7 +157,7 @@ inline bool operator<(const Number& lhs, const Number& rhs)
 
 inline bool operator==(const Number& lhs, const Number& rhs)
 {
-    return lhs.m_value == rhs.m_value && lhs.m_type == rhs.m_type;
+    return (lhs.m_value == rhs.m_value) && (lhs.m_type == rhs.m_type);
 }
 
 inline bool operator!=(const Number& lhs, const Number& rhs)

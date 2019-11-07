@@ -27,12 +27,13 @@
 #include "Database.h"
 #include "ResourceBuffer.h"
 #include "DDHType.h"
+#include "Assertion.h"
 
 namespace lsr
 {
-Database::Database(const ResourceBuffer& ddhbin, const ResourceBuffer& imgbin)
-: m_ddh(static_cast<const DDHType*>(ddhbin.getData()))
-, m_bitmapAccess(m_ddh, imgbin)
+Database::Database(const DDHType* const ddh)
+: m_ddh(ddh)
+, m_bitmapAccess(m_ddh)
 , m_error(LSR_NO_ERROR)
 {
     if (m_ddh == NULL)
@@ -49,10 +50,10 @@ Database::Database(const ResourceBuffer& ddhbin, const ResourceBuffer& imgbin)
     }
 }
 
-StaticBitmap Database::getBitmap(BitmapId id) const
+StaticBitmap Database::getBitmap(const BitmapId id) const
 {
     ASSERT(m_ddh != NULL);
     return m_bitmapAccess.getBitmap(id, 0U);
 }
 
-}
+} // namespace lsr

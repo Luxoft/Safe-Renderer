@@ -30,6 +30,8 @@
 #include <IDataHandler.h>
 
 #include <DynamicDataType.h>
+#include <ExpressionType.h>
+#include <LsrLimits.h>
 
 #include <gtest/gtest.h>
 
@@ -43,441 +45,59 @@ using ::testing::TypedEq;
 class DummyExpression: public Expression
 {
 public:
-    DummyExpression()
-    {}
-
-    void proxySubscribe(const ExpressionTermType* pTerm,
-                        DataContext* dataContex,
-                        IDataHandler::IListener* pListener)
-    {
-        Expression::subscribe(pTerm,
-                                           dataContex,
-                                           pListener);
-    }
-
-    void proxyUnsubscribe(const ExpressionTermType* pTerm,
-                          DataContext* dataContex,
-                          IDataHandler::IListener* pListener)
-    {
-        Expression::unsubscribe(pTerm,
-                                             dataContex,
-                                             pListener);
-    }
-
-private:
-    virtual void update() P_OVERRIDE
-    {}
+    DummyExpression() {}
 };
 
-TEST_F(ExpressionTestFixture, SubscribeDynamicDataTest)
+namespace infinite
 {
-    DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, subscribeData(dataType.fUClassId,
-                                             dataType.dataId,
-                                             static_cast<IDataHandler::IListener*>(&expr)))
-        .WillOnce(Return(true));
-
-    expr.proxySubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, SubscribeIntegerTest)
-{
-    m_termFactory.createIntegerExprTerm(5U);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxySubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, SubscribeBoolTest)
-{
-    m_termFactory.createBoolExprTerm(true);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxySubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, SubscribeExpressionTest)
-{
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 2U);
-
-    DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(dataType);
-
-    ExpressionTermTypeFactory term2;
-    term2.createDynamicDataExprTerm(dataType);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, subscribeData(dataType.GetFUClassId(),
-                                             dataType.GetDataId(),
-                                             static_cast<IDataHandler::IListener*>(&expr)))
-        .Times(2)
-        .WillRepeatedly(Return(true));
-
-    expr.proxySubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, SubscribeInfiniteExpressionTest)
-{
-    DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createInfiniteExpr(dataType);
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, subscribeData(dataType.GetFUClassId(),
-                                             dataType.GetDataId(),
-                                             static_cast<IDataHandler::IListener*>(&expr)))
-        .Times(MAX_EXPRESSION_NESTING - 1)
-        .WillRepeatedly(Return(true));
-
-    expr.proxySubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, SubscribeIndicationTest)
-{
-    DynamicIndicationIdType type;
-    type.fUClassId = 45U;
-    type.indicationId = 25U;
-
-    m_termFactory.createIndicationExprTerm(type);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, subscribeIndication(type.GetFUClassId(),
-                                                   type.GetIndicationId(),
-                                                   static_cast<IDataHandler::IListener*>(&expr)))
-        .WillOnce(Return(true));
-
-    expr.proxySubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, SubscribeIndicationWithoutListenerTest)
-{
-    DynamicIndicationIdType type;
-    m_termFactory.createIndicationExprTerm(type);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxySubscribe(m_termFactory.getDdh(), &m_context, NULL);
-}
-
-TEST_F(ExpressionTestFixture, SubscribeIndicationWithWrongHandlerTest)
-{
-    DynamicIndicationIdType type;
-    m_termFactory.createIndicationExprTerm(type);
-
-    DummyExpression expr;
-
-    corruptHandler();
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxySubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, SubscribeWrongDataTest)
-{
-    m_termFactory.createWrongExprTerm(5U);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxySubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, SubscribeWithWrongContextTest)
-{
-    DynamicDataType dataType;
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxySubscribe(m_termFactory.getDdh(), NULL, &expr);
-}
-
-TEST_F(ExpressionTestFixture, SubscribeWithWrongDataHandlerTest)
-{
-    DynamicDataType dataType;
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    DummyExpression expr;
-
-    corruptHandler();
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxySubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, SubscribeWithWrongTermTest)
-{
-    m_termFactory.createWrongExprTerm(5U);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxySubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeDynamicDataTest)
-{
-    DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(dataType.GetFUClassId(),
-                                               dataType.GetDataId(),
-                                               static_cast<IDataHandler::IListener*>(&expr)))
-        .Times(1);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeExpressionTest)
-{
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 2U);
-
-    DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(dataType);
-
-    ExpressionTermTypeFactory term2;
-    term2.createDynamicDataExprTerm(dataType);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(dataType.GetFUClassId(),
-                                               dataType.GetDataId(),
-                                               static_cast<IDataHandler::IListener*>(&expr)))
-        .Times(2);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeInfiniteExpressionTest)
-{
-    DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createInfiniteExpr(dataType);
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(dataType.GetFUClassId(),
-                                               dataType.GetDataId(),
-                                               static_cast<IDataHandler::IListener*>(&expr)))
-        .Times(MAX_EXPRESSION_NESTING - 1);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeIndicationTest)
-{
-    DynamicIndicationIdType type;
-    type.fUClassId = 32U;
-    type.indicationId = 26U;
-
-    m_termFactory.createIndicationExprTerm(type);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(type.GetFUClassId(),
-                                                     type.GetIndicationId(),
-                                                     static_cast<IDataHandler::IListener*>(&expr)))
-        .Times(1);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeIndicationWithoutListenerTest)
-{
-    DynamicIndicationIdType type;
-    m_termFactory.createIndicationExprTerm(type);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), &m_context, NULL);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeIndicationWithWrongContextTest)
-{
-    DynamicIndicationIdType type;
-    m_termFactory.createIndicationExprTerm(type);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), NULL, &expr);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeIndicationWithWrongHandlerTest)
-{
-    DynamicIndicationIdType type;
-    m_termFactory.createIndicationExprTerm(type);
-
-    DummyExpression expr;
-
-    corruptHandler();
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeIntegerTest)
-{
-    m_termFactory.createIntegerExprTerm(5U);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeBoolTest)
-{
-    m_termFactory.createBoolExprTerm(true);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeWrongDataTest)
-{
-    m_termFactory.createWrongExprTerm(5U);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeWithWrongDataHandlerTest)
-{
-    DynamicDataType dataType;
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    DummyExpression expr;
-
-    corruptHandler();
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), &m_context, &expr);
-}
-
-TEST_F(ExpressionTestFixture, UnsubscribeWithWrongTermTest)
-{
-    m_termFactory.createWrongExprTerm(5U);
-
-    DummyExpression expr;
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(_, _, _))
-        .Times(0);
-    EXPECT_CALL(m_dataHandler, unsubscribeIndication(_, _, _))
-        .Times(0);
-
-    expr.proxyUnsubscribe(m_termFactory.getDdh(), &m_context, &expr);
+    const DynamicDataType dynamicData = { ((13U << 16U | 52U)), DATATYPE_INTEGER };
+    const ExpressionTermType tdyn = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynamicData };
+
+    const ExpressionTermType* para11[] = { &tdyn, &tdyn, };
+    const ExpressionType e11 = { EXPRESSION_OPERATOR_EQUALS, para11, 2U };
+    const ExpressionTermType te11 = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &e11 };
+
+    const ExpressionTermType* para10[] = { &tdyn, &te11, };
+    const ExpressionType e10 = { EXPRESSION_OPERATOR_EQUALS, para10, 2U };
+    const ExpressionTermType te10 = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &e10 };
+
+    const ExpressionTermType* para9[] = { &tdyn, &te10, };
+    const ExpressionType e9 = { EXPRESSION_OPERATOR_EQUALS, para9, 2U };
+    const ExpressionTermType te9 = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &e9 };
+
+    const ExpressionTermType* para8[] = { &tdyn, &te9, };
+    const ExpressionType e8 = { EXPRESSION_OPERATOR_EQUALS, para8, 2U };
+    const ExpressionTermType te8 = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &e8 };
+
+    const ExpressionTermType* para7[] = { &tdyn, &te8, };
+    const ExpressionType e7 = { EXPRESSION_OPERATOR_EQUALS, para7, 2U };
+    const ExpressionTermType te7 = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &e7 };
+
+    const ExpressionTermType* para6[] = { &tdyn, &te7, };
+    const ExpressionType e6 = { EXPRESSION_OPERATOR_EQUALS, para6, 2U };
+    const ExpressionTermType te6 = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &e6 };
+
+    const ExpressionTermType* para5[] = { &tdyn, &te6, };
+    const ExpressionType e5 = { EXPRESSION_OPERATOR_EQUALS, para5, 2U };
+    const ExpressionTermType te5 = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &e5 };
+
+    const ExpressionTermType* para4[] = { &tdyn, &te5, };
+    const ExpressionType e4 = { EXPRESSION_OPERATOR_EQUALS, para4, 2U };
+    const ExpressionTermType te4 = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &e4 };
+
+    const ExpressionTermType* para3[] = { &tdyn, &te4, };
+    const ExpressionType e3 = { EXPRESSION_OPERATOR_EQUALS, para3, 2U };
+    const ExpressionTermType te3 = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &e3 };
+
+    const ExpressionTermType* para2[] = { &tdyn, &te3, };
+    const ExpressionType e2 = { EXPRESSION_OPERATOR_EQUALS, para2, 2U };
+    const ExpressionTermType te2 = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &e2 };
+
+    const ExpressionTermType* para1[] = { &tdyn, &te2, };
+    const ExpressionType e1 = { EXPRESSION_OPERATOR_EQUALS, para1, 2U };
+    const ExpressionTermType te1 = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &e1 };
+
+    const ExpressionTermType* parameters[] = { &tdyn, &te1, };
+    const ExpressionType exp = { EXPRESSION_OPERATOR_EQUALS, parameters, 2U };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &exp };
 }

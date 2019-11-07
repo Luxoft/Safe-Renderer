@@ -51,15 +51,10 @@ public:
     /**
      * Initializes the object and registers data subscriptions if needed.
      *
-     * @param[in] pExpr     expression configuration from database.
+     * @param[in] pTerm     expression configuration from database.
      * @param[in] pContext  data context, which shall be used for evaluation.
-     * @param[in] pListener an optional listener object that shall be notified for
-     *                      data changes. This notification will be evaluated even if
-     *                      current value is incorrect.
      */
-    void setup(const ExpressionTermType* pExpr,
-               DataContext* pContext,
-               Expression::IListener* pListener);
+    void setup(const ExpressionTermType* const pTerm, DataContext* const pContext);
 
     /**
      * Returns the current value.
@@ -79,10 +74,7 @@ private:
     NumberExpression(const NumberExpression&);
     NumberExpression& operator=(const NumberExpression&);
 
-    virtual void update() P_OVERRIDE;
-
     const ExpressionTermType* m_pTerm;
-    Expression::IListener* m_pListener;
     DataContext* m_pContext;
     mutable Number m_value;
     mutable DataStatus m_status;

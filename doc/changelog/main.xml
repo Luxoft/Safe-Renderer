@@ -11,21 +11,21 @@
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
   <info>
-    <title>&ChangeLogProduct_PopulusSC;</title>
-    <subtitle>Changelog for &ChangeLogProduct_PopulusSC; Releases</subtitle>
+    <title>&ChangeLogProduct_LSR;</title>
+    <subtitle>Changelog for &ChangeLogProduct_LSR; Releases</subtitle>
     <mediaobject>
       <imageobject>
         <imagedata contentdepth="100%"
-                   fileref="../GI_common_figures/CoverPopulus.png"
+                   fileref="../GI_common_figures/Luxoft-Safe-Renderer_logo.png"
                    format="png" width="75%"/>
       </imageobject>
     </mediaobject>
     <issuenum>&ChangeLogRelease;</issuenum>
     <pubdate>&ChangeLogDate;</pubdate>
   </info>
-  <xi:include href="../GI_common_files/LXFT.POPULUS.GI-(Changelog_Document_Information).xml"/>
+  <xi:include href="../GI_common_files/LXFT.LSR.GI-(Changelog_Document_Information).xml"/>
   <?hard-pagebreak ?>
-  <xi:include href="../GI_common_files/LXFT.POPULUS.GI-(Changelog_Introduction).xml"/>
+  <xi:include href="../GI_common_files/LXFT.LSR.GI-(Changelog_Introduction).xml"/>
   <?hard-pagebreak ?>
   <xi:include href="changelog.xml" xpointer="element(/1)"/>
   <?hard-pagebreak ?>

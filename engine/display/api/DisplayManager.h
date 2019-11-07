@@ -32,7 +32,6 @@
 
 namespace lsr
 {
-class StaticBitmap;
 
 class DisplayManager
 {

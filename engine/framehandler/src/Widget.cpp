@@ -31,7 +31,7 @@
 namespace lsr
 {
 
-LSRError Widget::dispose(WidgetPool& widgetPool, Widget* pWidget)
+LSRError Widget::dispose(WidgetPool& widgetPool, Widget* const pWidget)
 {
     LSRError error = LSR_NO_ERROR;
     if (NULL != pWidget)
@@ -87,18 +87,24 @@ LSRError Widget::dispose(WidgetPool& widgetPool, Widget* pWidget)
 }
 
 Widget::Widget()
-    : m_childrenCount(0U)
+    : NonCopyable<Widget>()
+    , m_childrenCount(0U)
     , m_isInvalidated(true)
     , m_error(LSR_NO_ERROR)
     , m_pVisibilityExpr(NULL)
     , m_isVisible(false)
-{}
+{
+    for (size_t pos = 0U; pos < MAX_WIDGET_CHILDREN_COUNT; ++pos)
+    {
+        m_children[pos] = NULL;
+    }
+}
 
 Widget::~Widget()
 {
 }
 
-Widget* Widget::childAt(std::size_t index) const
+Widget* Widget::childAt(const std::size_t index) const
 {
     Widget* pRes = NULL;
     if (index < m_childrenCount)
@@ -133,7 +139,7 @@ bool Widget::isInvalidated() const
     return ret;
 }
 
-bool Widget::addChild(Widget* pChild)
+bool Widget::addChild(Widget* const pChild)
 {
     bool res = false;
     if (m_childrenCount < MAX_WIDGET_CHILDREN_COUNT)
@@ -151,7 +157,7 @@ void Widget::setArea(const Area& area)
     m_area = area;
 }
 
-bool Widget::setArea(const AreaType* pDdhArea)
+bool Widget::setArea(const AreaType* const pDdhArea)
 {
     bool res = false;
     if (NULL != pDdhArea)
@@ -231,7 +237,7 @@ LSRError Widget::getError() const
         ASSERT(pChild != NULL);
 
         // coverity[stack_use_unknown]
-        LSRError childError = pChild->getError();
+        const LSRError childError = pChild->getError();
         error = childError;
     }
 

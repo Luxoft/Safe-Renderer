@@ -55,7 +55,6 @@ GILBoolean gilIsValidTexture(GILTexture texture, GILBoolean check4content);
 GILContext gilCreateContext(void);
 GILBoolean gilSetSurface(GILContext context, GILSurface surface);
 GILTexture gilCreateTexture(GILContext context);
-GILBoolean gilLoadTexture(GILTexture texture, uint32_t width, uint32_t height, GILFormat format, GILBoolean copy, const void* data);
 void gilBindTexture(GILContext context, GILTexture t);
 void gilDrawQuad(GILContext ctx, int32_t x1, int32_t y1, int32_t u1, int32_t v1, int32_t x2, int32_t y2, int32_t u2, int32_t v2);
 

@@ -42,6 +42,8 @@
 
 #else
 
+#include <stdint.h>
+
 namespace lsr
 {
 
@@ -58,7 +60,7 @@ namespace impl
  * @param file the source file where the assertion was generated - must not be null
  * @param line the line number where the assertion was generated
  */
-bool executeAssert(const char* msg, const char* file, int line);
+bool executeAssert(const char* const msg, const char* const file, const int32_t line);
 
 } // namespace impl
 

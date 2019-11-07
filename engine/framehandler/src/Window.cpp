@@ -45,7 +45,7 @@ Window::Window(DisplayManager& dsp, const WindowDefinition& winDef)
     : Widget()
     , m_canvas(dsp, winDef)
 {
-    setArea(Area(0, 0, m_canvas.getWidth() - 1, m_canvas.getHeight() - 1));
+    setArea(Area(0, 0, static_cast<I32>(m_canvas.getWidth()) - 1, static_cast<I32>(m_canvas.getHeight()) - 1));
 }
 
 bool Window::render()
@@ -54,7 +54,7 @@ bool Window::render()
     if (isInvalidated())
     {
         m_canvas.makeCurrent();
-        Color color;
+        const Color color;
         m_canvas.clear(color);
         draw(m_canvas, getArea());
         m_canvas.swapBuffers();
@@ -68,6 +68,7 @@ bool Window::verify()
 {
     m_canvas.makeCurrent();
     const bool verified = Widget::verify(m_canvas, getArea());
+    m_canvas.sync();
     return verified;
 }
 
@@ -78,7 +79,7 @@ bool Window::handleWindowEvents()
 
 bool Window::setup(WidgetPool& widgetPool,
                    const Database& db,
-                   DataContext* pContext,
+                   DataContext* const pContext,
                    LSRErrorCollector& error)
 {
     bool success = true;
@@ -86,13 +87,13 @@ bool Window::setup(WidgetPool& widgetPool,
     // Currently there's one frame, but there might be more
     const FrameId frameId = 1U;
 
-    Frame* pFrame = Frame::create(widgetPool, db, frameId, this, pContext, error);
+    Frame* const pFrame = Frame::create(widgetPool, db, frameId, this, pContext, error);
     /**
      * While @c MAX_FRAMES_COUNT < @c MAX_WIDGET_CHILDREN_COUNT,
      * @c addChild method will always return @c true value.
      * That's why we have coverage gap here.
      */
-    if (NULL == pFrame || !addChild(pFrame))
+    if ((NULL == pFrame) || (!addChild(pFrame)))
     {
         success = false;
     }
@@ -103,15 +104,15 @@ Window* Window::create(WidgetPool& widgetPool,
                        const Database& db,
                        DisplayManager& dsp,
                        const WindowDefinition& winDef,
-                       DataContext* pContext,
+                       DataContext* const pContext,
                        LSRErrorCollector& error)
 {
     LSRError tmpError = LSR_NO_ERROR;
-    void* pRawMemory = widgetPool.windowPool().allocate(tmpError);
+    void* const pRawMemory = widgetPool.windowPool().allocate(tmpError);
     error = tmpError;
 
     Window* pWnd = new(pRawMemory)Window(dsp, winDef);
-    if (pWnd)
+    if (NULL != pWnd)
     {
         if (!pWnd->setup(widgetPool, db, pContext, error))
         {
@@ -124,8 +125,9 @@ Window* Window::create(WidgetPool& widgetPool,
     return pWnd;
 }
 
-void Window::onUpdate(const U32 /* monotonicTimeMs */)
+void Window::onUpdate(const U32 monotonicTimeMs)
 {
+    static_cast<void>(monotonicTimeMs);  // ignore unused variable
 }
 
 void Window::onDraw(Canvas& /* canvas */, const Area& /* area */)

@@ -39,7 +39,6 @@ namespace lsr
 struct DDHType;
 class Database;
 class DataContext;
-class WidgetPool;
 
 /**
  * Window implements the widget which is parent for @c Frame widgets.
@@ -69,7 +68,7 @@ public:
                           const Database& db,
                           DisplayManager& dsp,
                           const WindowDefinition& winDef,
-                          DataContext* pContext,
+                          DataContext* const pContext,
                           LSRErrorCollector& error);
 
     /**
@@ -120,7 +119,7 @@ private:
      */
     bool setup(WidgetPool& widgetPool,
                const Database& db,
-               DataContext* pContext,
+               DataContext* const pContext,
                LSRErrorCollector& error);
 
     /**

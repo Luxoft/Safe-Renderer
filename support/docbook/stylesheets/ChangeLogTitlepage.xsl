@@ -106,7 +106,7 @@
 </xsl:template>
 
 <xsl:template match="title" mode="article.titlepage.recto.auto.mode">
-<fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" xsl:use-attribute-sets="article.titlepage.recto.style" keep-with-next.within-column="always" font-size="36pt" font-weight="bold" space-before="2.5in">
+<fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" xsl:use-attribute-sets="article.titlepage.recto.style" keep-with-next.within-column="always" font-size="36pt" font-weight="bold" space-before="2in">
 <xsl:call-template name="component.title">
 <xsl:with-param name="node" select="ancestor-or-self::article[1]"/>
 </xsl:call-template>
@@ -114,7 +114,7 @@
 </xsl:template>
 
 <xsl:template match="subtitle" mode="article.titlepage.recto.auto.mode">
-<fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" xsl:use-attribute-sets="article.titlepage.recto.style" font-size="17.28pt" space-before="0.7in" space-after="3.5in">
+<fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" xsl:use-attribute-sets="article.titlepage.recto.style" font-size="17.28pt" space-before="0.7in" space-after="2.5in">
 <xsl:apply-templates select="." mode="article.titlepage.recto.mode"/>
 </fo:block>
 </xsl:template>

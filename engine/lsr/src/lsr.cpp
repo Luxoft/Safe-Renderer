@@ -28,7 +28,6 @@
 #include "Assertion.h"
 #include "Pool.h"
 #include "Engine.h"
-#include "PilOdiComSession.h"
 #include "pil.h"
 
 #include <ddh_defs.h>
@@ -37,173 +36,122 @@
 #include <new>
 
 using lsr::Engine;
-const size_t MAX_ENGINES = 2;
+const size_t MAX_ENGINES = 2U;
 
-enum
-{
-    MAX_FUS = 10
-};
-typedef lsr::PilOdiComSession<MessageTypes::LAST - 1, MAX_FUS> ComSession;
-
-class LSREngineImpl
-{
-public:
-    LSREngineImpl(const lsr::Database& db, PILMailbox mailbox)
-        : session(mailbox, true)
-        , engine(db, session)
-    {
-        pilMailboxInit(mailbox);
-    }
-    ComSession session;
-    Engine engine;
-};
-
-typedef lsr::Pool<LSREngineImpl, MAX_ENGINES> EnginePool;
+typedef lsr::Pool<lsr::Engine, MAX_ENGINES> EnginePool;
 static EnginePool g_enginePool;
-
-lsr::DynamicDataTypeEnumeration dataTypeFromLSR(LSRDataTypeEnum type)
-{
-    lsr::DynamicDataTypeEnumeration res = lsr::DATATYPE_SPEED;
-    switch(type)
-    {
-    case LSR_DATA_TYPE_INTEGER:
-    {
-        res = lsr::DATATYPE_INTEGER;
-        break;
-    }
-    case LSR_DATA_TYPE_DECIMAL:
-    {
-        res = lsr::DATATYPE_DECIMAL;
-        break;
-    }
-    case LSR_DATA_TYPE_BITMAP_ID:
-    {
-        res = lsr::DATATYPE_BITMAP_ID;
-        break;
-    }
-    case LSR_DATA_TYPE_DECIMAL_SHORT:
-    {
-        res = lsr::DATATYPE_DECIMAL_SHORT;
-        break;
-    }
-    case LSR_DATA_TYPE_BOOLEAN:
-    {
-        res = lsr::DATATYPE_BOOLEAN;
-        break;
-    }
-    default:
-    {
-        ASSERT(res != lsr::DATATYPE_SPEED);
-        break;
-    }
-    }
-
-    return res;
-}
-
-lsr::DataStatus dataStatusFromLSR(LSRDataStatusEnum status)
-{
-    lsr::DataStatus res;
-    switch(status)
-    {
-    case LSR_DATA_STATUS_NOT_AVAILABLE:
-    {
-        res = lsr::DataStatus(lsr::DataStatus::NOT_AVAILABLE);
-        break;
-    }
-    case LSR_DATA_STATUS_VALID:
-    {
-        res = lsr::DataStatus(lsr::DataStatus::VALID);
-        break;
-    }
-    case LSR_DATA_STATUS_INVALID:
-    {
-        res = lsr::DataStatus(lsr::DataStatus::INVALID);
-        break;
-    }
-    case LSR_DATA_STATUS_INCONSISTENT:
-    default:
-    {
-        res = lsr::DataStatus(lsr::DataStatus::INCONSISTENT);
-        break;
-    }
-    }
-
-    return res;
-}
 
 extern "C"
 {
 
-LSREngine lsrCreate(const LSRDatabase* db, LSRError* error)
+LSREngine lsrCreate(const LSRDatabase db)
 {
     LSREngine engine = NULL;
-    *error = LSR_NO_ERROR;
-    void* mem = g_enginePool.allocate(*error);
+    LSRError error = LSR_NO_ERROR;
+    void* const mem = g_enginePool.allocate(error);
     if (NULL != mem)
     {
-        lsr::ResourceBuffer ddhbin(db->ddhbin, db->ddhbinSize);
-        lsr::ResourceBuffer imgbin(db->imgbin, db->imgbinSize);
-        lsr::Database dbObj(ddhbin, imgbin);
-        *error = dbObj.getError();
-        if (LSR_NO_ERROR == *error)
-        {
-            PILMailbox mailbox = 0;
-            LSREngineImpl* engineObj = new(mem)LSREngineImpl(dbObj, mailbox);
-            engine = engineObj;
-        }
+        const lsr::DDHType* const ddh = (static_cast<const lsr::DDHType* const>(db));
+        engine = new(mem)lsr::Engine(ddh);
     }
     return engine;
 }
 
-LSRError lsrDelete(LSREngine engine)
+void lsrDelete(const LSREngine engine)
 {
-    LSRError error = LSR_NO_ERROR;
     if (NULL != engine)
     {
-        static_cast<LSREngineImpl*>(engine)->~LSREngineImpl();
-        error = g_enginePool.deallocate(engine);
+        static_cast<lsr::Engine*>(engine)->~Engine();
+        static_cast<void>(g_enginePool.deallocate(engine));
     }
-    return error;
 }
 
-LSRBoolean lsrRender(LSREngine e)
+LSRBoolean lsrRender(const LSREngine e)
 {
-    LSREngineImpl* engine = static_cast<LSREngineImpl*>(e);
-    ASSERT(engine != NULL);
-    return engine->engine.render() ? LSR_TRUE : LSR_FALSE;
+    lsr::Engine* const pEngine = static_cast<lsr::Engine* const>(e);
+    ASSERT(pEngine != NULL);
+    return pEngine->render() ? static_cast<LSRBoolean>(LSR_TRUE) : static_cast<LSRBoolean>(LSR_FALSE);
 }
 
-LSRBoolean lsrVerify(LSREngine e)
+LSRBoolean lsrVerify(const LSREngine e)
 {
-    LSREngineImpl* engine = static_cast<LSREngineImpl*>(e);
-    ASSERT(engine != NULL);
-    return engine->engine.verify() ? LSR_TRUE : LSR_FALSE;
+    lsr::Engine* const pEngine = static_cast<lsr::Engine* const>(e);
+    ASSERT(pEngine != NULL);
+    return pEngine->verify() ? static_cast<LSRBoolean>(LSR_TRUE) : static_cast<LSRBoolean>(LSR_FALSE);
 }
 
-LSRBoolean lsrSetValue(LSREngine e,
-                       LSRFUClassId fuId,
-                       LSRDataId dataId,
-                       LSRDataValue value,
-                       LSRDataTypeEnum dataType,
-                       LSRDataStatusEnum dataStatus)
+LSRBoolean lsrSetBoolean(const LSREngine e,
+                       const LSRFUDataId fuDataId,
+                       const LSRBoolean value)
 {
-    LSREngineImpl* engine = static_cast<LSREngineImpl*>(e);
-    ASSERT(engine != NULL);
+    ASSERT(e != NULL);
+    lsr::Engine* const pEngine = static_cast<lsr::Engine* const>(e);
 
-    lsr::Number tmpValue(static_cast<U32>(value), dataTypeFromLSR(dataType));
-    lsr::DataStatus status = dataStatusFromLSR(dataStatus);
+    lsr::Number tmpValue(value == LSR_TRUE);
+    const lsr::DataStatus status = lsr::DataStatus::VALID;
 
-    return engine->engine.setData(fuId, dataId, tmpValue, status) ?
-        LSR_TRUE : LSR_FALSE;
+    return pEngine->setData(lsr::DynamicData(fuDataId), tmpValue, status) ?
+        static_cast<LSRBoolean>(LSR_TRUE) : static_cast<LSRBoolean>(LSR_FALSE);
 }
 
-LSRError lsrGetError(LSREngine e)
+LSRBoolean lsrSetInteger(const LSREngine engine,
+                       const LSRFUDataId fuDataId,
+                       const LSRBoolean value)
 {
-    LSREngineImpl* engine = static_cast<LSREngineImpl*>(e);
     ASSERT(engine != NULL);
-    return engine->engine.getError();
+    lsr::Engine* const pEngine = static_cast<lsr::Engine* const>(engine);
+
+    lsr::Number tmpValue(static_cast<U32>(value), lsr::DATATYPE_INTEGER);
+    const lsr::DataStatus status = lsr::DataStatus::VALID;
+
+    return pEngine->setData(lsr::DynamicData(fuDataId), tmpValue, status) ?
+        static_cast<LSRBoolean>(LSR_TRUE) : static_cast<LSRBoolean>(LSR_FALSE);
+}
+
+LSRDataStatus lsrGetBoolean(const LSREngine engine, const LSRFUDataId fuDataId, LSRBoolean* value)
+{
+    ASSERT(engine != NULL);
+    lsr::Engine* const pEngine = static_cast<lsr::Engine* const>(engine);
+    lsr::Number tmpValue;
+    lsr::DataStatus status = pEngine->getData(lsr::DynamicData(fuDataId), tmpValue);
+    if (tmpValue.getType() == lsr::DATATYPE_BOOLEAN)
+    {
+        if (value != NULL)
+        {
+            *value = tmpValue.getBool() ? LSR_TRUE : LSR_FALSE;
+        }
+    }
+    else
+    {
+        status = lsr::DataStatus::INCONSISTENT;
+    }
+    return static_cast<LSRDataStatus>(status.getValue());
+}
+
+LSRDataStatus lsrGetInteger(const LSREngine engine, const LSRFUDataId fuDataId, int32_t* value)
+{
+    ASSERT(engine != NULL);
+    lsr::Engine* const pEngine = static_cast<lsr::Engine* const>(engine);
+    lsr::Number tmpValue;
+    lsr::DataStatus status = pEngine->getData(lsr::DynamicData(fuDataId), tmpValue);
+    if (tmpValue.getType() == lsr::DATATYPE_INTEGER)
+    {
+        if (value != NULL)
+        {
+            *value = static_cast<int32_t>(tmpValue.getU32());
+        }
+    }
+    else
+    {
+        status = lsr::DataStatus::INCONSISTENT;
+    }
+    return static_cast<LSRDataStatus>(status.getValue());
+}
+
+LSRError lsrGetError(const LSREngine e)
+{
+    lsr::Engine* const pEngine = static_cast<lsr::Engine* const>(e);
+    return (NULL != pEngine) ? pEngine->getError() : LSR_UNKNOWN_ERROR;
 }
 
 } // extern "C"
-

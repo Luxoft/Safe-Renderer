@@ -39,8 +39,6 @@ struct PanelType;
 class Area;
 
 class Database;
-class DataContext;
-class WidgetPool;
 
 /**
  * Panel implements the widget which is parent for @c BitmapFiled widgets.
@@ -66,8 +64,8 @@ public:
      */
     static Panel* create(WidgetPool& widgetPool,
                          const Database& db,
-                         const PanelType* pDdhPanel,
-                         DataContext* pContext,
+                         const PanelType* const pDdhPanel,
+                         DataContext* const pContext,
                          LSRErrorCollector& error);
 
 private:
@@ -76,7 +74,7 @@ private:
      *
      * @param[in] pDdh @c lsr::PanelType ddh configuration.
      */
-    Panel(const PanelType* pDdh);
+    explicit Panel(const PanelType* const pDdh);
 
     /**
      * Method initialize object.
@@ -91,7 +89,7 @@ private:
      */
     bool setup(WidgetPool& widgetPool,
                const Database& db,
-               DataContext* pContext,
+               DataContext* const pContext,
                LSRErrorCollector& error);
 
     /**
@@ -116,7 +114,7 @@ private:
      */
     virtual WidgetType getType() const P_OVERRIDE;
 
-    bool setupVisibilityExpr(DataContext* pContext);
+    bool setupVisibilityExpr(DataContext* const pContext);
 
     const PanelType* m_pDdh;
     BoolExpression m_visibilityExpr;

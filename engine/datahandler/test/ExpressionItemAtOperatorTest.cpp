@@ -34,93 +34,29 @@ using namespace lsr;
 
 class ExpressionItemAtOpFixture : public ExpressionTestFixture
 {
-protected:
-    ExpressionItemAtOpFixture()
-    {
-    }
-
-    void addKeyValue(ExpressionTypeFactory& exprFactory, U32 value)
-    {
-        addIntegerValue(exprFactory, value);
-    }
-
-    void addWrongKeyValue(ExpressionTypeFactory& exprFactory, U32 value)
-    {
-        addWrongIntegerValue(exprFactory, value);
-    }
-
-    void addDefaultValue(ExpressionTypeFactory& exprFactory, U32 value)
-    {
-        addIntegerValue(exprFactory, value);
-    }
-
-    void addWrongDefaultValue(ExpressionTypeFactory& exprFactory, U32 value)
-    {
-        addWrongIntegerValue(exprFactory, value);
-    }
-
-    void addRow(BitmapIdTableTypeFactory& tableFactory,
-                U32 bitmapId,
-                U32 value,
-                bool isSet)
-    {
-        EnumerationBitmapMapTypeFactory row;
-        row.create(bitmapId, isSet, value);
-        tableFactory.addRow(row.getDdh(), row.getSize());
-    }
-
-    void addTableToExpression(ExpressionTypeFactory& exprFactory,
-                              BitmapIdTableTypeFactory& tableFactory)
-    {
-        ExpressionTermTypeFactory tableTerm;
-        tableTerm.createBitmapIdTableExprTerm(tableFactory.getDdh(), tableFactory.getSize());
-
-        exprFactory.addExprTerm(tableTerm.getDdh(), tableTerm.getSize());
-    }
-
-private:
-    void addIntegerValue(ExpressionTypeFactory& exprFactory, U32 value)
-    {
-        ExpressionTermTypeFactory valueFactory;
-        valueFactory.createIntegerExprTerm(value);
-
-        exprFactory.addExprTerm(valueFactory.getDdh(), valueFactory.getSize());
-    }
-
-    void addWrongIntegerValue(ExpressionTypeFactory& exprFactory, U32 value)
-    {
-        ExpressionTermTypeFactory valueFactory;
-        valueFactory.createWrongExprTerm(value);
-
-        exprFactory.addExprTerm(valueFactory.getDdh(), valueFactory.getSize());
-    }
 };
+
+namespace
+{
+    const EnumerationBitmapMapType map1 = { 29U, 23U };
+    const EnumerationBitmapMapType map2 = { 39U, 33U };
+    const EnumerationBitmapMapType* tableEntries[] = { &map1, &map2, };
+    const BitmapIdTableType bitmapTable = { tableEntries, 2 };
+}
 
 TEST_F(ExpressionItemAtOpFixture, ItemAtTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_ITEM_AT, 2U);
-
-    addKeyValue(exprFactory, 39U);
-
-    BitmapIdTableTypeFactory tableFactory;
-    tableFactory.createExpr(2U);
-
-    addRow(tableFactory, 23U, 29U, true);
-    addRow(tableFactory, 33U, 39U, true);
-
-    addTableToExpression(exprFactory, tableFactory);
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    const ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 39U, NULL };
+    const ExpressionTermType t2 = { ExpressionTermType::BITMAPIDTABLE_CHOICE, 0U, &bitmapTable };
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ITEM_AT, parameters, 2 };
 
     const lsr::Number expectedValue(33U, lsr::DATATYPE_INTEGER);
     const lsr::DataStatus expectedStatus = lsr::DataStatus::VALID;
     lsr::Number actualValue;
 
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::itemAt(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::itemAt(&expr, &m_context, actualValue);
 
     EXPECT_EQ(expectedStatus, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -128,31 +64,18 @@ TEST_F(ExpressionItemAtOpFixture, ItemAtTest)
 
 TEST_F(ExpressionItemAtOpFixture, ItemAtUseDefaultValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_ITEM_AT, 3U);
-
-    addKeyValue(exprFactory, 40U);
-
-    BitmapIdTableTypeFactory tableFactory;
-    tableFactory.createExpr(2U);
-
-    addRow(tableFactory, 23U, 29U, true);
-    addRow(tableFactory, 33U, 39U, true);
-
-    addTableToExpression(exprFactory, tableFactory);
-
-    addDefaultValue(exprFactory, 55);
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    const ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 40U, NULL };
+    const ExpressionTermType t2 = { ExpressionTermType::BITMAPIDTABLE_CHOICE, 0U, &bitmapTable };
+    const ExpressionTermType defaultVal = { ExpressionTermType::INTEGER_CHOICE, 55U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &defaultVal };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ITEM_AT, parameters, 3 };
 
     const lsr::Number expectedValue(55U, lsr::DATATYPE_INTEGER);
     const lsr::DataStatus expectedStatus = lsr::DataStatus::VALID;
 
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::itemAt(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::itemAt(&expr, &m_context, actualValue);
 
     EXPECT_EQ(expectedStatus, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -160,141 +83,67 @@ TEST_F(ExpressionItemAtOpFixture, ItemAtUseDefaultValueTest)
 
 TEST_F(ExpressionItemAtOpFixture, ItemAtWithoutDefaultValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_ITEM_AT, 2U);
-
-    addKeyValue(exprFactory, 40U);
-
-    BitmapIdTableTypeFactory tableFactory;
-    tableFactory.createExpr(2U);
-
-    addRow(tableFactory, 23U, 29U, true);
-    addRow(tableFactory, 33U, 39U, true);
-
-    addTableToExpression(exprFactory, tableFactory);
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    const ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 40U, NULL };
+    const ExpressionTermType t2 = { ExpressionTermType::BITMAPIDTABLE_CHOICE, 0U, &bitmapTable };
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ITEM_AT, parameters, 2 };
 
     const lsr::DataStatus expectedStatus = lsr::DataStatus::INVALID;
     lsr::Number actualValue;
 
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::itemAt(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::itemAt(&expr, &m_context, actualValue);
 
     EXPECT_EQ(expectedStatus, actualStatus);
 }
 
 TEST_F(ExpressionItemAtOpFixture, ItemAtWithWrongDefaultValueTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_ITEM_AT, 3U);
-
-    addKeyValue(exprFactory, 40U);
-
-    BitmapIdTableTypeFactory tableFactory;
-    tableFactory.createExpr(2U);
-
-    addRow(tableFactory, 23U, 29U, true);
-    addRow(tableFactory, 33U, 39U, true);
-
-    addTableToExpression(exprFactory, tableFactory);
-
-    addWrongDefaultValue(exprFactory, 55);
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    const ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 40U, NULL };
+    const ExpressionTermType t2 = { ExpressionTermType::BITMAPIDTABLE_CHOICE, 0U, &bitmapTable };
+    const ExpressionTermType defaultVal = { ExpressionTermType::NONE, 55U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &defaultVal };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ITEM_AT, parameters, 3 };
 
     const lsr::DataStatus expectedStatus = lsr::DataStatus::INCONSISTENT;
     lsr::Number actualValue;
 
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::itemAt(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::itemAt(&expr, &m_context, actualValue);
 
     EXPECT_EQ(expectedStatus, actualStatus);
 }
 
 TEST_F(ExpressionItemAtOpFixture, ItemAtWithWrongFirstTermTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_ITEM_AT, 3U);
-
-    addWrongKeyValue(exprFactory, 39U);
-
-    BitmapIdTableTypeFactory tableFactory;
-    tableFactory.createExpr(2U);
-
-    addRow(tableFactory, 23U, 29U, true);
-    addRow(tableFactory, 33U, 39U, true);
-
-    addTableToExpression(exprFactory, tableFactory);
-
-    addDefaultValue(exprFactory, 55);
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    const ExpressionTermType t1 = { ExpressionTermType::NONE, 39U, NULL };
+    const ExpressionTermType t2 = { ExpressionTermType::BITMAPIDTABLE_CHOICE, 0U, &bitmapTable };
+    const ExpressionTermType defaultVal = { ExpressionTermType::INTEGER_CHOICE, 55U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &defaultVal };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ITEM_AT, parameters, 3 };
 
     lsr::Number actualValue;
     const lsr::DataStatus expectedStatus = lsr::DataStatus::INCONSISTENT;
 
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::itemAt(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::itemAt(&expr, &m_context, actualValue);
 
     EXPECT_EQ(expectedStatus, actualStatus);
 }
 
 TEST_F(ExpressionItemAtOpFixture, ItemAtWithEmptyBitmapTableTest1)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_ITEM_AT, 2U);
-
-    addKeyValue(exprFactory, 39U);
-
-    BitmapIdTableTypeFactory tableFactory;
-    tableFactory.createExpr(0U);
-
-    addTableToExpression(exprFactory, tableFactory);
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    const ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 39U, NULL };
+    BitmapIdTableType emptyTable = { NULL, 0U, };
+    const ExpressionTermType t2 = { ExpressionTermType::BITMAPIDTABLE_CHOICE, 0U, &emptyTable };
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ITEM_AT, parameters, 2 };
 
     lsr::Number actualValue;
     const lsr::DataStatus expectedStatus = lsr::DataStatus::INVALID;
 
     lsr::DataStatus actualStatus =
-        lsr::expressionoperators::itemAt(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
-
-    EXPECT_EQ(expectedStatus, actualStatus);
-}
-
-TEST_F(ExpressionItemAtOpFixture, ItemAtWithNotSetValueTest)
-{
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_ITEM_AT, 2U);
-
-    addKeyValue(exprFactory, 39U);
-
-    BitmapIdTableTypeFactory tableFactory;
-    tableFactory.createExpr(2U);
-
-    addRow(tableFactory, 23U, 29U, false);
-    addRow(tableFactory, 33U, 39U, false);
-
-    addTableToExpression(exprFactory, tableFactory);
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    lsr::Number actualValue;
-    const lsr::DataStatus expectedStatus = lsr::DataStatus::INCONSISTENT;
-
-    lsr::DataStatus actualStatus =
-        lsr::expressionoperators::itemAt(m_termFactory.getDdh()->GetExpression(),
-                                                 &m_context,
-                                                 actualValue);
+        lsr::expressionoperators::itemAt(&expr, &m_context, actualValue);
 
     EXPECT_EQ(expectedStatus, actualStatus);
 }

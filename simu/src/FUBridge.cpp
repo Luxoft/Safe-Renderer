@@ -31,17 +31,17 @@
 #include <OdiMsgHeader.h>
 #include <MessageHeader.h>
 #include <RegistrationMsgReader.h>
-#include <FUDatabaseType.h>
+#include <DDHType.h>
 #include <FUClassType.h>
 #include <DynamicDataEntryType.h>
 #include <DataResponseMessage.h>
-#include <DataHandler.h>
+#include <Engine.h>
 #include <LSRErrorCollector.h>
 
 using namespace lsr;
 
 
-FUBridge::FUBridge(const FUDatabaseType* ddh, int port, const std::string& hostname, DataHandler& dh)
+FUBridge::FUBridge(const DDHType* ddh, int port, const std::string& hostname, Engine& dh)
 : m_session()
 , m_dataHandler(dh)
 , m_ddh(ddh)
@@ -113,7 +113,7 @@ LSRError FUBridge::subscribeAll()
     for (U16 i = 0; i < m_ddh->GetFUCount(); ++i)
     {
         const FUClassType* fu = m_ddh->GetFU(i);
-        if (!fu->GetInternalFU() && fu->GetFUClassId() != 0)
+        if (!fu->GetInternal() && fu->GetFUClassId() != 0)
         {
             for (U16 k = 0; k < fu->GetDynamicDataEntryCount(); ++k)
             {
@@ -149,17 +149,17 @@ void FUBridge::refresh()
     for (U16 i = 0; i < m_ddh->GetFUCount(); ++i)
     {
         const FUClassType* fu = m_ddh->GetFU(i);
-        if (!fu->GetInternalFU() && fu->GetFUClassId() != 0)
+        if (!fu->GetInternal() && fu->GetFUClassId() != 0)
         {
             const U16 fuId = fu->GetFUClassId();
             for (U16 k = 0; k < fu->GetDynamicDataEntryCount(); ++k)
             {
                 const U16 dataId = fu->GetDynamicDataEntry(k)->GetDataId();
                 Number value;
-                DataStatus status = m_dataHandler.getNumber(fuId, dataId , value);
+                DataStatus status = m_dataHandler.getData(DynamicData(fuId, dataId), value);
                 if (DataStatus::VALID == status)
                 {
-                    m_dataHandler.setData(fuId, dataId, value, status);
+                    m_dataHandler.setData(DynamicData(fuId, dataId), value, status);
                 }
             }
         }
@@ -172,7 +172,7 @@ LSRError FUBridge::onODI(IMsgTransmitter* pTransmitter, InputStream& stream)
     LSRErrorCollector err = LSR_NO_ERROR;
     if (odiMsgHeader.getOdiType() == DataMessageTypes::DYN_DATA_RESP)
     {
-        err = m_dataHandler.dynamicDataResponseHandler(stream);
+        err = onODIDynamicData(stream);
     }
     else
     {
@@ -181,6 +181,17 @@ LSRError FUBridge::onODI(IMsgTransmitter* pTransmitter, InputStream& stream)
     }
     err = stream.getError();
     return err.get();
+}
+
+LSRError FUBridge::onODIDynamicData(InputStream& stream)
+{
+    const DataResponseMessage dataResponse = DataResponseMessage::fromStream(stream);
+    const DynamicData dynData(dataResponse.getFuId(), dataResponse.getDataId());
+
+    const Number value(dataResponse.getDataValue(), dataResponse.getDataType());
+    const DataStatus status = dataResponse.getInvalidFlag() ? DataStatus::INVALID : DataStatus::VALID;
+    const bool success = m_dataHandler.setData(dynData, value, status);
+    return success ? LSR_NO_ERROR : LSR_DH_INVALID_MESSAGE_TYPE;
 }
 
 void FUBridge::onConnect(IMsgTransmitter* pMsgTransmitter)

@@ -29,30 +29,30 @@
 #include <Frame.h>
 
 #include <LSRErrorCollector.h>
+#include <PageDatabaseType.h>
+#include <PanelDatabaseType.h>
+#include <PageType.h>
+#include <HMIGlobalSettingsType.h>
+#include <DisplaySizeType.h>
+#include <DDHType.h>
+#include <Telltales.hpp>
 
 #include <gtest/gtest.h>
+
+using namespace lsr;
 
 class FrameTest: public WidgetTestBase
 {
 protected:
     FrameTest()
+        : m_db(Telltales::getDDH())
     {}
 
-    lsr::Frame* create(const lsr::AreaType& area,
-                       const bool isVisible,
-                       const U16 fieldsCount)
+    lsr::Frame* create()
     {
-        framehandlertests::DdhPageBuilder pageBuilder;
-        pageBuilder.create(1U, 1U);
-
-        framehandlertests::DdhPanelBuilder panelBuilder;
-        panelBuilder.create(area, isVisible, fieldsCount);
-
-        initDb(pageBuilder, panelBuilder);
-
         lsr::LSRErrorCollector error(LSR_NO_ERROR);
         lsr::Frame* frame = lsr::Frame::create(m_widgetPool,
-                                               *m_pDb,
+                                               m_db,
                                                1U,
                                                NULL,
                                                &m_context,
@@ -61,30 +61,49 @@ protected:
 
         return frame;
     }
+
+    lsr::Database m_db;
 };
 
 TEST_F(FrameTest, CreateFrameTest)
 {
-    lsr::AreaType area;
-    lsr::Frame* frame = create(area, true, 2U);
-
+    lsr::Frame* frame = create();
     EXPECT_TRUE(NULL != frame);
 }
 
 TEST_F(FrameTest, CreateFrameWithWrongPanelTest)
 {
-    lsr::AreaType area;
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
+    PanelId panelIds[] = { 1U };
+    PageType page = { panelIds, 1, NULL, NULL };
+    PageType* pages[] = { &page };
+    PageDatabaseType pageDB = { pages, 1 };
 
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.createWithoutVisibility(area, true, 2U);
+    AreaType area = { 0U, 0U, 0U, 0U };
+    PanelType p1 = {&area, NULL, NULL, 0U}; // broken panel (without visibility set)
+    PanelType* panels1[] = { &p1 };
+    PanelDatabaseType panelDB1 = {panels1, 1};
 
-    initDb(pageBuilder, panelBuilder);
+    DisplaySizeType displaySize = { 0U, 0U };
+    HMIGlobalSettingsType globalSettings = { &displaySize, NULL };
+
+    const DDHType ddh = {
+        0U,
+        DDHType::SCHEMA_CHECKSUM,
+        DDHType::SCHEMA_VERSION,
+        DDHType::SERIALIZER_VERSION,
+        &pageDB,
+        &panelDB1,
+        &globalSettings,
+        NULL,
+        NULL,
+        NULL,
+        0U
+    };
+    Database db(&ddh);
 
     lsr::LSRErrorCollector error(LSR_NO_ERROR);
     lsr::Frame* frame = lsr::Frame::create(m_widgetPool,
-                                           *m_pDb,
+                                           db,
                                            1U,
                                            NULL,
                                            &m_context,
@@ -95,21 +114,16 @@ TEST_F(FrameTest, CreateFrameWithWrongPanelTest)
 
 TEST_F(FrameTest, VerifyTest)
 {
-    lsr::AreaType areaType;
-    lsr::Area area(&areaType);
-
-    lsr::Frame* frame = create(areaType, true, 2U);
-
+    lsr::Area area;
+    lsr::Frame* frame = create();
     EXPECT_TRUE(NULL != frame);
     EXPECT_TRUE(frame->verify(m_canvas, area));
 }
 
 TEST_F(FrameTest, DrawTest)
 {
-    lsr::AreaType areaType;
-    lsr::Area area(&areaType);
-
-    lsr::Frame* frame = create(areaType, true, 2U);
+    lsr::Area area;
+    lsr::Frame* frame = create();
 
     EXPECT_TRUE(NULL != frame);
 

@@ -44,8 +44,6 @@ class WidgetPoolCorrupter;
 namespace lsr
 {
 
-struct PanelType;
-struct FieldType;
 struct DDHType;
 class DataContext;
 
@@ -145,6 +143,7 @@ private:
 };
 
 inline WidgetPool::WidgetPool()
+: NonCopyable<WidgetPool>()
 {
 }
 

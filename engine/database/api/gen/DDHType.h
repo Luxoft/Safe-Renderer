@@ -1,5 +1,5 @@
-#ifndef _DDHTYPE_H_
-#define _DDHTYPE_H_
+#ifndef _LSR_DDHTYPE_H_
+#define _LSR_DDHTYPE_H_
 
 /******************************************************************************
 **
@@ -8,9 +8,9 @@
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
-**   This file is part of Safe Renderer.
+**   This file is part of Luxoft Safe Renderer.
 **
-**   Safe Renderer is free software: you can redistribute it and/or
+**   Luxoft Safe Renderer is free software: you can redistribute it and/or
 **   modify it under the terms of the GNU Lesser General Public
 **   License as published by the Free Software Foundation.
 **
@@ -28,8 +28,6 @@
 ******************************************************************************/
 
 #include "ddh_defs.h"
-#include "LsrTypes.h"  // for P_STATIC_ASSERT
-
 
 namespace lsr
 {
@@ -38,199 +36,152 @@ struct PanelDatabaseType;
 struct HMIGlobalSettingsType;
 struct ColorDatabaseType;
 struct SkinDatabaseType;
-struct FUDatabaseType;
-
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(push)
-#pragma pack(1)
-#endif
+struct FUClassType;
 
 struct DDHType
 {
-public:
-    //----------------------------------------------------------------
-    /**
-     * This is the ROM structure for the DDHType.
-     * Each element of this type has this exact image in ROM memory.
-     */
-    U32 imagesChecksum :32;
-    U32 schemaChecksum :32;
-    U32 schemaVersion :32;
-    U32 serializerVersion :32;
-    U32 pageDatabaseOffset :32;
-    U32 panelDatabaseOffset :32;
-    U32 hMIGlobalSettingsOffset :32;
-    U32 colorDatabaseOffset :32;
-    U32 skinDatabaseOffset :32;
-    U32 fUDatabaseOffset :32;
-    //----------------------------------------------------------------
+    const U32 imagesChecksum;
+    const U32 schemaChecksum;
+    const U32 schemaVersion;
+    const U32 serializerVersion;
+    const PageDatabaseType* const pageDatabase;
+    const PanelDatabaseType* const panelDatabase;
+    const HMIGlobalSettingsType* const hMIGlobalSettings;
+    const ColorDatabaseType* const colorDatabase;
+    const SkinDatabaseType* const skinDatabase;
+    const FUClassType* const *fU;
+    const U16 fUCount;
 
-    static const char* const serializerVersionError;
-    static const char* const schemaVersionError;
-    static const char* const schemaChecksumError;
+    static const U32 SERIALIZER_VERSION = 0x50400U;  ///< Version of the serializer
+    static const U32 SCHEMA_VERSION = 0x50400U;  ///< Version of the schema
+    static const U32 SCHEMA_CHECKSUM = 0x49D84938U;  ///< Checksum of the schema
 
-public:
-    // used for checking consistency between API and data
-    static const U32 SERIALIZER_VERSION = 0x42900;  ///< Version of the serializer
-    static const U32 SCHEMA_VERSION = 0x43a00;  ///< Version of the schema
-    static const U32 SCHEMA_CHECKSUM = 0x6ed7ab2d;  ///< Checksum of the schema
+    bool IsVersionOK() const
+    {
+        return (GetSerializerVersion() == SERIALIZER_VERSION) &&
+            (GetSchemaVersion() == SCHEMA_VERSION) &&
+            (GetSchemaChecksum() == SCHEMA_CHECKSUM);
+    }
 
-    bool IsVersionOK() const;
-    const char* GetErrorMessage() const;
-
+    const char* GetErrorMessage() const
+    {
+        const char* errorMessage = "";
+        if (GetSerializerVersion() != SERIALIZER_VERSION)
+        {
+            errorMessage = "Data has been serialized with another version of the serializer than what the HMI Engine expects (Expecting Serializer version: 5.4.0)";
+        }
+        else if (GetSchemaVersion() != SCHEMA_VERSION)
+        {
+            errorMessage = "Data has been generated from another schema version than the HMI Engine expects (Expecting Schema Version: 5.4.x)";
+        }
+        else if (GetSchemaChecksum() != SCHEMA_CHECKSUM)
+        {
+            errorMessage = "Data has been generated from a schema version with another checksum than the HMI Engine expects (Expecting Schema checksum: 0x49d84938)";
+        }
+        else
+        {
+            // errorMessage is already empty
+        }
+        return errorMessage;
+    }
 
     /**
      * Returns the value of the imagesChecksum attribute
      */
-    U32 GetImagesChecksum() const;
+    U32 GetImagesChecksum() const
+    {
+        return imagesChecksum;
+    }
 
     /**
      * Returns the value of the schemaChecksum attribute
      */
-    U32 GetSchemaChecksum() const;
+    U32 GetSchemaChecksum() const
+    {
+        return schemaChecksum;
+    }
 
     /**
      * Returns the value of the schemaVersion attribute
      */
-    U32 GetSchemaVersion() const;
+    U32 GetSchemaVersion() const
+    {
+        return schemaVersion;
+    }
 
     /**
      * Returns the value of the serializerVersion attribute
      */
-    U32 GetSerializerVersion() const;
+    U32 GetSerializerVersion() const
+    {
+        return serializerVersion;
+    }
 
     /**
      * Returns a pointer to the pageDatabase child reference.
      * Contains definitions of pages. Every page belongs to a specific profile
      */
-    const PageDatabaseType* GetPageDatabase() const;
+    const PageDatabaseType* GetPageDatabase() const
+    {
+        return pageDatabase;
+    }
 
     /**
      * Returns a pointer to the panelDatabase child reference.
      * Contains definitions of panels. Panels can be reused in different pages
      */
-    const PanelDatabaseType* GetPanelDatabase() const;
+    const PanelDatabaseType* GetPanelDatabase() const
+    {
+        return panelDatabase;
+    }
 
     /**
      * Returns a pointer to the hMIGlobalSettings child reference.
-     * The global settings for the project. Contains definitions of several
-     * settings needed for the HMI Engine and for the Editor to operate
-     * correctly
+     * The global settings for the project. Contains definitions of several settings needed for the HMI Engine and for the Editor to operate correctly
      */
-    const HMIGlobalSettingsType* GetHMIGlobalSettings() const;
+    const HMIGlobalSettingsType* GetHMIGlobalSettings() const
+    {
+        return hMIGlobalSettings;
+    }
 
     /**
      * Returns a pointer to the colorDatabase child reference.
-     * Contains definitions of colors. Only required on systems with color
-     * displays
+     * Contains definitions of colors. Only required on systems with color displays
      */
-    const ColorDatabaseType* GetColorDatabase() const;
+    const ColorDatabaseType* GetColorDatabase() const
+    {
+        return colorDatabase;
+    }
 
     /**
      * Returns a pointer to the skinDatabase child reference.
+     *
      */
-    const SkinDatabaseType* GetSkinDatabase() const;
+    const SkinDatabaseType* GetSkinDatabase() const
+    {
+        return skinDatabase;
+    }
 
     /**
-     * Returns a pointer to the fUDatabase child reference.
-     * Contains information about functional units.
+     * Returns the number of fU elements.
      */
-    const FUDatabaseType* GetFUDatabase() const;
+    U16 GetFUCount() const
+    {
+        return fUCount;
+    }
+
+    /**
+     * Returns a pointer to the fU child reference at index i.
+     * This method checks the index and returns NULL if the item index exceeds the element count.
+     * This is the list of all Functional Units known by the Engine
+     */
+    const FUClassType* GetFU(const U16 i) const
+    {
+        return (i < fUCount) ? fU[i] : NULL;
+    }
+
 };
-
-P_STATIC_ASSERT((sizeof(DDHType)) == 40, "DDHType size")
-
-
-inline U32 DDHType::GetImagesChecksum() const
-{
-    return imagesChecksum;
-}
-
-inline U32 DDHType::GetSchemaChecksum() const
-{
-    return schemaChecksum;
-}
-
-inline U32 DDHType::GetSchemaVersion() const
-{
-    return schemaVersion;
-}
-
-inline U32 DDHType::GetSerializerVersion() const
-{
-    return serializerVersion;
-}
-
-inline const PageDatabaseType* DDHType::GetPageDatabase() const
-{
-    const PageDatabaseType* pResult = NULL;
-    if (pageDatabaseOffset != 0U)
-    {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const PageDatabaseType*>(pThis + pageDatabaseOffset * 4);
-    }
-    return pResult;
-}
-
-inline const PanelDatabaseType* DDHType::GetPanelDatabase() const
-{
-    const PanelDatabaseType* pResult = NULL;
-    if (panelDatabaseOffset != 0U)
-    {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const PanelDatabaseType*>(pThis + panelDatabaseOffset * 4);
-    }
-    return pResult;
-}
-
-inline const HMIGlobalSettingsType* DDHType::GetHMIGlobalSettings() const
-{
-    const HMIGlobalSettingsType* pResult = NULL;
-    if (hMIGlobalSettingsOffset != 0U)
-    {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const HMIGlobalSettingsType*>(pThis + hMIGlobalSettingsOffset * 4);
-    }
-    return pResult;
-}
-
-inline const ColorDatabaseType* DDHType::GetColorDatabase() const
-{
-    const ColorDatabaseType* pResult = NULL;
-    if (colorDatabaseOffset != 0U)
-    {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const ColorDatabaseType*>(pThis + colorDatabaseOffset * 4);
-    }
-    return pResult;
-}
-
-inline const SkinDatabaseType* DDHType::GetSkinDatabase() const
-{
-    const SkinDatabaseType* pResult = NULL;
-    if (skinDatabaseOffset != 0U)
-    {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const SkinDatabaseType*>(pThis + skinDatabaseOffset * 4);
-    }
-    return pResult;
-}
-
-inline const FUDatabaseType* DDHType::GetFUDatabase() const
-{
-    const FUDatabaseType* pResult = NULL;
-    if (fUDatabaseOffset != 0U)
-    {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const FUDatabaseType*>(pThis + fUDatabaseOffset * 4);
-    }
-    return pResult;
-}
 
 } // namespace lsr
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(pop)
-#endif
-
-#endif  // #ifndef _DDHTYPE_H_
+#endif // #ifndef _LSR_DDHTYPE_H_

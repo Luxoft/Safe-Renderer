@@ -35,52 +35,123 @@ namespace lsr
 Texture::Texture()
 : m_texture(NULL)
 , m_format(GIL_FORMAT_ARGB_8888)
-, m_width(0)
-, m_height(0)
+, m_width(0U)
+, m_height(0U)
 {
 }
 
-void Texture::load(GILContext ctx, const ResourceBuffer& buf, const bool needsCopy)
+void Texture::load(const GILContext ctx, const LsrImage* const img)
 {
-    ASSERT(buf.getSize() > 0);
-
-    LsrImage img(buf);
-    m_height = img.getHeight();
-    m_width = img.getWidth();
-    const void* pixelData = img.getPixelData();
-    switch (img.getPixelFormat())
+    ASSERT(img != NULL);
+    m_height = static_cast<U16>(img->getHeight());
+    m_width = static_cast<U16>(img->getWidth());
+    const void* const pixelData = img->getPixelData();
+    const GILFormat format = convertFormat(img);
+    const U8 colorSize = getPaletteColorSize(img);
+    if ((NULL != pixelData) && (format != GIL_FORMAT_INVALID))
     {
-    case LsrImage::PIXEL_FORMAT_RGB565:
-        m_format = GIL_FORMAT_RGB_565;
-        break;
-    case LsrImage::PIXEL_FORMAT_RGB888:
-        m_format = GIL_FORMAT_RGB_888;
-        break;
-    case LsrImage::PIXEL_FORMAT_BGR888:
-        m_format = GIL_FORMAT_BGR_888;
-        break;
-    case LsrImage::PIXEL_FORMAT_RGBA8888:
-        m_format = GIL_FORMAT_RGBA_8888;
-        break;
-    case LsrImage::PIXEL_FORMAT_BGRA8888:
-        m_format = GIL_FORMAT_BGRA_8888;
-        break;
-    default:
-        ASSERT_MSG(0, "unknown pixel format");
-        pixelData = NULL;
-        break;
-    }
-    if (NULL != pixelData)
-    {
+        m_format = format;
         m_texture = gilCreateTexture(ctx);
-        gilLoadTexture(m_texture, m_width, m_height, m_format, needsCopy, pixelData);
+        static_cast<void>(gilTexPixels(m_texture, static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height), m_format, pixelData)); // ignore return value
+        switch (colorSize)
+        {
+        case 4U:
+            static_cast<void>(gilTexPalette4(m_texture, img->palette, img->header.clutSize)); // ignore return value
+            break;
+        case 3U:
+            static_cast<void>(gilTexPalette3(m_texture, img->palette, img->header.clutSize)); // ignore return value
+            break;
+        case 2U:
+            static_cast<void>(gilTexPalette2(m_texture, img->palette, img->header.clutSize)); // ignore return value
+            break;
+        default:
+            break;
+        }
     }
 }
 
-void Texture::bind(GILContext context)
+void Texture::bind(GILContext ctx)
 {
     ASSERT(isLoaded());
-    gilBindTexture(context, m_texture);
+    gilBindTexture(ctx, m_texture);
 }
 
+U8 Texture::getPaletteColorSize(const LsrImage* const img)
+{
+    U8 retval = 0U;
+    if (0U != img->header.clutSize)
+    {
+        switch (img->getPixelFormat())
+        {
+        case LsrImageTypes::PIXEL_FORMAT_RGB565:
+            retval = 2U;
+            break;
+        case LsrImageTypes::PIXEL_FORMAT_RGB888:
+        case LsrImageTypes::PIXEL_FORMAT_BGR888:
+            retval = 3U;
+            break;
+        case LsrImageTypes::PIXEL_FORMAT_RGBA8888:
+        case LsrImageTypes::PIXEL_FORMAT_BGRA8888:
+            retval = 4U;
+            break;
+        default:
+            break;
+        }
+    }
+    return retval;
 }
+
+GILFormat Texture::convertFormat(const LsrImage* const img)
+{
+    GILFormat format = GIL_FORMAT_INVALID;
+    if (img->palette != NULL)
+    {
+        ASSERT(img->header.clutSize > 0);
+        if (2U == img->header.bitDepth)
+        {
+            switch (img->getPixelFormat())
+            {
+            case LsrImageTypes::PIXEL_FORMAT_RGB565:
+                format = GIL_FORMAT_P_2_RGB_565;
+                break;
+            case LsrImageTypes::PIXEL_FORMAT_RGB888:
+                format = GIL_FORMAT_P_2_RGB_888;
+                break;
+            case LsrImageTypes::PIXEL_FORMAT_RGBA8888:
+                format = GIL_FORMAT_P_2_RGBA_8888;
+                break;
+            case LsrImageTypes::PIXEL_FORMAT_BGRA8888:
+                format = GIL_FORMAT_P_2_BGRA_8888;
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    else
+    {
+        switch (img->getPixelFormat())
+        {
+        case LsrImageTypes::PIXEL_FORMAT_RGB565:
+            format = GIL_FORMAT_RGB_565;
+            break;
+        case LsrImageTypes::PIXEL_FORMAT_RGB888:
+            format = GIL_FORMAT_RGB_888;
+            break;
+        case LsrImageTypes::PIXEL_FORMAT_BGR888:
+            format = GIL_FORMAT_BGR_888;
+            break;
+        case LsrImageTypes::PIXEL_FORMAT_RGBA8888:
+            format = GIL_FORMAT_RGBA_8888;
+            break;
+        case LsrImageTypes::PIXEL_FORMAT_BGRA8888:
+            format = GIL_FORMAT_BGRA_8888;
+            break;
+        default:
+            break;
+        }
+    }
+    return format;
+}
+
+} // namespace lsr

@@ -32,9 +32,9 @@
 namespace lsr
 {
 
-Database::Database(const ResourceBuffer& ddhbin, const ResourceBuffer& imgbin)
-    : m_ddh(static_cast<const DDHType*>(ddhbin.getData()))
-    , m_bitmapAccess(m_ddh, imgbin)
+Database::Database(const DDHType* ddh)
+    : m_ddh(ddh)
+    , m_bitmapAccess(m_ddh)
     , m_error(LSR_NO_ERROR)
 {
 }

@@ -34,8 +34,8 @@
 
 namespace lsr
 {
-class DataHandler;
-struct FUDatabaseType;
+class Engine;
+struct DDHType;
 
 /**
  * Provides a connection to non-asil functional units (like the FU Simulator in Populus Editor)
@@ -54,7 +54,7 @@ public:
      * @param hostname server ip (TCP/IP)
      * @param dataHandler Reference to the dataHandler which shall receive the data
      */
-    FUBridge(const FUDatabaseType* ddh, int port, const std::string& hostname, DataHandler& dataHandler);
+    FUBridge(const DDHType* ddh, int port, const std::string& hostname, Engine& dataHandler);
     ~FUBridge();
 
     /**
@@ -66,18 +66,19 @@ public:
 
 private:
     // IMsgReceiver
-    virtual LSRError onMessage(IMsgTransmitter* pMsgTransmitter, const U8 messageType, InputStream& stream) P_OVERRIDE;
-    virtual void onConnect(IMsgTransmitter* pMsgTransmitter) P_OVERRIDE;
-    virtual void onDisconnect(IMsgTransmitter* pMsgTransmitter) P_OVERRIDE;
+    virtual LSRError onMessage(IMsgTransmitter* const pMsgTransmitter, const U8 messageType, InputStream& stream) P_OVERRIDE;
+    virtual void onConnect(IMsgTransmitter* const pMsgTransmitter) P_OVERRIDE;
+    virtual void onDisconnect(IMsgTransmitter* const pMsgTransmitter) P_OVERRIDE;
 
     LSRError onRegistration(IMsgTransmitter*, InputStream& stream);
     LSRError onODI(IMsgTransmitter*, InputStream& stream);
+    LSRError onODIDynamicData(InputStream& stream);
     LSRError subscribeAll();
     void refresh();
 
     ODIComSession m_session;
-    DataHandler& m_dataHandler;
-    const FUDatabaseType* m_ddh;
+    Engine& m_dataHandler;
+    const DDHType* m_ddh;
     IMsgTransmitter *m_transmitter;
 };
 

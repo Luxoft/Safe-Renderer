@@ -29,12 +29,10 @@
 
 #include "LsrTypes.h"
 
-static const U32 MAX_NUM_MESSAGE_TO_PROCESS = 10U;
-
 /**
  * Value describes maximum nesting level which @c lsr::Expression can have.
  */
-static const U32 MAX_EXPRESSION_NESTING = 10U;
+static const U32 MAX_EXPRESSION_NESTING = 8U;
 
 // FrameHandler constants
 static const U8 MAX_FRAMES_COUNT = 1U;

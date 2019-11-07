@@ -32,14 +32,24 @@
 
 namespace lsr
 {
-
+    /**
+    * LSR image uses a layout optimized to be read and displayed by the LSR Engine.
+    * Image layout:
+    *
+    *  ImgHeader
+    *  FrameHeader, frame 1
+    *  Palette data (if any), frame 1
+    *  Pad bytes, frame 1
+    *  Image data, frame 1
+    *  Pad bytes, frame 1
+    *  ...
+    *  FrameHeader, frame n
+    *  Palette data (if any), frame n
+    *  Pad bytes, frame n
+    *  Image data, frame n
+    *  Pad bytes, frame n
+    */
 namespace LsrImageTypes
-{
-    struct ImgHeader;
-    struct FrameHeader;
-}
-
-class LsrImage
 {
     enum PixelSize
     {
@@ -49,7 +59,6 @@ class LsrImage
         PIXEL_SIZE_4BYTE=64
     };
 
-public:
     enum PixelFormat
     {
         PIXEL_FORMAT_UNKNOWN = 0,
@@ -60,16 +69,47 @@ public:
         PIXEL_FORMAT_BGRA8888 = PIXEL_SIZE_4BYTE + 1
     };
 
-    explicit LsrImage(const ResourceBuffer& buf);
+    /**
+    * Header for the image.
+    */
+    struct ImgHeader
+    {
+        const U32 width; ///< The width of the image in pixels
+        const U32 height; ///< The height of the image in pixels
+        const U32 clutSize; ///< The number of colors in the clut
+        const U32 imageDataSize; ///< The size of the frame image data in bytes
+        const U32 pitch; ///< The number of pixels (not bytes) in a row. Could be more than width
+        const PixelFormat pixelFormat; ///< The format of the pixels
+        const U8 bitDepth; ///< Bits per pixel (if palette is used)
+    };
+}
 
-    U32 getWidth() const;
-    U32 getHeight() const;
-    PixelFormat getPixelFormat() const;
-    const void* getPixelData() const;
 
-private:
-    const LsrImageTypes::ImgHeader* m_image;
-    const LsrImageTypes::FrameHeader* m_frame;
+struct LsrImage
+{
+    const LsrImageTypes::ImgHeader header;
+    const U8* const palette; // color lookup table
+    const U8* const data; // pixel data
+
+    U32 getWidth() const
+    {
+        return header.width;
+    }
+
+    U32 getHeight() const
+    {
+        return header.height;
+    }
+
+    LsrImageTypes::PixelFormat getPixelFormat() const
+    {
+        return header.pixelFormat;
+    }
+
+    const void* getPixelData() const
+    {
+        return data;
+    }
 };
 
 } // namespace lsr

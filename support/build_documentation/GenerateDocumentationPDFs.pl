@@ -3,11 +3,11 @@
 =head1 NAME
   GenerateDocumentationPDFs.pl
 
-  Generate PDF files and put them in root folder of PopulusSC for files in
-  * PopulusSC\doc\SUG_PopulusSC_Build_Configuration
-  * PopulusSC\doc\SUG_PopulusSC_Editor_User_Manual
-  * PopulusSC\doc\SUG_PopulusSC_Hardware_Requirements
-  * PopulusSC\doc\SUG_PopulusSC_Safety_Notes
+  Generate PDF files and put them in root folder of repository for files in
+  * doc\SUG_LSR_Build_Configuration
+  * doc\SUG_LSR_Editor_User_Manual
+  * doc\SUG_LSR_Hardware_Requirements
+  * doc\SUG_LSR_Safety_Notes
 
 =head1 USAGE
   perl GenerateDocumentationPDFs.pl
@@ -38,7 +38,7 @@ sub GetVariables () {
 
     # read parameters into hash
     my %vars = ();
-    open(my $fh, '<', '../../config/DocBookConfig.ent') or die("Can't open 'PopulusSC/config/DocBookConfig.ent' for reading: $!\n");
+    open(my $fh, '<', '../../config/DocBookConfig.ent') or die("Can't open 'config/DocBookConfig.ent' for reading: $!\n");
     while (my $line = <$fh>) {
         if ($line =~ /^\s*<!ENTITY\s+(\S+)\s+"(\S+)">/) {
             $vars{$1} = $2;
@@ -51,7 +51,7 @@ sub GetVariables () {
         'ChangeLogDate',
         'ChangeLogRelease',
         'ChangeLogIssuer',
-        'ChangeLogProduct_PopulusSC',
+        'ChangeLogProduct_LSR',
         'CopyrightYear',
     );
     my %validNames = map { $_ => 1 } @validNames;
@@ -87,10 +87,10 @@ unless (chdir($scriptDir)) {
 
 my $vars = GetVariables();
 my %files = (
-    '..\doc\SUG_PopulusSC_Build_Configuration\LXFT.POPULUS.SUG-(PopulusSC_Build_Configuration).xml'    => "LXFT.POPULUS.SUG.$$vars{'ChangeLogRelease'}-(Populus Safety Critical Build Configuration).pdf",
-    '..\doc\SUG_PopulusSC_Editor_User_Manual\LXFT.POPULUS.SUG-(PopulusSC_Editor_User_Manual).xml'    => "LXFT.POPULUS.SUG.$$vars{'ChangeLogRelease'}-(Populus Safety Critical Editor User Manual).pdf",
-    '..\doc\SUG_PopulusSC_Hardware_Requirements\LXFT.POPULUS.SUG-(PopulusSC_Hardware_Requirements).xml'    => "LXFT.POPULUS.SUG.$$vars{'ChangeLogRelease'}-(Populus Safety Critical Hardware Requirements).pdf",
-    '..\doc\SUG_PopulusSC_Safety_Notes\LXFT.POPULUS.SUG-(PopulusSC_Safety_Notes).xml'    => "LXFT.POPULUS.SUG.$$vars{'ChangeLogRelease'}-(Populus Safety Critical Safety Notes).pdf",
+    '..\doc\SUG_LSR_Build_Configuration\LXFT.LSR.SUG-(LSR_Build_Configuration).xml'    => "LXFT.LSR.SUG.$$vars{'ChangeLogRelease'}-(Luxoft Safe Renderer Build Configuration).pdf",
+    '..\doc\SUG_LSR_Editor_User_Manual\LXFT.LSR.SUG-(LSR_Editor_User_Manual).xml'    => "LXFT.LSR.SUG.$$vars{'ChangeLogRelease'}-(Luxoft Safe Renderer Editor User Manual).pdf",
+    '..\doc\SUG_LSR_Hardware_Requirements\LXFT.LSR.SUG-(LSR_Hardware_Requirements).xml'    => "LXFT.LSR.SUG.$$vars{'ChangeLogRelease'}-(Luxoft Safe Renderer Hardware Requirements).pdf",
+    '..\doc\SUG_LSR_Safety_Notes\LXFT.LSR.SUG-(LSR_Safety_Notes).xml'    => "LXFT.LSR.SUG.$$vars{'ChangeLogRelease'}-(Luxoft Safe Renderer Safety Notes).pdf",
 );
 
 print "Converting documentation XMLs into PDFs...\n";

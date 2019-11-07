@@ -33,7 +33,6 @@
 namespace lsr
 {
 
-class DisplayManager;
 struct WindowDefinition;
 
 /**
@@ -46,6 +45,12 @@ public:
 
     void makeCurrent();
     void swapBuffers();
+
+    /**
+     * notifies the canvas about the finished main loop
+     * (all verification calls done for one Engine iteration)
+     */
+    void sync();
 
     /**
      * @return true to indicate that the window has been closed by the window system

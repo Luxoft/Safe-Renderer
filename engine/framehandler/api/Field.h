@@ -32,10 +32,9 @@
 namespace lsr
 {
 
-struct FieldType;
+struct BaseFieldChoiceType;
 class Database;
 class DataContext;
-class WidgetPool;
 
 /**
  * @reqid SW_ENG_076
@@ -59,8 +58,8 @@ public:
      */
     static Field* create(WidgetPool& widgetPool,
                          const Database& db,
-                         const FieldType* pDdh,
-                         DataContext* pContext,
+                         const BaseFieldChoiceType* const pDdh,
+                         DataContext* const pContext,
                          LSRErrorCollector& error);
 
 protected:

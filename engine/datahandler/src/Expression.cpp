@@ -31,7 +31,6 @@
 #include <LsrLimits.h>
 
 #include <ExpressionType.h>
-#include <DynamicIndicationIdType.h>
 
 #include <algorithm>
 
@@ -73,13 +72,13 @@ private:
 
 } // namespace
 
-DataStatus Expression::getNumber(const ExpressionTermType* pTerm,
-                                 DataContext* pContext,
+DataStatus Expression::getNumber(const ExpressionTermType* const pTerm,
+                                 DataContext* const pContext,
                                  Number& value)
 {
     DataStatus status = DataStatus::INCONSISTENT;
 
-    if (NULL != pContext && MAX_EXPRESSION_NESTING > pContext->getNestingCounter())
+    if ((NULL != pContext) && (MAX_EXPRESSION_NESTING > pContext->getNestingCounter()))
     {
         NestingCounterHelper nestingCounter(*pContext);
 
@@ -88,16 +87,11 @@ DataStatus Expression::getNumber(const ExpressionTermType* pTerm,
         {
         case ExpressionTermType::DYNAMICDATA_CHOICE:
         {
-            const IDataHandler* pHandler = pContext->getDataHandler();
-            if (NULL != pHandler)
-            {
-                const DynamicDataType* pData = pTerm->GetDynamicData();
+            const IDataHandler& dh = pContext->getDataHandler();
+            const DynamicDataType* const pData = pTerm->GetDynamicData();
 
-                ASSERT(NULL != pData);
-                status = pHandler->getNumber(pData->GetFUClassId(),
-                                             pData->GetDataId(),
-                                             value);
-            }
+            ASSERT(NULL != pData);
+            status = dh.getNumber(pData, value);
             break;
         }
         case ExpressionTermType::EXPRESSION_CHOICE:
@@ -112,30 +106,13 @@ DataStatus Expression::getNumber(const ExpressionTermType* pTerm,
         case ExpressionTermType::INTEGER_CHOICE:
         {
             status = DataStatus::VALID;
-            value = Number(pTerm->GetInteger(), DATATYPE_INTEGER);
+            value = Number(static_cast<U32>(pTerm->GetInteger()), DATATYPE_INTEGER);
             break;
         }
         case ExpressionTermType::BOOLEAN_CHOICE:
         {
             status = DataStatus::VALID;
             value = Number(pTerm->GetBoolean());
-            break;
-        }
-        case ExpressionTermType::INDICATION_CHOICE:
-        {
-            const IDataHandler* pHandler = pContext->getDataHandler();
-            if (NULL != pHandler)
-            {
-                const DynamicIndicationIdType* pIndication = pTerm->GetIndication();
-
-                ASSERT(NULL != pIndication);
-                bool indication = false;
-                status = pHandler->getIndication(pIndication->GetFUClassId(),
-                                                 pIndication->GetIndicationId(),
-                                                 indication);
-
-                value = Number(indication);
-            }
             break;
         }
         case ExpressionTermType::BITMAPID_CHOICE:
@@ -154,167 +131,19 @@ DataStatus Expression::getNumber(const ExpressionTermType* pTerm,
     return status;
 }
 
-DataStatus Expression::getBool(const ExpressionTermType* pTerm,
-                               DataContext* pContext,
+DataStatus Expression::getBool(const ExpressionTermType* const pTerm,
+                               DataContext* const pContext,
                                bool& value)
 {
     Number tmpValue;
-    DataStatus status = getNumber(pTerm, pContext, tmpValue);
+    const DataStatus status = getNumber(pTerm, pContext, tmpValue);
     value = tmpValue.getBool();
     return status;
 }
 
-void Expression::subscribe(const ExpressionTermType* pTerm,
-                           DataContext* pContext,
-                           IDataHandler::IListener* pListener)
-{
-    if (NULL != pContext && MAX_EXPRESSION_NESTING > pContext->getNestingCounter())
-    {
-        NestingCounterHelper nestingCounter(*pContext);
-
-        ASSERT(NULL != pTerm);
-        switch (pTerm->GetExpressionTermTypeChoice())
-        {
-        case ExpressionTermType::DYNAMICDATA_CHOICE:
-        {
-            IDataHandler* pHandler = pContext->getDataHandler();
-            if (NULL != pHandler)
-            {
-                const DynamicDataType* pData = pTerm->GetDynamicData();
-
-                ASSERT(NULL != pData);
-                pHandler->subscribeData(pData->GetFUClassId(), pData->GetDataId(), pListener);
-            }
-            break;
-        }
-        case ExpressionTermType::EXPRESSION_CHOICE:
-        {
-            const ExpressionType* pExpr = pTerm->GetExpression();
-
-            ASSERT(NULL != pExpr);
-            for (U16 i = 0U; i < pExpr->GetTermCount(); ++i)
-            {
-                /**
-                 * Coverity has an error here. Error is about infinite recursion.
-                 * This should be checked by Editor, that's why we can
-                 * suppress it.
-                 */
-                // coverity[stack_use_unknown]
-                subscribe(pExpr->GetTerm(i), pContext, pListener);
-            }
-
-            break;
-        }
-        case ExpressionTermType::INDICATION_CHOICE:
-        {
-            if (NULL != pListener)
-            {
-                IDataHandler* pHandler = pContext->getDataHandler();
-                if (NULL != pHandler)
-                {
-                    const DynamicIndicationIdType* pIndication = pTerm->GetIndication();
-
-                    ASSERT(NULL != pIndication);
-                    pHandler->subscribeIndication(pIndication->GetFUClassId(),
-                                                  pIndication->GetIndicationId(),
-                                                  pListener);
-                }
-            }
-            break;
-        }
-        case ExpressionTermType::INTEGER_CHOICE:
-        case ExpressionTermType::BOOLEAN_CHOICE:
-        {
-            // Subscription is not supported for this data type.
-            break;
-        }
-        default:
-        {
-            break;
-        }
-        }
-    }
-}
-
-void Expression::unsubscribe(const ExpressionTermType* pTerm,
-                             DataContext* pContext,
-                             IDataHandler::IListener* pListener)
-{
-    if (NULL != pContext && MAX_EXPRESSION_NESTING > pContext->getNestingCounter())
-    {
-        NestingCounterHelper nestingCounter(*pContext);
-
-        ASSERT(NULL != pTerm);
-        switch (pTerm->GetExpressionTermTypeChoice())
-        {
-        case ExpressionTermType::DYNAMICDATA_CHOICE:
-        {
-            IDataHandler* pHandler = pContext->getDataHandler();
-            if (NULL != pHandler)
-            {
-                const DynamicDataType* pData = pTerm->GetDynamicData();
-
-                ASSERT(NULL != pData);
-                pHandler->unsubscribeData(pData->GetFUClassId(), pData->GetDataId(), pListener);
-            }
-            break;
-        }
-        case ExpressionTermType::EXPRESSION_CHOICE:
-        {
-            const ExpressionType* pExpr = pTerm->GetExpression();
-
-            ASSERT(NULL != pExpr);
-            for (U16 i = 0U; i < pExpr->GetTermCount(); ++i)
-            {
-                /**
-                 * Coverity has an error here. Error is about infinite recursion.
-                 * This should be checked by Editor, that's why we can
-                 * suppress it.
-                 */
-                // coverity[stack_use_unknown]
-                unsubscribe(pExpr->GetTerm(i), pContext, pListener);
-            }
-            break;
-        }
-        case ExpressionTermType::INDICATION_CHOICE:
-        {
-            if (NULL != pListener)
-            {
-                IDataHandler* pHandler = pContext->getDataHandler();
-                if (NULL != pHandler)
-                {
-                    const DynamicIndicationIdType* pIndication = pTerm->GetIndication();
-
-                    ASSERT(NULL != pIndication);
-                    pHandler->unsubscribeIndication(pIndication->GetFUClassId(),
-                                                    pIndication->GetIndicationId(),
-                                                    pListener);
-                }
-            }
-            break;
-        }
-        case ExpressionTermType::INTEGER_CHOICE:
-        case ExpressionTermType::BOOLEAN_CHOICE:
-        {
-            // Unsubscription is not supported for this data type.
-            break;
-        }
-        default:
-        {
-            break;
-        }
-        }
-    }
-}
-
-void Expression::onDataChange()
-{
-    update();
-}
-
-DataStatus Expression::calcNumber(const ExpressionType* pExpression,
-                            DataContext* pContext,
-                            Number& value)
+DataStatus Expression::calcNumber(const ExpressionType* const pExpression,
+                                  DataContext* const pContext,
+                                  Number& value)
 {
     DataStatus status = DataStatus::INCONSISTENT;
 

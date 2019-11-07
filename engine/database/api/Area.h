@@ -27,8 +27,6 @@
 **
 ******************************************************************************/
 
-//#include "ddh_defs.h"
-//#include "AreaType.h"
 #include "LsrTypes.h"
 #ifdef UNIT_TEST
 #include <iostream>
@@ -53,8 +51,8 @@ class Area
 {
 public:
     Area();
-    Area(const AreaType* pArea);
-    Area(const Area& area);
+    explicit Area(const AreaType* const pArea);
+    Area(const Area& other);
     Area(const I32 left, const I32 top, const I32 right, const I32 bottom);
     ~Area();
 
@@ -97,20 +95,22 @@ public:
 
 
     inline void clear() {m_x = 0; m_y = 0; m_width = 0; m_height = 0;}      ///< Empties the area and moves it to origin
-    inline bool isEmpty() const {return (m_width == 0 || m_height == 0);}   ///< @return Whether area encloses any pixel or not
+    inline bool isEmpty() const {return ((m_width == 0) || (m_height == 0));}   ///< @return Whether area encloses any pixel or not
 
     /**
     *   @returns True if this area defines the exact same area as the argument
     */
-    bool operator==(const Area &area) const {
-        return (m_x == area.m_x && m_y == area.m_y && m_width == area.m_width && m_height == area.m_height);
+    bool operator==(const Area& rhs) const
+    {
+        return ((m_x == rhs.m_x) && (m_y == rhs.m_y) && (m_width == rhs.m_width) && (m_height == rhs.m_height));
     }
 
     /**
     *   @returns True if this area doens't define the exact same area as the argument
     */
-    bool operator!=(const Area &area) const {
-        return !(*this == area);
+    bool operator!=(const Area& rhs) const
+    {
+        return !(*this == rhs);
     }
 
     /**
@@ -128,7 +128,7 @@ public:
     /**
     *   Sets the area from a DDH AreaType
     */
-    void setArea(const AreaType *pArea);
+    void setArea(const AreaType* const pArea);
 
 
     /////////////////////////////////////////////////////////////////
@@ -138,17 +138,13 @@ public:
     /**
     *   @return whether the given area is overlapping the area of this Area instance (true) or not (false).
     */
-    bool isOverlapping(const Area &area) const;
+    bool isOverlapping(const Area& other) const;
 
 private:
     I32 m_x;        ///< Internal sub pixel resolution fixed point horizontal reference coordinate
     I32 m_y;        ///< Internal sub pixel resolution fixed point vertical reference coordinate
     I32 m_width;    ///< Internal sub pixel resolution fixed point horizontal size
     I32 m_height;   ///< Internal sub pixel resolution fixed point vertical size
-
-    enum {
-        FIXED_POINT_BITS = 4,     ///< Number of fraction bits in the internal sub pixel resolution representation of a coordinate
-    };
 };
 
 

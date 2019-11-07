@@ -28,39 +28,30 @@
 #include "DDHType.h"
 #include "SkinDatabaseType.h"
 #include "BitmapDefinitionType.h"
-#include "BitmapStateDefinitionType.h"
 #include "SkinType.h"
+#include "Assertion.h"
 
 namespace lsr
 {
 
-const U16 NO_IMAGE = 0xffff;
 
-BitmapAccess::BitmapAccess(const DDHType* ddh, const ResourceBuffer& imgbin)
+
+BitmapAccess::BitmapAccess(const DDHType* const ddh)
 : m_ddh(ddh)
-, m_fonbin()
 , m_error(LSR_NO_ERROR)
 {
-    if (ddh)
+    if (NULL == ddh)
     {
-        FonBinReader::EFonBinReaderStatus status = m_fonbin.setFonBin(imgbin, ddh->GetImagesChecksum());
-        if (status != FonBinReader::OK)
-        {
-            m_error = LSR_DB_IMGBIN_VERSION_MISMATCH;
-        }
-    }
-    else
-    {
-        m_error = LSR_DB_IMGBIN_VERSION_MISMATCH;
+        m_error = LSR_DB_DDHBIN_EMPTY;
     }
 }
 
-StaticBitmap BitmapAccess::getBitmap(BitmapId bitmapId, const U16 skin) const
+StaticBitmap BitmapAccess::getBitmap(const BitmapId bitmapId, const U16 skin) const
 {
     const BitmapStateDefinitionType* pState = NULL;
-    if (bitmapId != 0)
+    if (bitmapId != 0U)
     {
-        const BitmapDefinitionType * pBitmapDef = getBitmapDefinition(bitmapId, skin);
+        const BitmapDefinitionType* const pBitmapDef = getBitmapDefinition(bitmapId, skin);
         if (pBitmapDef != NULL)
         {
             pState = pBitmapDef->GetDefault();
@@ -69,7 +60,7 @@ StaticBitmap BitmapAccess::getBitmap(BitmapId bitmapId, const U16 skin) const
     return StaticBitmap(*this, pState);
 }
 
-const BitmapDefinitionType *BitmapAccess::getBitmapDefinition(BitmapId bitmapId, const U16 skinIx) const
+const BitmapDefinitionType *BitmapAccess::getBitmapDefinition(const BitmapId bitmapId, const U16 skinIx) const
 {
     /**
      * There are several ways to find the BitmapDefinitionType.
@@ -77,50 +68,27 @@ const BitmapDefinitionType *BitmapAccess::getBitmapDefinition(BitmapId bitmapId,
      * Alternatively the SkinType could be searched (binary search: O(log)) or guessed (O(1) for default skin)
      */
     const BitmapDefinitionType* result = NULL;
-    const SkinDatabaseType* skinDB = m_ddh->GetSkinDatabase();
-    const FonBinReader::SkinBitmapTable table = m_fonbin.getSkinBitmapTable();
+    const SkinDatabaseType* const skinDB = m_ddh->GetSkinDatabase();
 
     // Try with assigned/specified skin
-    U16 skinBitmapIx = table.GetSkinBitmapIndex(bitmapId, skinIx);
-    const SkinType* pSkin = skinDB->GetSkin(skinIx);
-    if (NO_IMAGE == skinBitmapIx)
+    const SkinType* const pSkin = skinDB->GetSkin(skinIx);
+    result = (pSkin != NULL) ? pSkin->GetBitmap(bitmapId - 1U) : NULL;
+    if (result != NULL)
     {
-        const U16 defaultSkinIx = 0U; // TODO: check if Editor can change this
-        skinBitmapIx = table.GetSkinBitmapIndex(bitmapId, defaultSkinIx);
-        pSkin = skinDB->GetSkin(defaultSkinIx);
-    }
-    if (NO_IMAGE != skinBitmapIx)
-    {
-        result = pSkin->GetBitmap(skinBitmapIx);
         ASSERT(result->GetBitmapId() == bitmapId);
     }
     return result;
 }
 
-ResourceBuffer BitmapAccess::getBitmapBuffer(const StaticBitmap& bmp) const
+const LsrImage* BitmapAccess::getBitmapBuffer(const StaticBitmap& bitmap) const
 {
-    ResourceBuffer image;
-    const BitmapStateDefinitionType* pStateBitmap = bmp.m_bmp;
-    if (pStateBitmap)
-    {
-        const FonBinReader::StateBitmapTable stateTable = m_fonbin.getStateBitmapTable();
-        const FonBinReader::ImageDataTable imageDataTable = m_fonbin.getImageDataTable();
-        const U16 stateBitmapIx = pStateBitmap->GetStateBitmapId() - 1;
-        ASSERT(stateBitmapIx < stateTable.GetSize());
-        const U16 bitmapIx = stateTable.GetImageIndex(stateBitmapIx);
-        ASSERT(bitmapIx < imageDataTable.GetSize());
-        U32 imageBufSize = 0U;
-        const U8* imageBuf = imageDataTable.ReadImage(static_cast<U32>(bitmapIx), imageBufSize);
-        image = ResourceBuffer(imageBuf, imageBufSize);
-    }
-    return image;
+    const BitmapStateDefinitionType* const pStateBitmap = bitmap.m_bmp;
+    return (pStateBitmap != NULL) ? pStateBitmap->GetFile() : NULL;
 }
 
 LSRError BitmapAccess::getError() const
 {
-    LSRError ret = m_error;
-    // m_error = LSR_NO_ERROR; // TODO?
-    return ret;
+    return m_error;
 }
 
-}
+} // namespace lsr

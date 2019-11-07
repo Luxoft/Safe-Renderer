@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8"?>
-<ddh:DDH xmlns:ddh="http://www.populus.luxoft.com/ddh" ddh:Name="Telltales.ddh">
+<ddh:DDH xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddh="http://www.populus.luxoft.com/ddh">
   <VersionData>
-    <DDHVersion ddh:DDHSchemaVersion="4.58.0">
+    <DDHVersion ddh:DDHSchemaVersion="5.4.0">
       <Version>4.57.0</Version>
       <HMIVehicleId>1</HMIVehicleId>
       <DDHStringIndex>1</DDHStringIndex>
@@ -22,7 +22,7 @@
       <ProfileEventDatabase/>
       <PageTraversalOrder>
         <TraversalWrap>
-          <Default>false</Default>
+          <Boolean>false</Boolean>
         </TraversalWrap>
         <Page>
           <PageId>Telltales.ddh::Default Page</PageId>
@@ -38,7 +38,7 @@
       <PanelId>Telltales.ddh::ReferencePanel</PanelId>
       <PanelTraversalOrder>
         <TraversalWrap>
-          <Default>false</Default>
+          <Boolean>false</Boolean>
         </TraversalWrap>
       </PanelTraversalOrder>
       <PageEventDatabase/>
@@ -59,121 +59,108 @@
         <LayoutType>Fixed</LayoutType>
         <LayoutConfiguration/>
         <SmoothScroll>
-          <Default>true</Default>
+          <Boolean>true</Boolean>
         </SmoothScroll>
         <ScrollAnimationFilter>
           <Filter>None</Filter>
         </ScrollAnimationFilter>
+        <ShowFocusBehaviour>AskParent</ShowFocusBehaviour>
       </Layout>
       <ExternalScrollbarData/>
       <FieldTraversalOrder>
         <TraversalWrap>
-          <Default>false</Default>
+          <Boolean>false</Boolean>
         </TraversalWrap>
         <TraversalContain>
-          <Default>false</Default>
+          <Boolean>false</Boolean>
         </TraversalContain>
         <AnimateFocusedOutlineBitmap>false</AnimateFocusedOutlineBitmap>
       </FieldTraversalOrder>
-      <Fields>
-        <Field>
-          <StaticBitmapField ddh:Documentation="This telltale is rendered by the PopulusSC engine.&#xD;&#xA;It's visibility is controlled by 2 redundant flags. If there is any error detected (any data not received or the redundant values are not equal), the telltale will be displayed." ddh:Name="Break">
-            <Area>
-              <XCoord>20</XCoord>
-              <YCoord>2</YCoord>
-              <Width>100</Width>
-              <Height>69</Height>
-            </Area>
-            <Visible>
+      <Field xsi:type="ddh:StaticBitmapFieldType" ddh:Documentation="This telltale is rendered by the PopulusSC engine.&#xD;&#xA;It's visibility is controlled by 2 redundant flags. If there is any error detected (any data not received or the redundant values are not equal), the telltale will be displayed." ddh:Name="Break">
+        <Area>
+          <XCoord>20</XCoord>
+          <YCoord>2</YCoord>
+          <Width>100</Width>
+          <Height>69</Height>
+        </Area>
+        <Visible>
+          <Expression>
+            <Operator>fallback</Operator>
+            <Term>
               <Expression>
-                <Operator>fallback</Operator>
+                <Operator>or</Operator>
+                <Term>
+                  <DynamicData>
+                    <Data>42#data_1</Data>
+                    <SubData>None</SubData>
+                  </DynamicData>
+                </Term>
                 <Term>
                   <Expression>
-                    <Operator>or</Operator>
+                    <Operator>not</Operator>
                     <Term>
                       <DynamicData>
-                        <Type>Speed</Type>
-                        <FUClassId>42</FUClassId>
-                        <DataId>1</DataId>
+                        <Data>42#data_2</Data>
                         <SubData>None</SubData>
                       </DynamicData>
                     </Term>
-                    <Term>
-                      <Expression>
-                        <Operator>not</Operator>
-                        <Term>
-                          <DynamicData>
-                            <Type>Speed</Type>
-                            <FUClassId>42</FUClassId>
-                            <DataId>2</DataId>
-                            <SubData>None</SubData>
-                          </DynamicData>
-                        </Term>
-                      </Expression>
-                    </Term>
                   </Expression>
+                </Term>
+              </Expression>
+            </Term>
+            <Term>
+              <Boolean>true</Boolean>
+            </Term>
+          </Expression>
+        </Visible>
+        <Bitmap>
+          <BitmapId>Telltales.ddh::Parking_Break</BitmapId>
+        </Bitmap>
+      </Field>
+      <Field xsi:type="ddh:StaticBitmapFieldType" ddh:Documentation="This telltale is usually rendered by another instance (QM engine).&#xD;&#xA;PopulusSC will render it only as a fallback, i.e if the video output check fails.&#xD;&#xA;Therefore it checks 2 conditions: 1) The visibility state of the icon, 2) The output of the image verification" ddh:Name="Airbag">
+        <Area>
+          <XCoord>130</XCoord>
+          <YCoord>2</YCoord>
+          <Width>102</Width>
+          <Height>68</Height>
+        </Area>
+        <Visible>
+          <Expression>
+            <Operator>and</Operator>
+            <Term>
+              <Expression>
+                <Operator>greater</Operator>
+                <Term>
+                  <DynamicData>
+                    <Data>255#data_2</Data>
+                    <SubData>None</SubData>
+                  </DynamicData>
+                </Term>
+                <Term>
+                  <Integer>10</Integer>
+                </Term>
+              </Expression>
+            </Term>
+            <Term>
+              <Expression>
+                <Operator>fallback</Operator>
+                <Term>
+                  <DynamicData>
+                    <Data>42#data_3</Data>
+                    <SubData>None</SubData>
+                  </DynamicData>
                 </Term>
                 <Term>
                   <Boolean>true</Boolean>
                 </Term>
               </Expression>
-            </Visible>
-            <Bitmap>
-              <BitmapId>Telltales.ddh::Parking_Break</BitmapId>
-            </Bitmap>
-          </StaticBitmapField>
-        </Field>
-        <Field>
-          <StaticBitmapField ddh:Documentation="This telltale is usually rendered by another instance (QM engine).&#xD;&#xA;PopulusSC will render it only as a fallback, i.e if the video output check fails.&#xD;&#xA;Therefore it checks 2 conditions: 1) The visibility state of the icon, 2) The output of the image verification" ddh:Name="Airbag">
-            <Area>
-              <XCoord>130</XCoord>
-              <YCoord>2</YCoord>
-              <Width>102</Width>
-              <Height>68</Height>
-            </Area>
-            <Visible>
-              <Expression>
-                <Operator>and</Operator>
-                <Term>
-                  <Expression>
-                    <Operator>greater</Operator>
-                    <Term>
-                      <DynamicData>
-                        <Type>Speed</Type>
-                        <FUClassId>255</FUClassId>
-                        <DataId>2</DataId>
-                        <SubData>None</SubData>
-                      </DynamicData>
-                    </Term>
-                    <Term>
-                      <Integer>10</Integer>
-                    </Term>
-                  </Expression>
-                </Term>
-                <Term>
-                  <Expression>
-                    <Operator>fallback</Operator>
-                    <Term>
-                      <DynamicData>
-                        <Type>Speed</Type>
-                        <FUClassId>42</FUClassId>
-                        <DataId>3</DataId>
-                        <SubData>None</SubData>
-                      </DynamicData>
-                    </Term>
-                    <Term>
-                      <Boolean>true</Boolean>
-                    </Term>
-                  </Expression>
-                </Term>
-              </Expression>
-            </Visible>
-            <Bitmap>
-              <BitmapId>Telltales.ddh::Airbag_Warning</BitmapId>
-            </Bitmap>
-          </StaticBitmapField>
-        </Field>
-      </Fields>
+            </Term>
+          </Expression>
+        </Visible>
+        <Bitmap>
+          <BitmapId>Telltales.ddh::Airbag_Warning</BitmapId>
+        </Bitmap>
+      </Field>
     </Panel>
     <Panel ddh:Documentation="Contains verification widgets for video output checks" ddh:Name="ReferencePanel">
       <Area>
@@ -189,108 +176,99 @@
         <LayoutType>Fixed</LayoutType>
         <LayoutConfiguration/>
         <SmoothScroll>
-          <Default>true</Default>
+          <Boolean>true</Boolean>
         </SmoothScroll>
         <ScrollAnimationFilter>
           <Filter>None</Filter>
         </ScrollAnimationFilter>
+        <ShowFocusBehaviour>AskParent</ShowFocusBehaviour>
       </Layout>
       <ExternalScrollbarData/>
       <FieldTraversalOrder>
         <TraversalWrap>
-          <Default>false</Default>
+          <Boolean>false</Boolean>
         </TraversalWrap>
         <TraversalContain>
-          <Default>false</Default>
+          <Boolean>false</Boolean>
         </TraversalContain>
         <AnimateFocusedOutlineBitmap>false</AnimateFocusedOutlineBitmap>
       </FieldTraversalOrder>
-      <Fields>
-        <Field>
-          <ReferenceBitmapField ddh:Documentation="Reference Bitmap for output verification. Verifies expected content of ContentPanel->Break." ddh:Name="Break">
-            <Area>
-              <XCoord>20</XCoord>
-              <YCoord>2</YCoord>
-              <Width>100</Width>
-              <Height>69</Height>
-            </Area>
-            <Visible>
+      <Field xsi:type="ddh:ReferenceBitmapFieldType" ddh:Documentation="Reference Bitmap for output verification. Verifies expected content of ContentPanel->Break." ddh:Name="Break">
+        <Area>
+          <XCoord>20</XCoord>
+          <YCoord>2</YCoord>
+          <Width>100</Width>
+          <Height>69</Height>
+        </Area>
+        <Visible>
+          <Expression>
+            <Operator>fallback</Operator>
+            <Term>
               <Expression>
-                <Operator>fallback</Operator>
-                <Term>
-                  <Expression>
-                    <Operator>or</Operator>
-                    <Term>
-                      <DynamicData>
-                        <Type>Speed</Type>
-                        <FUClassId>42</FUClassId>
-                        <DataId>1</DataId>
-                        <SubData>None</SubData>
-                      </DynamicData>
-                    </Term>
-                    <Term>
-                      <Expression>
-                        <Operator>not</Operator>
-                        <Term>
-                          <DynamicData>
-                            <Type>Speed</Type>
-                            <FUClassId>42</FUClassId>
-                            <DataId>2</DataId>
-                            <SubData>None</SubData>
-                          </DynamicData>
-                        </Term>
-                      </Expression>
-                    </Term>
-                  </Expression>
-                </Term>
-                <Term>
-                  <Boolean>true</Boolean>
-                </Term>
-              </Expression>
-            </Visible>
-            <Bitmap>
-              <BitmapId>Telltales.ddh::Parking_Break</BitmapId>
-            </Bitmap>
-            <ErrorCounter>1</ErrorCounter>
-          </ReferenceBitmapField>
-        </Field>
-        <Field>
-          <ReferenceBitmapField ddh:Name="Airbag">
-            <Area>
-              <XCoord>130</XCoord>
-              <YCoord>2</YCoord>
-              <Width>102</Width>
-              <Height>68</Height>
-            </Area>
-            <Visible>
-              <Expression>
-                <Operator>fallback</Operator>
+                <Operator>or</Operator>
                 <Term>
                   <DynamicData>
-                    <Type>Speed</Type>
-                    <FUClassId>42</FUClassId>
-                    <DataId>3</DataId>
+                    <Data>42#data_1</Data>
                     <SubData>None</SubData>
                   </DynamicData>
                 </Term>
                 <Term>
-                  <Boolean>true</Boolean>
+                  <Expression>
+                    <Operator>not</Operator>
+                    <Term>
+                      <DynamicData>
+                        <Data>42#data_2</Data>
+                        <SubData>None</SubData>
+                      </DynamicData>
+                    </Term>
+                  </Expression>
                 </Term>
               </Expression>
-            </Visible>
-            <Bitmap>
-              <BitmapId>Telltales.ddh::Airbag_Warning</BitmapId>
-            </Bitmap>
-            <ErrorCounter>2</ErrorCounter>
-          </ReferenceBitmapField>
-        </Field>
-      </Fields>
+            </Term>
+            <Term>
+              <Boolean>true</Boolean>
+            </Term>
+          </Expression>
+        </Visible>
+        <Bitmap>
+          <BitmapId>Telltales.ddh::Parking_Break_palette</BitmapId>
+        </Bitmap>
+        <ErrorCounterData>255#data_1</ErrorCounterData>
+      </Field>
+      <Field xsi:type="ddh:ReferenceBitmapFieldType" ddh:Name="Airbag">
+        <Area>
+          <XCoord>130</XCoord>
+          <YCoord>2</YCoord>
+          <Width>102</Width>
+          <Height>68</Height>
+        </Area>
+        <Visible>
+          <Expression>
+            <Operator>fallback</Operator>
+            <Term>
+              <DynamicData>
+                <Data>42#data_3</Data>
+                <SubData>None</SubData>
+              </DynamicData>
+            </Term>
+            <Term>
+              <Boolean>true</Boolean>
+            </Term>
+          </Expression>
+        </Visible>
+        <Bitmap>
+          <BitmapId>Telltales.ddh::Airbag_Warning_palette</BitmapId>
+        </Bitmap>
+        <ErrorCounterData>255#data_2</ErrorCounterData>
+      </Field>
     </Panel>
   </PanelDatabase>
   <BitmapDatabase>
     <Bitmap ddh:Name="Airbag_Warning"/>
+    <Bitmap ddh:Name="Airbag_Warning_palette"/>
     <Bitmap ddh:Name="Parking_Break"/>
-    <Bitmap ddh:Name="RightSide_Indicators"/>
+    <Bitmap ddh:Name="Parking_Break_palette"/>
+    <Bitmap ddh:Name="palette"/>
   </BitmapDatabase>
   <ControlMapDatabase/>
   <EventDatabase/>
@@ -340,7 +318,7 @@
             </EasingCurve>
           </Filter>
           <Enabled>
-            <Default>true</Default>
+            <Boolean>true</Boolean>
           </Enabled>
         </Config>
       </SnapAnimationFilter>
@@ -351,30 +329,30 @@
     <AutomaticHorizontalScrollSettings>
       <ScrollRate>50</ScrollRate>
       <ScrollIn>
-        <Default>false</Default>
+        <Boolean>false</Boolean>
       </ScrollIn>
       <ScrollOut>
-        <Default>false</Default>
+        <Boolean>false</Boolean>
       </ScrollOut>
       <Wrap>
-        <Default>false</Default>
+        <Boolean>false</Boolean>
       </Wrap>
     </AutomaticHorizontalScrollSettings>
     <ControlTimeouts>
       <ShortPressTimeout>
-        <StaticDataValue>200</StaticDataValue>
+        <Integer>200</Integer>
       </ShortPressTimeout>
       <MediumPressTimeout>
-        <StaticDataValue>500</StaticDataValue>
+        <Integer>500</Integer>
       </MediumPressTimeout>
       <LongPressTimeout>
-        <StaticDataValue>1000</StaticDataValue>
+        <Integer>1000</Integer>
       </LongPressTimeout>
       <ExtraLongPressTimeout>
-        <StaticDataValue>5000</StaticDataValue>
+        <Integer>5000</Integer>
       </ExtraLongPressTimeout>
       <DoublePressTimeout>
-        <StaticDataValue>500</StaticDataValue>
+        <Integer>500</Integer>
       </DoublePressTimeout>
     </ControlTimeouts>
   </HMIGlobalSettings>
@@ -391,7 +369,6 @@
   </ColorDatabase>
   <GuardDatabase/>
   <AnimationDatabase>
-    <LayerDefinitions/>
     <Animations/>
     <Transitions/>
   </AnimationDatabase>
@@ -402,17 +379,30 @@
     <Skin ddh:Name="Default">
       <ColorMap>
         <ColorId>Telltales.ddh::Background Color</ColorId>
-        <ColorValue>4278190080</ColorValue>
+        <Color>
+          <Color>4278190080</Color>
+        </Color>
       </ColorMap>
       <ColorMap>
         <ColorId>Telltales.ddh::Transparent Color</ColorId>
-        <ColorValue>0</ColorValue>
+        <Color>
+          <Color>0</Color>
+        </Color>
       </ColorMap>
       <Bitmap>
         <BitmapId>Telltales.ddh::Airbag_Warning</BitmapId>
         <Default>
           <StateBitmap>
             <BitmapFileName>\Telltales\Bitmaps\Airbag_Warning.png</BitmapFileName>
+          </StateBitmap>
+          <RenderValue>FixedSize</RenderValue>
+        </Default>
+      </Bitmap>
+      <Bitmap>
+        <BitmapId>Telltales.ddh::Airbag_Warning_palette</BitmapId>
+        <Default>
+          <StateBitmap>
+            <BitmapFileName>\Telltales\Bitmaps\Airbag_Warning_palette.png</BitmapFileName>
           </StateBitmap>
           <RenderValue>FixedSize</RenderValue>
         </Default>
@@ -427,10 +417,27 @@
         </Default>
       </Bitmap>
       <Bitmap>
-        <BitmapId>Telltales.ddh::RightSide_Indicators</BitmapId>
+        <BitmapId>Telltales.ddh::Parking_Break_palette</BitmapId>
         <Default>
           <StateBitmap>
-            <BitmapFileName>\Telltales\Bitmaps\RightSide_Indicators.png</BitmapFileName>
+            <BitmapFileName>\Telltales\Bitmaps\Parking_Break_palette.png</BitmapFileName>
+          </StateBitmap>
+          <Palette>4293849589</Palette>
+          <Palette>4286578943</Palette>
+          <Palette>4284309756</Palette>
+          <Palette>4289506040</Palette>
+          <Palette>4293849589</Palette>
+          <Palette>4286578943</Palette>
+          <Palette>4284309756</Palette>
+          <Palette>4289506040</Palette>
+          <RenderValue>FixedSize</RenderValue>
+        </Default>
+      </Bitmap>
+      <Bitmap>
+        <BitmapId>Telltales.ddh::palette</BitmapId>
+        <Default>
+          <StateBitmap>
+            <BitmapFileName>\Telltales\Bitmaps\palette.png</BitmapFileName>
           </StateBitmap>
           <RenderValue>FixedSize</RenderValue>
         </Default>
@@ -439,4 +446,5 @@
   </SkinDatabase>
   <ScriptDatabase/>
   <VideoDatabase/>
+  <PriorityDatabase/>
 </ddh:DDH>

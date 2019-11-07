@@ -27,24 +27,31 @@
 **
 ******************************************************************************/
 
-#include "DdhBuilder.h"
-#include "DdhPanelBuilder.h"
-#include "DdhPageBuilder.h"
 #include "TestCanvas.h"
 
 #include <WidgetPool.h>
 
-#include <TestDataContext.h>
 #include <MockDataHandler.h>
 
 #include <AreaType.h>
+#include <ReferenceBitmapFieldType.h>
+#include <StaticBitmapFieldType.h>
+#include <ExpressionTermType.h>
+#include <BaseFieldChoiceType.h>
+#include <PanelType.h>
 #include <ResourceBuffer.h>
+#include <PageDatabaseType.h>
+#include <PageType.h>
+#include <HMIGlobalSettingsType.h>
+#include <PanelDatabaseType.h>
+#include <DDHType.h>
 #include <Database.h>
 #include <DatabaseAccessor.h>
 
 #include <DisplayManager.h>
 #include <DisplayAccessor.h>
 #include <DisplaySizeType.h>
+#include <DataContext.h>
 
 #include <gtest/gtest.h>
 
@@ -59,80 +66,30 @@ protected:
     void initDataHandler(U32 value);
     void initDHWithOutdatedData(U32 value);
 
-    void initNullDb();
-    void initNormalDb();
-    void initDb(framehandlertests::DdhPageBuilder& pageBuilder,
-                framehandlertests::DdhPanelBuilder& panelBuilder);
-    void initDb(framehandlertests::DdhPageBuilder& pageBuilder,
-                framehandlertests::DdhPanelBuilder& panelBuilder,
-                const lsr::DisplaySizeType& displaySize);
-    void initDbWithManyPanels(framehandlertests::DdhPageBuilder& pageBuilder,
-                              framehandlertests::DdhPanelBuilder& panelBuilder,
-                              const lsr::DisplaySizeType& displaySize,
-                              U32 panelCount);
-
-    framehandlertests::DdhBuilder m_ddhBuilder;
-
     lsr::WidgetPool m_widgetPool;
     MockDataHandler m_dataHandler;
-    TestDataContext m_context;
+    lsr::DataContext m_context;
     lsr::DisplayManager m_dsp;
     TestCanvas m_canvas;
-
-    lsr::ResourceBuffer* m_pBinBuffer;
-    lsr::ResourceBuffer* m_pImgBuffer;
-    lsr::Database* m_pDb;
-
-private:
-    void deinitDB();
 };
 
 inline WidgetTestBase::WidgetTestBase()
-    : m_ddhBuilder()
-    , m_widgetPool()
+    : m_widgetPool()
     , m_dataHandler()
-    , m_context()
+    , m_context(m_dataHandler)
     , m_dsp()
     , m_canvas(m_dsp, 640U, 480U)
-    , m_pBinBuffer(NULL)
-    , m_pImgBuffer(NULL)
-    , m_pDb(NULL)
 {
-    m_context.setHandler(&m_dataHandler);
 }
 
 inline void WidgetTestBase::SetUp()
 {
-    initNullDb();
-
     lsr::DatabaseAccessor::instance().toDefault();
     lsr::DisplayAccessor::instance().toDefault();
 }
 
 inline void WidgetTestBase::TearDown()
 {
-    deinitDB();
-}
-
-inline void WidgetTestBase::deinitDB()
-{
-    if (m_pDb)
-    {
-        delete m_pDb;
-        m_pDb = NULL;
-    }
-
-    if (m_pBinBuffer)
-    {
-        delete m_pBinBuffer;
-        m_pBinBuffer = NULL;
-    }
-
-    if (m_pImgBuffer)
-    {
-        delete m_pImgBuffer;
-        m_pImgBuffer = NULL;
-    }
 }
 
 inline void WidgetTestBase::initDataHandler(U32 value)
@@ -147,68 +104,7 @@ inline void WidgetTestBase::initDHWithOutdatedData(U32 value)
     m_dataHandler.setOutDatedNumber(num);
 }
 
-inline void WidgetTestBase::initDb(framehandlertests::DdhPageBuilder& pageBuilder,
-                            framehandlertests::DdhPanelBuilder& panelBuilder)
-{
-    deinitDB();
 
-    lsr::DisplaySizeType displaySize;
-    m_ddhBuilder.create(panelBuilder, pageBuilder, displaySize);
 
-    m_pBinBuffer = new lsr::ResourceBuffer(m_ddhBuilder.getDdh(), m_ddhBuilder.getSize());
-    m_pImgBuffer = new lsr::ResourceBuffer();
-    m_pDb = new lsr::Database(*m_pBinBuffer, *m_pImgBuffer);
-}
-
-inline void WidgetTestBase::initDb(framehandlertests::DdhPageBuilder& pageBuilder,
-                            framehandlertests::DdhPanelBuilder& panelBuilder,
-                            const lsr::DisplaySizeType& displaySize)
-{
-    deinitDB();
-
-    m_ddhBuilder.create(panelBuilder, pageBuilder, displaySize);
-
-    m_pBinBuffer = new lsr::ResourceBuffer(m_ddhBuilder.getDdh(), m_ddhBuilder.getSize());
-    m_pImgBuffer = new lsr::ResourceBuffer();
-    m_pDb = new lsr::Database(*m_pBinBuffer, *m_pImgBuffer);
-}
-
-inline void WidgetTestBase::initDbWithManyPanels(framehandlertests::DdhPageBuilder& pageBuilder,
-                                                 framehandlertests::DdhPanelBuilder& panelBuilder,
-                                                 const lsr::DisplaySizeType& displaySize,
-                                                 U32 panelCount)
-{
-    deinitDB();
-
-    m_ddhBuilder.create(panelBuilder, pageBuilder, displaySize, panelCount);
-
-    m_pBinBuffer = new lsr::ResourceBuffer(m_ddhBuilder.getDdh(), m_ddhBuilder.getSize());
-    m_pImgBuffer = new lsr::ResourceBuffer();
-    m_pDb = new lsr::Database(*m_pBinBuffer, *m_pImgBuffer);
-}
-
-inline void WidgetTestBase::initNullDb()
-{
-    deinitDB();
-
-    m_pBinBuffer = new lsr::ResourceBuffer();
-    m_pImgBuffer = new lsr::ResourceBuffer();
-    m_pDb = new lsr::Database(*m_pBinBuffer, *m_pImgBuffer);
-}
-
-inline void WidgetTestBase::initNormalDb()
-{
-    deinitDB();
-
-    lsr::AreaType area;
-    lsr::DisplaySizeType displaySize;
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
-
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.create(area, true, 2U);
-
-    initDb(pageBuilder, panelBuilder, displaySize);
-}
 
 #endif // LUXOFTSAFERENDERER_WIDGETTESTBASE_H

@@ -1,5 +1,5 @@
-#ifndef _PANELTYPE_H_
-#define _PANELTYPE_H_
+#ifndef _LSR_PANELTYPE_H_
+#define _LSR_PANELTYPE_H_
 
 /******************************************************************************
 **
@@ -8,9 +8,9 @@
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
-**   This file is part of Safe Renderer.
+**   This file is part of Luxoft Safe Renderer.
 **
-**   Safe Renderer is free software: you can redistribute it and/or
+**   Luxoft Safe Renderer is free software: you can redistribute it and/or
 **   modify it under the terms of the GNU Lesser General Public
 **   License as published by the Free Software Foundation.
 **
@@ -28,100 +28,59 @@
 ******************************************************************************/
 
 #include "ddh_defs.h"
-#include "LsrTypes.h"  // for P_STATIC_ASSERT
-
 
 namespace lsr
 {
 struct AreaType;
 struct ExpressionTermType;
-struct FieldsType;
-
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(push)
-#pragma pack(1)
-#endif
+struct BaseFieldChoiceType;
 
 struct PanelType
 {
-public:
-    //----------------------------------------------------------------
-    /**
-     * This is the ROM structure for the PanelType.
-     * Each element of this type has this exact image in ROM memory.
-     */
-    U16 areaOffset :16;
-    U16 visibleOffset :16;
-    U16 fieldsOffset :16;
-    U8  PADDING1 :8;
-    U8  PADDING2 :8;
-    //----------------------------------------------------------------
+    const AreaType* const area;
+    const ExpressionTermType* const visible;
+    const BaseFieldChoiceType* const *field;
+    const U16 fieldCount;
 
-public:
 
     /**
      * Returns a pointer to the area child reference.
-     * Defines the area of the element relative to the upper left corner of its
-     * parent
+     * Defines the area of the element relative to the upper left corner of its parent
      */
-    const AreaType* GetArea() const;
+    const AreaType* GetArea() const
+    {
+        return area;
+    }
 
     /**
      * Returns a pointer to the visible child reference.
-     * Controls the visibility of the element. It can make sense to have a field
-     * invisible if it is also enabled because when it receives focus, it
-     * becomes visible and when it loses focus, it becomes invisible again
+     * Controls the visibility of the element. It can make sense to have a field invisible if it is also enabled because when it receives focus, it becomes visible and when it loses focus, it becomes invisible again
      */
-    const ExpressionTermType* GetVisible() const;
+    const ExpressionTermType* GetVisible() const
+    {
+        return visible;
+    }
 
     /**
-     * Returns a pointer to the fields child reference.
-     * The list of fields in the panel. The fields are drawn in the order they
-     * appear in the list
+     * Returns the number of field elements.
      */
-    const FieldsType* GetFields() const;
+    U16 GetFieldCount() const
+    {
+        return fieldCount;
+    }
+
+    /**
+     * Returns a pointer to the field child reference at index i.
+     * This method checks the index and returns NULL if the item index exceeds the element count.
+     * The list of fields in the panel. The fields are drawn in the order they appear in the list
+     */
+    const BaseFieldChoiceType* GetField(const U16 i) const
+    {
+        return (i < fieldCount) ? field[i] : NULL;
+    }
+
 };
-
-P_STATIC_ASSERT((sizeof(PanelType)) == 8, "PanelType size")
-
-
-inline const AreaType* PanelType::GetArea() const
-{
-    const AreaType* pResult = NULL;
-    if (areaOffset != 0U)
-    {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const AreaType*>(pThis + areaOffset * 4);
-    }
-    return pResult;
-}
-
-inline const ExpressionTermType* PanelType::GetVisible() const
-{
-    const ExpressionTermType* pResult = NULL;
-    if (visibleOffset != 0U)
-    {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const ExpressionTermType*>(pThis + visibleOffset * 4);
-    }
-    return pResult;
-}
-
-inline const FieldsType* PanelType::GetFields() const
-{
-    const FieldsType* pResult = NULL;
-    if (fieldsOffset != 0U)
-    {
-        const U8* pThis = reinterpret_cast<const U8*>(this);
-        pResult = reinterpret_cast<const FieldsType*>(pThis + fieldsOffset * 4);
-    }
-    return pResult;
-}
 
 } // namespace lsr
 
-#ifdef _USE_PACK_PRAGMA
-#pragma pack(pop)
-#endif
-
-#endif  // #ifndef _PANELTYPE_H_
+#endif // #ifndef _LSR_PANELTYPE_H_

@@ -44,7 +44,7 @@ class StaticBitmap
 public:
     StaticBitmap(const BitmapAccess& db, const BitmapStateDefinitionType* const bmp);
 
-    ResourceBuffer getData() const;
+    const LsrImage* getData() const;
     U16 getId() const;
 
 private:
@@ -60,7 +60,7 @@ inline StaticBitmap::StaticBitmap(const BitmapAccess& db, const BitmapStateDefin
 
 inline U16 StaticBitmap::getId() const
 {
-    return m_bmp ? m_bmp->GetStateBitmapId() : 0;
+    return (NULL != m_bmp) ? m_bmp->GetStateBitmapId() : 0U;
 }
 
 }

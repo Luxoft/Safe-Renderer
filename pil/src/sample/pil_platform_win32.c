@@ -24,67 +24,12 @@
 **
 ******************************************************************************/
 
-#include "pil_platform.h"
+#include "pil.h"
+#include <Windows.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-void pil_mutex_create(pil_mutex_t* mutex, pil_mutex_id_t id)
-{
-    *mutex = CreateMutex(NULL, FALSE, NULL);
-}
-
-pil_bool_t pil_mutex_lock(pil_mutex_t* mutex)
-{
-    WaitForSingleObject(*mutex, INFINITE);
-    return pil_true;
-}
-
-pil_bool_t pil_mutex_unlock(pil_mutex_t* mutex)
-{
-    ReleaseMutex(*mutex);
-    return pil_true;
-}
-
-void pil_mutex_destroy(pil_mutex_t* mutex)
-{
-    CloseHandle(*mutex);
-}
-
-void pil_event_create(pil_event_t* ev, pil_event_id_t id)
-{
-    *ev = CreateEvent(NULL, TRUE, FALSE, NULL);
-}
-
-void pil_event_destroy(pil_event_t* ev)
-{
-}
-
-void pil_event_set(pil_event_t* ev)
-{
-    SetEvent(*ev);
-}
-
-void pil_event_clear(pil_event_t* ev)
-{
-    ResetEvent(*ev);
-}
-
-void pil_event_wait(pil_event_t* ev)
-{
-    WaitForSingleObject(*ev, INFINITE);
-}
-
-void pil_event_wait_timeout(pil_event_t* ev, uint32_t msTimeout)
-{
-    WaitForSingleObject(*ev, msTimeout);
-}
-
-void pil_event_assign(pil_event_t* to, pil_event_t* from)
-{
-    *to = *from;
-}
 
 uint32_t pilGetMonotonicTime(void)
 {

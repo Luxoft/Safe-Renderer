@@ -10,7 +10,7 @@
   <!-- ***************  Additional  *********************  -->
   <xsl:param name="paper.type">A4</xsl:param>
   <xsl:param name="fop1.extensions" select="1"/>
-  <xsl:param name="header.image.filename">file:///../images/LuxoftLogo2015.png</xsl:param>
+  <xsl:param name="header.image.filename">file:///../images/LUXOFT_DXC_logo_rgb_blue_2019.png</xsl:param>
   <!-- Do not indent body text relative to section titles -->
   <xsl:param name="body.start.indent">0pt</xsl:param>
 
@@ -86,13 +86,13 @@
   <!-- Make admonition label text font smaller (12pt instead of 14), and even smaller in tables and informaltables -->
   <xsl:attribute-set name="admonition.title.properties">
     <xsl:attribute name="font-size">
-      <xsl:variable name="populus.admonition.font.size" select="12"/>
+      <xsl:variable name="lsr.admonition.font.size" select="12"/>
       <xsl:choose>
         <xsl:when test="(ancestor::informaltable | ancestor::table)">
-          <xsl:value-of select="$populus.admonition.font.size * $met.table.head.font.size"/>
+          <xsl:value-of select="$lsr.admonition.font.size * $met.table.head.font.size"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="$populus.admonition.font.size"/>
+          <xsl:value-of select="$lsr.admonition.font.size"/>
         </xsl:otherwise>
       </xsl:choose>
       <xsl:text>pt</xsl:text>
@@ -316,13 +316,13 @@
     <xsl:attribute name="font-family">Courier</xsl:attribute>
     <!-- Check if we are in an informaltable or table and resize the font accordingly -->
     <xsl:attribute name="font-size">
-      <xsl:variable name="populus.monospace.font.size" select="8.4"/>
+      <xsl:variable name="lsr.monospace.font.size" select="8.4"/>
       <xsl:choose>
         <xsl:when test="ancestor::*[name() = name(//informaltable)] or ancestor::*[name() = name(//table)]">
-          <xsl:value-of select="$populus.monospace.font.size * $met.table.font.size"/>
+          <xsl:value-of select="$lsr.monospace.font.size * $met.table.font.size"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="$populus.monospace.font.size"/>
+          <xsl:value-of select="$lsr.monospace.font.size"/>
         </xsl:otherwise>
       </xsl:choose>
       <xsl:text>pt</xsl:text>

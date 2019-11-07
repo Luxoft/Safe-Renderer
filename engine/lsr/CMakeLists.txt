@@ -21,9 +21,6 @@ include_directories(
     ${LSRROOT}/pil/api
     ${LSRROOT}/gil/api
     ${LSRENGINE}/common/api
-    ${LSRENGINE}/odi/api
-    ${LSRENGINE}/communication/api
-    ${LSRENGINE}/communication/src #TODO
     ${LSRENGINE}/database/api
     ${LSRENGINE}/database/api/gen
     ${LSRENGINE}/framehandler/api
@@ -35,11 +32,11 @@ include_directories(
 
 set(LSR_HEADERS
     ${LSR_BASE}/api/lsr.h
+    ${LSR_BASE}/api/Engine.h
 )
 
 set(LSR_SOURCES
     ${LSR_BASE}/src/lsr.cpp
-    ${LSR_BASE}/src/Engine.h
     ${LSR_BASE}/src/Engine.cpp
 )
 

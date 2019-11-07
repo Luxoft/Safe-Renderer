@@ -46,74 +46,12 @@ protected:
     {
     }
 
-    void addOperands(U32 value)
-    {
-        ExpressionTypeFactory exprFactory;
-        exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 1U);
-
-        ExpressionTermTypeFactory term;
-        term.createIntegerExprTerm(value);
-
-        exprFactory.addExprTerm(term.getDdh(), term.getSize());
-
-        m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-    }
-
-    void addOperands(bool value)
-    {
-        ExpressionTypeFactory exprFactory;
-        exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 1U);
-
-        ExpressionTermTypeFactory term;
-        term.createBoolExprTerm(value);
-
-        exprFactory.addExprTerm(term.getDdh(), term.getSize());
-
-        m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-    }
-
-    void addOperands(U32 value1, U32 value2)
-    {
-        ExpressionTypeFactory exprFactory;
-        exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 2U);
-
-        ExpressionTermTypeFactory term1;
-        term1.createIntegerExprTerm(value1);
-
-        ExpressionTermTypeFactory term2;
-        term2.createIntegerExprTerm(value2);
-
-        exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-        exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-        m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-    }
-
-    void addOperands(bool value1, bool value2)
-    {
-        ExpressionTypeFactory exprFactory;
-        exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 2U);
-
-        ExpressionTermTypeFactory term1;
-        term1.createBoolExprTerm(value1);
-
-        ExpressionTermTypeFactory term2;
-        term2.createBoolExprTerm(value2);
-
-        exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-        exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-        m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-    }
-
-    void testOperator(TestingOperator op,
+    void testOperator(TestingOperator op, const ExpressionType* expr,
                       const DataStatus expectedStatus,
                       const Number expectedValue)
     {
         Number actualValue;
-        DataStatus actualStatus = (*op)(m_termFactory.getDdh()->GetExpression(),
-                                                     &m_context,
-                                                     actualValue);
+        DataStatus actualStatus = (*op)(expr, &m_context, actualValue);
 
         EXPECT_EQ(expectedStatus, actualStatus);
 
@@ -130,360 +68,317 @@ protected:
 
 TEST_F(ExpressionBooleanOpFixture, IntOperatorsWithEqualValuesTest)
 {
-    addOperands(5U, 5U);
+    ExpressionTermType t1 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 2 };
 
-    testOperator(&expressionoperators::equals,
+    testOperator(&expressionoperators::equals, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 
-    testOperator(&expressionoperators::notEquals,
+    testOperator(&expressionoperators::notEquals, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 
-    testOperator(&expressionoperators::lessThan,
+    testOperator(&expressionoperators::lessThan, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 
-    testOperator(&expressionoperators::lessThanOrEquals,
+    testOperator(&expressionoperators::lessThanOrEquals, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 
-    testOperator(&expressionoperators::greaterThan,
+    testOperator(&expressionoperators::greaterThan, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 
-    testOperator(&expressionoperators::greaterThanOrEquals,
+    testOperator(&expressionoperators::greaterThanOrEquals, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 }
 
+
 TEST_F(ExpressionBooleanOpFixture, IntOperatorsWithValue1LessValue2Test)
 {
-    addOperands(3U, 5U);
+    ExpressionTermType t1 = {ExpressionTermType::INTEGER_CHOICE, 3U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 2 };
 
-    testOperator(&expressionoperators::equals,
+    testOperator(&expressionoperators::equals, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 
-    testOperator(&expressionoperators::notEquals,
+    testOperator(&expressionoperators::notEquals, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 
-    testOperator(&expressionoperators::lessThan,
+    testOperator(&expressionoperators::lessThan, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 
-    testOperator(&expressionoperators::lessThanOrEquals,
+    testOperator(&expressionoperators::lessThanOrEquals, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 
-    testOperator(&expressionoperators::greaterThan,
+    testOperator(&expressionoperators::greaterThan, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 
-    testOperator(&expressionoperators::greaterThanOrEquals,
+    testOperator(&expressionoperators::greaterThanOrEquals, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 }
 
 TEST_F(ExpressionBooleanOpFixture, IntOperatorsWithValue1GreaterValue2Test)
 {
-    addOperands(5U, 3U);
+    ExpressionTermType t1 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 3U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 2 };
 
-    testOperator(&expressionoperators::equals,
+    testOperator(&expressionoperators::equals, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 
-    testOperator(&expressionoperators::notEquals,
+    testOperator(&expressionoperators::notEquals, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 
-    testOperator(&expressionoperators::lessThan,
+    testOperator(&expressionoperators::lessThan, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 
-    testOperator(&expressionoperators::lessThanOrEquals,
+    testOperator(&expressionoperators::lessThanOrEquals, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 
-    testOperator(&expressionoperators::greaterThan,
+    testOperator(&expressionoperators::greaterThan, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 
-    testOperator(&expressionoperators::greaterThanOrEquals,
+    testOperator(&expressionoperators::greaterThanOrEquals, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 }
 
 TEST_F(ExpressionBooleanOpFixture, NotOperatorTest1)
 {
-    addOperands(true);
+    ExpressionTermType t1 = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 1 };
 
-    testOperator(&expressionoperators::booleanNot,
+    testOperator(&expressionoperators::booleanNot, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 }
 
 TEST_F(ExpressionBooleanOpFixture, NotOperatorTest2)
 {
-    addOperands(false);
+    ExpressionTermType t1 = {ExpressionTermType::BOOLEAN_CHOICE, 0U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 1 };
 
-    testOperator(&expressionoperators::booleanNot,
+    testOperator(&expressionoperators::booleanNot, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 }
 
 TEST_F(ExpressionBooleanOpFixture, BoolOperatorsWithEqualValuesTest)
 {
-    addOperands(true, true);
+    ExpressionTermType t1 = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 2 };
 
-    testOperator(&expressionoperators::booleanAnd,
+    testOperator(&expressionoperators::booleanAnd, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 
-    testOperator(&expressionoperators::booleanOr,
+    testOperator(&expressionoperators::booleanOr, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 }
 
 TEST_F(ExpressionBooleanOpFixture, BoolOperatorsWithNotEqualValuesTest1)
 {
-    addOperands(true, false);
+    ExpressionTermType t1 = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::BOOLEAN_CHOICE, 0U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 2 };
 
-    testOperator(&expressionoperators::booleanAnd,
+    testOperator(&expressionoperators::booleanAnd, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 
-    testOperator(&expressionoperators::booleanOr,
+    testOperator(&expressionoperators::booleanOr, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 }
 
 TEST_F(ExpressionBooleanOpFixture, BoolOperatorsWithNotEqualValuesTest2)
 {
-    addOperands(false, true);
+    ExpressionTermType t1 = {ExpressionTermType::BOOLEAN_CHOICE, 0U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_ENUM_SIZE, parameters, 2 };
 
-    testOperator(&expressionoperators::booleanAnd,
+    testOperator(&expressionoperators::booleanAnd, &expr,
                  DataStatus::VALID,
                  m_expectedFalse);
 
-    testOperator(&expressionoperators::booleanOr,
+    testOperator(&expressionoperators::booleanOr, &expr,
                  DataStatus::VALID,
                  m_expectedTrue);
 }
 
 TEST_F(ExpressionBooleanOpFixture, IntOperatorsWithWrongTermTest1)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 2U);
+    ExpressionTermType t1 = {ExpressionTermType::NONE, 5U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_EQUALS, parameters, 2 };
 
-    ExpressionTermTypeFactory term1;
-    term1.createWrongExprTerm(5U);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    testOperator(&expressionoperators::equals,
+    testOperator(&expressionoperators::equals, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::notEquals,
+    testOperator(&expressionoperators::notEquals, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::lessThan,
+    testOperator(&expressionoperators::lessThan, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::lessThanOrEquals,
+    testOperator(&expressionoperators::lessThanOrEquals, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::greaterThan,
+    testOperator(&expressionoperators::greaterThan, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::greaterThanOrEquals,
+    testOperator(&expressionoperators::greaterThanOrEquals, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 }
 
 TEST_F(ExpressionBooleanOpFixture, IntOperatorsWithWrongTermTest2)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 2U);
+    ExpressionTermType t1 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::NONE, 5U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_EQUALS, parameters, 2 };
 
-    ExpressionTermTypeFactory term1;
-    term1.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory term2;
-    term2.createWrongExprTerm(5U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    testOperator(&expressionoperators::equals,
+    testOperator(&expressionoperators::equals, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::notEquals,
+    testOperator(&expressionoperators::notEquals, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::lessThan,
+    testOperator(&expressionoperators::lessThan, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::lessThanOrEquals,
+    testOperator(&expressionoperators::lessThanOrEquals, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::greaterThan,
+    testOperator(&expressionoperators::greaterThan, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::greaterThanOrEquals,
+    testOperator(&expressionoperators::greaterThanOrEquals, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 }
 
 TEST_F(ExpressionBooleanOpFixture, BoolOperatorsWithWrongTermTest1)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 2U);
+    ExpressionTermType t1 = {ExpressionTermType::NONE, 5U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_EQUALS, parameters, 2 };
 
-    ExpressionTermTypeFactory term1;
-    term1.createWrongExprTerm(5U);
-
-    ExpressionTermTypeFactory term2;
-    term2.createBoolExprTerm(true);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    testOperator(&expressionoperators::booleanAnd,
+    testOperator(&expressionoperators::booleanAnd, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::booleanOr,
+    testOperator(&expressionoperators::booleanOr, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 }
 
 TEST_F(ExpressionBooleanOpFixture, BoolOperatorsWithWrongTermTest2)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 2U);
+    ExpressionTermType t1 = {ExpressionTermType::BOOLEAN_CHOICE, 5U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::NONE, 0U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_EQUALS, parameters, 2 };
 
-    ExpressionTermTypeFactory term1;
-    term1.createBoolExprTerm(true);
-
-    ExpressionTermTypeFactory term2;
-    term2.createWrongExprTerm(false);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    testOperator(&expressionoperators::booleanAnd,
+    testOperator(&expressionoperators::booleanAnd, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::booleanOr,
+    testOperator(&expressionoperators::booleanOr, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 }
 
 TEST_F(ExpressionBooleanOpFixture, NotOperatorsWithWrongTermTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 1U);
+    ExpressionTermType t1 = {ExpressionTermType::NONE, 5U, NULL};
+    const ExpressionTermType* parameters[] = { &t1,};
+    const ExpressionType expr = { EXPRESSION_OPERATOR_EQUALS, parameters, 1 };
 
-    ExpressionTermTypeFactory term;
-    term.createWrongExprTerm(5U);
-
-    exprFactory.addExprTerm(term.getDdh(), term.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    testOperator(&expressionoperators::booleanNot,
+    testOperator(&expressionoperators::booleanNot, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 }
 
 TEST_F(ExpressionBooleanOpFixture, BoolOperatorsWithWrongTermTypeTest1)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 2U);
+    ExpressionTermType t1 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_EQUALS, parameters, 2 };
 
-    ExpressionTermTypeFactory term1;
-    term1.createIntegerExprTerm(5U);
-
-    ExpressionTermTypeFactory term2;
-    term2.createBoolExprTerm(true);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    testOperator(&expressionoperators::booleanAnd,
+    testOperator(&expressionoperators::booleanAnd, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::booleanOr,
+    testOperator(&expressionoperators::booleanOr, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 }
 
 TEST_F(ExpressionBooleanOpFixture, BoolOperatorsWithWrongTermTypeTest2)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 2U);
+    ExpressionTermType t1 = {ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL};
+    ExpressionTermType t2 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, &t2 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_EQUALS, parameters, 2 };
 
-    ExpressionTermTypeFactory term1;
-    term1.createBoolExprTerm(true);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(5U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    testOperator(&expressionoperators::booleanAnd,
+    testOperator(&expressionoperators::booleanAnd, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 
-    testOperator(&expressionoperators::booleanOr,
+    testOperator(&expressionoperators::booleanOr, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 }
 
 TEST_F(ExpressionBooleanOpFixture, NotOperatorsWithWrongTermTypeTest)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(EXPRESSION_OPERATOR_EQUALS, 1U);
+    ExpressionTermType t1 = {ExpressionTermType::INTEGER_CHOICE, 5U, NULL};
+    const ExpressionTermType* parameters[] = { &t1, };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_EQUALS, parameters, 1 };
 
-    ExpressionTermTypeFactory term;
-    term.createIntegerExprTerm(5U);
-
-    exprFactory.addExprTerm(term.getDdh(), term.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
-    testOperator(&expressionoperators::booleanNot,
+    testOperator(&expressionoperators::booleanNot, &expr,
                  DataStatus::INCONSISTENT,
                  m_notIntersting);
 }

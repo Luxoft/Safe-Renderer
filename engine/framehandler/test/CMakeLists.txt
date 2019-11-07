@@ -24,17 +24,14 @@ function(GUNITTEST_FRAMEHANDLER)
     )
 endfunction()
 
-set(DDHBUILDERS
-    ddhbuilders/DdhBuilder.h
-    ddhbuilders/DdhBuilder.cpp
-    ddhbuilders/DdhPageBuilder.h
-    ddhbuilders/DdhPageBuilder.cpp
-    ddhbuilders/DdhPanelBuilder.h
-    ddhbuilders/DdhPanelBuilder.cpp
-    ddhbuilders/DdhReferenceBitmapFieldBuilder.h
-    ddhbuilders/DdhReferenceBitmapFieldBuilder.cpp
-    ddhbuilders/DdhStaticBitmapFieldBuilder.h
-    ddhbuilders/DdhStaticBitmapFieldBuilder.cpp
+include_directories(
+    ${FRAMEHANDLER_BASE}/test
+    ${FRAMEHANDLER_BASE}/test/ddhbuilders
+    ${LSRENGINE}/datahandler/test
+    ${LSRENGINE}/database/test
+    ${LSRENGINE}/common/test
+    ${LSRENGINE}/display/test
+    ${LSRENGINE}/lsr/api
 )
 
 GUNITTEST_FRAMEHANDLER(
@@ -44,7 +41,7 @@ GUNITTEST_FRAMEHANDLER(
           MockWidget.h
           TestCanvas.h
           WidgetTestBase.h
-          ${DDHBUILDERS}
+          ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
 )
 
 GUNITTEST_FRAMEHANDLER(
@@ -61,7 +58,7 @@ GUNITTEST_FRAMEHANDLER(
           WidgetTest.cpp
           WidgetTestBase.h
           WindowTest.cpp
-          ${DDHBUILDERS}
+          ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
 )
 
 GUNITTEST_FRAMEHANDLER(
@@ -70,5 +67,5 @@ GUNITTEST_FRAMEHANDLER(
           WidgetPoolHelper.h
           WidgetPoolHelper.cpp
           WidgetPoolCorrupter.h
-          ${DDHBUILDERS}
+          ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
 )

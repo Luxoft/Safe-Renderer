@@ -53,25 +53,9 @@ namespace lsr
  *
  * @reqid SW_ENG_048, SW_ENG_049, SW_ENG_051, SW_ENG_053, SW_ENG_064
  */
-class Expression : public IDataHandler::IListener
+class Expression
 {
 public:
-    /**
-     * Listener interface for objects which need to be notified when an expression value changes
-     */
-    class IListener
-    {
-    public:
-        /**
-        * Called when an expression value changes
-        *
-        * @param[in] expression expression whose value was changed.
-        */
-        virtual void notifyDataChange(Expression& expression) = 0;
-
-        virtual ~IListener() {}
-    };
-
     /**
      * Evaluates the given expression as a Boolean value
      *
@@ -81,8 +65,8 @@ public:
      *
      * @return status of @c value, see @c DataStatus.
      */
-    static DataStatus getBool(const lsr::ExpressionTermType* pTerm,
-                              DataContext* pContext,
+    static DataStatus getBool(const lsr::ExpressionTermType* const pTerm,
+                              DataContext* const pContext,
                               bool& value);
 
     /**
@@ -94,47 +78,14 @@ public:
      *
      * @return status of @c value, see @c DataStatus.
      */
-    static DataStatus getNumber(const lsr::ExpressionTermType* pTerm,
-                                DataContext* pContext,
+    static DataStatus getNumber(const lsr::ExpressionTermType* const pTerm,
+                                DataContext* const pContext,
                                 Number& value);
 
     virtual ~Expression() {}
 
 protected:
     Expression() {}
-
-    /**
-     * Subscribes to all data which is related to the given expression.
-     *
-     * @param[in] pTerm     lsr expression configuration.
-     * @param[in] pContext  data context, which shall be used for evaluation.
-     * @param[in] pListener the listener which shall be called for data changes.
-     */
-    static void subscribe(const lsr::ExpressionTermType* pTerm,
-                          DataContext* pContext,
-                          IDataHandler::IListener* pListener);
-
-    /**
-     * Unsubscribes all data which is related to the given expression
-     *
-     * @param[in] pTerm     lsr expression configuration.
-     * @param[in] pContext  data context, which shall be used for evaluation.
-     * @param[in] pListener the listener which shall be called for data changes.
-     */
-    static void unsubscribe(const lsr::ExpressionTermType* pTerm,
-                            DataContext* pContext,
-                            IDataHandler::IListener* pListener);
-
-    /**
-     * This callback should be called for all kinds of data changes.
-     */
-    virtual void update() = 0;
-
-    /**
-     * With these methods new (changed) data updates inside Expression.
-     *
-     */
-    virtual void onDataChange() P_FINAL P_OVERRIDE;
 
 private:
     /**
@@ -147,8 +98,8 @@ private:
      *
      * @return status of @c value, see @c DataStatus.
      */
-    static DataStatus calcNumber(const lsr::ExpressionType* pExpression,
-                                 DataContext* pContext,
+    static DataStatus calcNumber(const lsr::ExpressionType* const pExpression,
+                                 DataContext* const pContext,
                                  Number& value);
 };
 

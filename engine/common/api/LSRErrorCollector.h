@@ -51,7 +51,7 @@ public:
     /**
      * Creates an error collector with an initial error value
      */
-    LSRErrorCollector(LSRError err) : m_error(err)
+    LSRErrorCollector(const LSRError err) : m_error(err)
     {}
 
     /**
@@ -60,7 +60,7 @@ public:
      * @param err new error value
      * @return reference to this
      */
-    LSRErrorCollector& operator=(LSRError err)
+    LSRErrorCollector& operator=(const LSRError err)
     {
         if (err > m_error)
         {

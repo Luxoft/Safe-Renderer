@@ -34,23 +34,15 @@
 #include "WindowDefinition.h"
 #include <fstream>
 #include <string>
+#include <Telltales.hpp>
 
 using namespace lsr;
-
-const char* ddhbin = ROOT_PATH "/test/database/Telltales/Output/Telltales.ddhbin";
-const char* imgbin = ROOT_PATH "/test/database/Telltales/Output/Telltales.imgbin";
 
 class DisplayManagerTest : public ::testing::Test
 {
     void SetUp() P_OVERRIDE
     {
-        std::ifstream ifs1(ddhbin, std::ios::binary);
-        m_ddhbinData.assign ((std::istreambuf_iterator<char>(ifs1)), (std::istreambuf_iterator<char>()));
-        ResourceBuffer ddhbin = ResourceBuffer(m_ddhbinData.c_str(), m_ddhbinData.size());
-        std::ifstream ifs2(imgbin, std::ios::binary);
-        m_imgbinData.assign ((std::istreambuf_iterator<char>(ifs2)), (std::istreambuf_iterator<char>()));
-        ResourceBuffer imgbin = ResourceBuffer(m_imgbinData.c_str(), m_imgbinData.size());
-        m_db = new Database(ddhbin, imgbin);
+        m_db = new Database(Telltales::getDDH());
     }
 
     void TearDown() P_OVERRIDE
@@ -58,9 +50,6 @@ class DisplayManagerTest : public ::testing::Test
         delete m_db;
         m_db = NULL;
     }
-
-    std::string m_ddhbinData;
-    std::string m_imgbinData;
 
 protected:
     Database* m_db;

@@ -28,14 +28,9 @@
 #include "DataHandler.h"
 #include "Database.h"
 #include "DDHType.h"
-#include "FUDatabaseType.h"
 #include "FUClassType.h"
 #include "DynamicDataEntryType.h"
 #include "LsrTypes.h"
-#include "OdiTypes.h"
-#include "OdiMsgHeader.h"
-#include "DataResponseMessage.h"
-#include "EventMessage.h"
 #include "pil.h"
 
 #include <algorithm>
@@ -64,48 +59,41 @@ namespace
 namespace lsr
 {
 
-bool DynamicDataEntry_Comparer::operator ()(DynamicDataEntry const& entry, U32 const value) const
+bool DynamicDataEntry_Comparer::operator()(DynamicDataEntry const& entry, const U32 value) const
 {
     return key(entry.fu->fUClassId, entry.data->dataId) < value;
 }
 
 DataHandler::DataHandler(const Database& db)
-: m_numDataEntries(0)
+: IDataHandler()
+, m_numDataEntries(0U)
 , m_error(LSR_NO_ERROR)
 {
-    const DDHType* ddh = db.getDdh();
+    const DDHType* const ddh = db.getDdh();
     if (NULL != ddh)
     {
-        const FUDatabaseType* fudb = ddh->GetFUDatabase();
-        if (NULL != fudb)
+        for (U16 i = 0u; i < ddh->GetFUCount(); ++i)
         {
-            for (U16 i = 0u; i < fudb->GetFUCount(); ++i)
+            const FUClassType* fu = ddh->GetFU(i);
+            ASSERT(NULL != fu);
+            for (U16 k = 0u; k < fu->GetDynamicDataEntryCount(); ++k)
             {
-                const FUClassType* fu = fudb->GetFU(i);
-                ASSERT(NULL != fu);
-                for (U16 k = 0u; k < fu->GetDynamicDataEntryCount(); ++k)
+                const DynamicDataEntryType* data = fu->GetDynamicDataEntry(k);
+                ASSERT(NULL != data);
+                if (m_numDataEntries < MAX_DYNAMIC_DATA)
                 {
-                    const DynamicDataEntryType* data = fu->GetDynamicDataEntry(k);
-                    ASSERT(NULL != data);
-                    if (m_numDataEntries < MAX_DYNAMIC_DATA)
-                    {
-                        m_dataEntries[m_numDataEntries].fu = fu;
-                        m_dataEntries[m_numDataEntries].data = data;
-                        m_dataEntries[m_numDataEntries].value = 0;
-                        m_dataEntries[m_numDataEntries].timestamp = 0;
-                        m_dataEntries[m_numDataEntries].status = fu->GetInternalFU() ? DataStatus::VALID : DataStatus::NOT_AVAILABLE;
-                        ++m_numDataEntries;
-                    }
-                    else
-                    {
-                        m_error = LSR_DB_ERROR;
-                    }
+                    m_dataEntries[m_numDataEntries].fu = fu;
+                    m_dataEntries[m_numDataEntries].data = data;
+                    m_dataEntries[m_numDataEntries].value = 0U;
+                    m_dataEntries[m_numDataEntries].timestamp = 0U;
+                    m_dataEntries[m_numDataEntries].status = fu->GetInternal() ? DataStatus::VALID : DataStatus::NOT_AVAILABLE;
+                    ++m_numDataEntries;
+                }
+                else
+                {
+                    m_error = LSR_DB_ERROR;
                 }
             }
-        }
-        else
-        {
-            m_error = LSR_DB_ERROR;
         }
     }
     else
@@ -114,47 +102,20 @@ DataHandler::DataHandler(const Database& db)
     }
 }
 
-bool DataHandler::subscribeData(FUClassId fuClassId,
-    DataId dataId,
-    IDataHandler::IListener* pListener)
-{
-    return false;
-}
-
-bool DataHandler::subscribeIndication(FUClassId fuClassId,
-    IndicationId indicationId,
-    IDataHandler::IListener* pListener)
-{
-    return false;
-}
-
-void DataHandler::unsubscribeData(FUClassId fuClassId,
-    DataId dataId,
-    IDataHandler::IListener* pListener)
-{
-}
-
-void DataHandler::unsubscribeIndication(FUClassId fuClassId,
-    IndicationId indicationId,
-    IDataHandler::IListener* pListener)
-{
-}
-
-DataStatus DataHandler::getNumber(FUClassId fuClassId,
-    DataId dataId,
+DataStatus DataHandler::getNumber(const DynamicData& dataId,
     Number &value) const
 {
-    const DynamicDataEntry* entry = find(fuClassId, dataId);
+    const DynamicDataEntry* const entry = find(dataId);
     DataStatus status = DataStatus::NOT_AVAILABLE;
-    if (entry)
+    if (NULL != entry)
     {
         value = Number(entry->value, entry->data->GetDataType());
         const U16 repeatTimeout = entry->data->GetRepeatTimeout();
         status = entry->status;
-        if (repeatTimeout > 0)
+        if (repeatTimeout > 0U)
         {
             // check for aged data
-            if (isElapsed(entry->timestamp, repeatTimeout))
+            if (isElapsed(entry->timestamp, static_cast<U32>(repeatTimeout)))
             {
                 status = DataStatus::NOT_AVAILABLE;
             }
@@ -163,21 +124,13 @@ DataStatus DataHandler::getNumber(FUClassId fuClassId,
     return status;
 }
 
-DataStatus DataHandler::getIndication(FUClassId fuClassId,
-    IndicationId indicationId,
-    bool& value) const
-{
-    return DataStatus::NOT_AVAILABLE;
-}
-
-bool DataHandler::setData(FUClassId fuClassId,
-    DataId dataId,
+bool DataHandler::setData(const DynamicData& dataId,
     const Number& value,
-    DataStatus status)
+    const DataStatus status)
 {
     bool success = false;
-    DynamicDataEntry* entry = find(fuClassId, dataId);
-    if (entry && entry->data->GetDataType() == value.getType())
+    DynamicDataEntry* const entry = find(dataId);
+    if ((NULL != entry) && (entry->data->GetDataType() == value.getType()))
     {
         entry->value = value.getU32();
         entry->status = status;
@@ -187,90 +140,20 @@ bool DataHandler::setData(FUClassId fuClassId,
     return success;
 }
 
-LSRError DataHandler::onMessage(IMsgTransmitter* pMsgTransmitter,
-    const U8 messageType,
-    InputStream& stream)
+const DynamicDataEntry* DataHandler::find(const DynamicData& data) const
 {
-    LSRError retValue = LSR_NO_ERROR;
-
-    // TODO: Alive and Registration messages?
-    ASSERT_MSG(MessageTypes::ODI == messageType, "Invalid message type");
-
-    const OdiMsgHeader odiMsgHeader = OdiMsgHeader::fromStream(stream);
-    const DataMessageTypes::Val odiMsgType = odiMsgHeader.getOdiType();
-
-    switch(odiMsgType)
-    {
-    case DataMessageTypes::DYN_DATA_RESP:
-        retValue = dynamicDataResponseHandler(stream);
-        break;
-    case DataMessageTypes::EVENT:
-    case DataMessageTypes::INDICATION:
-    default:
-        retValue = LSR_DH_INVALID_MESSAGE_TYPE;
-        // call pilError() ?
-        break;
-    };
-
-    return retValue;
+    return const_cast<DataHandler*>(this)->find(data);
 }
 
-void DataHandler::onConnect(IMsgTransmitter* pMsgTransmitter)
+DynamicDataEntry* DataHandler::find(const DynamicData& data)
 {
-}
-
-void DataHandler::onDisconnect(IMsgTransmitter* pMsgTransmitter)
-{
-}
-
-const DynamicDataEntry* DataHandler::find(const FUClassId fu, const DataId data) const
-{
-    return const_cast<DataHandler*>(this)->find(fu, data);
-}
-
-DynamicDataEntry* DataHandler::find(const FUClassId fuId, const DataId dataId)
-{
-    DynamicDataEntry* pDataEntry = std::lower_bound(
+    DynamicDataEntry* const pDataEntry = std::lower_bound(
         &m_dataEntries[0],
         &m_dataEntries[m_numDataEntries],
-        DynamicDataEntry_Comparer::key(fuId, dataId),
+        DynamicDataEntry_Comparer::key(data.getFUClassId(), data.getDataId()),
         DynamicDataEntry_Comparer());
 
-    return ((pDataEntry != &m_dataEntries[m_numDataEntries] && pDataEntry->fu->fUClassId == fuId && pDataEntry->data->dataId == dataId) ? pDataEntry : NULL);
-}
-
-LSRError DataHandler::dynamicDataResponseHandler(InputStream& stream)
-{
-    LSRError error = LSR_NO_ERROR;
-    DataResponseMessage dataResponse = DataResponseMessage::fromStream(stream);
-    const U32 currentTime = pilGetMonotonicTime();
-
-    DynamicDataEntry* pDataEntry = find(dataResponse.getFuId(), dataResponse.getDataId());
-    if (pDataEntry)
-    {
-        if (pDataEntry->data->GetDataType() == dataResponse.getDataType())
-        {
-            pDataEntry->value = dataResponse.getDataValue();
-            pDataEntry->status = dataResponse.getInvalidFlag() ? DataStatus::INVALID : DataStatus::VALID;
-            pDataEntry->timestamp = currentTime;
-            // TODO: range check if minimum/maximum value is specified
-            // TODO: Notify listeners ?
-        }
-        else
-        {
-            // FU sent wrong type
-            error = LSR_DH_INVALID_MESSAGE_TYPE; // TODO: separate error ?
-            // call pilError() ?
-        }
-    }
-    else
-    {
-        // Unknown FU/Data pair
-        error = LSR_DH_INVALID_MESSAGE_TYPE; // TODO: separate error ?
-        // call pilError() ?
-    }
-
-    return error;
+    return (((pDataEntry != &m_dataEntries[m_numDataEntries]) && (pDataEntry->fu->fUClassId == data.getFUClassId()) && (pDataEntry->data->dataId == data.getDataId())) ? pDataEntry : NULL);
 }
 
 }

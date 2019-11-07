@@ -25,11 +25,6 @@
 ******************************************************************************/
 
 #include "WidgetPoolHelper.h"
-#include "DdhStaticBitmapFieldBuilder.h"
-#include "DdhReferenceBitmapFieldBuilder.h"
-#include "DdhPanelBuilder.h"
-#include "DdhPageBuilder.h"
-#include "DdhBuilder.h"
 
 #include <LsrLimits.h>
 
@@ -38,11 +33,20 @@
 #include <DisplaySizeType.h>
 #include <Database.h>
 
-#include <TestDataContext.h>
 #include <MockDataHandler.h>
 
 #include <DisplayManager.h>
 #include <WindowDefinition.h>
+
+#include <AreaType.h>
+#include <ExpressionTermType.h>
+#include <StaticBitmapFieldType.h>
+#include <ReferenceBitmapFieldType.h>
+#include <PanelType.h>
+
+#include <Telltales.hpp>
+
+using namespace lsr;
 
 WidgetPoolHelper::WidgetPoolHelper(lsr::WidgetPool& widgetPool)
     : m_widgetPool(widgetPool)
@@ -145,23 +149,22 @@ lsr::Window* WidgetPoolHelper::fillUpWithWindows(const lsr::Database& db,
 
 bool WidgetPoolHelper::isBitMapPoolFilled() const
 {
-    lsr::AreaType area;
-    framehandlertests::DdhStaticBitmapFieldBuilder builder;
-    builder.create(area, true, 23U);
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    StaticBitmapFieldType bmpField = { &area, &visible, &bmp };
 
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
 
-    lsr::ResourceBuffer binBuffer;
     lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     lsr::LSRErrorCollector error(LSR_NO_ERROR);
     lsr::BitmapField* field =
         lsr::BitmapField::create(m_widgetPool,
                                  db,
-                                 builder.getDdh(),
+                                 &bmpField,
                                  &context,
                                  error);
 
@@ -170,23 +173,22 @@ bool WidgetPoolHelper::isBitMapPoolFilled() const
 
 bool WidgetPoolHelper::isReferenceBitMapPoolFilled() const
 {
-    lsr::AreaType area;
-    framehandlertests::DdhReferenceBitmapFieldBuilder builder;
-    builder.create(32U, area, true, 23U);
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    ReferenceBitmapFieldType bmpField = { 32U, &area, &visible, &bmp };
 
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
 
-    lsr::ResourceBuffer binBuffer;
     lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     lsr::LSRErrorCollector error(LSR_NO_ERROR);
     lsr::ReferenceBitmapField* field =
         lsr::ReferenceBitmapField::create(m_widgetPool,
                                           db,
-                                          builder.getDdh(),
+                                          &bmpField,
                                           &context,
                                           error);
 
@@ -195,23 +197,21 @@ bool WidgetPoolHelper::isReferenceBitMapPoolFilled() const
 
 bool WidgetPoolHelper::isPanelPoolFilled() const
 {
-    lsr::AreaType area;
-    framehandlertests::DdhPanelBuilder builder;
-    builder.create(area, true, 0U);
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    PanelType tpanel = { &area, &visible, NULL, 0 };
 
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
 
-    lsr::ResourceBuffer binBuffer;
     lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     lsr::LSRErrorCollector error(LSR_NO_ERROR);
     lsr::Panel* panel =
         lsr::Panel::create(m_widgetPool,
                            db,
-                           builder.getDdh(),
+                           &tpanel,
                            &context,
                            error);
 
@@ -220,25 +220,11 @@ bool WidgetPoolHelper::isPanelPoolFilled() const
 
 bool WidgetPoolHelper::isFramePoolFilled() const
 {
-    lsr::AreaType area;
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.create(area, true, 2U);
-
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
-
-    lsr::DisplaySizeType displaySize;
-
-    framehandlertests::DdhBuilder ddhBuilder;
-    ddhBuilder.create(panelBuilder, pageBuilder, displaySize);
-
-    lsr::ResourceBuffer binBuffer(ddhBuilder.getDdh(), ddhBuilder.getSize());
     lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
 
     lsr::LSRErrorCollector error(LSR_NO_ERROR);
     lsr::Frame* frame =
@@ -254,26 +240,13 @@ bool WidgetPoolHelper::isFramePoolFilled() const
 
 bool WidgetPoolHelper::isWindowPoolFilled() const
 {
-    lsr::AreaType area;
-    lsr::DisplaySizeType displaySize;
     lsr::DisplayManager dm;
     lsr::WindowDefinition winDef;
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.create(area, true, 2U);
-
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
-
-    framehandlertests::DdhBuilder ddhBuilder;
-    ddhBuilder.create(panelBuilder, pageBuilder, displaySize);
-
-    lsr::ResourceBuffer binBuffer(ddhBuilder.getDdh(), ddhBuilder.getSize());
     lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
 
     lsr::LSRErrorCollector error(LSR_NO_ERROR);
     lsr::Window* window =

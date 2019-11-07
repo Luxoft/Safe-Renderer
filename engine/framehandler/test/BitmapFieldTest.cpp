@@ -25,27 +25,31 @@
 ******************************************************************************/
 
 #include "WidgetTestBase.h"
-#include "DdhStaticBitmapFieldBuilder.h"
 
 #include <LSRErrorCollector.h>
 
 #include <BitmapField.h>
+#include <StaticBitmapFieldType.h>
+#include "Telltales.hpp"
 
 #include <gtest/gtest.h>
+
+using namespace lsr;
 
 class BitmapFieldTest: public WidgetTestBase
 {
 protected:
     BitmapFieldTest()
+        : m_db(Telltales::getDDH())
     {}
 
-    lsr::BitmapField* createField(const framehandlertests::DdhStaticBitmapFieldBuilder& builder)
+    lsr::BitmapField* createField(const StaticBitmapFieldType* ddh)
     {
         lsr::LSRErrorCollector error(LSR_NO_ERROR);
         lsr::BitmapField* field =
             lsr::BitmapField::create(m_widgetPool,
-                                     *m_pDb,
-                                     builder.getDdh(),
+                                     m_db,
+                                     ddh,
                                      &m_context,
                                      error);
         EXPECT_EQ(LSR_NO_ERROR, error.get());
@@ -53,13 +57,13 @@ protected:
         return field;
     }
 
-    lsr::BitmapField* createWrongField(const framehandlertests::DdhStaticBitmapFieldBuilder& builder)
+    lsr::BitmapField* createWrongField(const StaticBitmapFieldType* ddh)
     {
         lsr::LSRErrorCollector error(LSR_NO_ERROR);
         lsr::BitmapField* field =
             lsr::BitmapField::create(m_widgetPool,
-                                     *m_pDb,
-                                     builder.getDdh(),
+                                     m_db,
+                                     ddh,
                                      &m_context,
                                      error);
         EXPECT_EQ(LSR_DB_INCONSISTENT, error.get());
@@ -67,60 +71,67 @@ protected:
         return field;
     }
 
-    framehandlertests::DdhStaticBitmapFieldBuilder m_builder;
+    lsr::Database m_db;
 };
 
 TEST_F(BitmapFieldTest, CreateBitmapFieldTest)
 {
-    lsr::AreaType area;
-    m_builder.create(area, true, 23U);
-    lsr::BitmapField* field = createField(m_builder);
-
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    const StaticBitmapFieldType bmpField = { &area, &visible, &bmp };
+    lsr::BitmapField* field = createField(&bmpField);
     EXPECT_TRUE(NULL != field);
 }
 
 TEST_F(BitmapFieldTest, CreateWrongBitmapFieldTest1)
 {
-    m_builder.createWithoutArea(true, 23U);
-    lsr::BitmapField* field = createWrongField(m_builder);
-
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    const StaticBitmapFieldType bmpField = { NULL, &visible, &bmp };
+    lsr::BitmapField* field = createWrongField(&bmpField);
     EXPECT_TRUE(NULL == field);
 }
 
 TEST_F(BitmapFieldTest, CreateWrongBitmapFieldTest2)
 {
-    lsr::AreaType area;
-    m_builder.createWithoutVisibility(area, 23U);
-    lsr::BitmapField* field = createWrongField(m_builder);
-
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    const StaticBitmapFieldType bmpField = { &area, NULL, &bmp };
+    lsr::BitmapField* field = createWrongField(&bmpField);
     EXPECT_TRUE(NULL == field);
 }
 
 TEST_F(BitmapFieldTest, CreateWrongBitmapFieldTest3)
 {
-    lsr::AreaType area;
-    m_builder.createWithoutBitmap(area, true);
-    lsr::BitmapField* field = createWrongField(m_builder);
-
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const StaticBitmapFieldType bmpField = { &area, &visible, NULL };
+    lsr::BitmapField* field = createWrongField(&bmpField);
     EXPECT_TRUE(NULL == field);
 }
 
 TEST_F(BitmapFieldTest, VerifyTest)
 {
-    lsr::AreaType areaType;
-    m_builder.create(areaType, true, 23U);
-    lsr::BitmapField* field = createField(m_builder);
+    const AreaType tarea = { 0U, 0U, 1U, 3U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    const StaticBitmapFieldType bmpField = { &tarea, &visible, &bmp };
+    lsr::BitmapField* field = createField(&bmpField);
 
-    lsr::Area area(&areaType);
+    lsr::Area area(&tarea);
     EXPECT_TRUE(field->verify(m_canvas, area));
 }
 
 TEST_F(BitmapFieldTest, OnUpdateTest)
 {
-    lsr::AreaType areaType;
-    lsr::DynamicDataType dataType;
-    m_builder.create(areaType, true, dataType);
-    lsr::BitmapField* field = createField(m_builder);
+    const AreaType areaType = { 0U, 0U, 1U, 3U };
+    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
+    const StaticBitmapFieldType bmpField = { &areaType, &visible, &bmp };
+
+    lsr::BitmapField* field = createField(&bmpField);
 
     U16 expectedId = 6U;
     initDataHandler(expectedId);
@@ -136,10 +147,13 @@ TEST_F(BitmapFieldTest, OnUpdateTest)
 
 TEST_F(BitmapFieldTest, OnUpdateWithTheSameValueTest)
 {
-    lsr::AreaType areaType;
-    lsr::DynamicDataType dataType;
-    m_builder.create(areaType, true, dataType);
-    lsr::BitmapField* field = createField(m_builder);
+    const AreaType areaType = { 0U, 0U, 1U, 3U };
+    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
+    const StaticBitmapFieldType bmpField = { &areaType, &visible, &bmp };
+
+    lsr::BitmapField* field = createField(&bmpField);
 
     U16 expectedId = 6U;
     initDataHandler(expectedId);
@@ -162,10 +176,13 @@ TEST_F(BitmapFieldTest, OnUpdateWithTheSameValueTest)
 
 TEST_F(BitmapFieldTest, OnUpdateWrongValueTest)
 {
-    lsr::AreaType areaType;
-    lsr::DynamicDataType dataType;
-    m_builder.create(areaType, true, dataType);
-    lsr::BitmapField* field = createField(m_builder);
+    const AreaType areaType = { 0U, 0U, 1U, 3U };
+    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
+    const StaticBitmapFieldType bmpField = { &areaType, &visible, &bmp };
+
+    lsr::BitmapField* field = createField(&bmpField);
 
     U16 expectedId = 6U;
     initDHWithOutdatedData(expectedId);
@@ -180,10 +197,13 @@ TEST_F(BitmapFieldTest, OnUpdateWrongValueTest)
 
 TEST_F(BitmapFieldTest, DrawBitmapFieldTest)
 {
-    lsr::AreaType areaType;
-    lsr::DynamicDataType dataType;
-    m_builder.create(areaType, true, dataType);
-    lsr::BitmapField* field = createField(m_builder);
+    const AreaType areaType = { 0U, 0U, 1U, 3U };
+    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
+    const StaticBitmapFieldType bmpField = { &areaType, &visible, &bmp };
+
+    lsr::BitmapField* field = createField(&bmpField);
 
     U16 expectedId = 6U;
     initDHWithOutdatedData(expectedId);

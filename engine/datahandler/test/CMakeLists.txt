@@ -17,6 +17,10 @@ function(GUNITTEST_DATAHANDLER)
     )
 endfunction()
 
+include_directories(
+    ${LSRENGINE}/lsr/api
+)
+
 GUNITTEST_DATAHANDLER(
     NAME ExpressionTest
     FILES BitmapExpressionTest.cpp
@@ -30,9 +34,7 @@ GUNITTEST_DATAHANDLER(
           ExpressionTest.cpp
           ExpressionTestFixture.h
           MockDataHandler.h
-          MockListener.h
           NumberExpressionTest.cpp
-          TestDataContext.h
 )
 
 GUNITTEST_DATAHANDLER(
@@ -46,11 +48,12 @@ GUNITTEST_DATAHANDLER(
 )
 
 GUNITTEST_DATAHANDLER(
-    NAME DefaultDataContextTest
-    FILES DefaultDataContextTest.cpp
+    NAME DataContextTest
+    FILES DataContextTest.cpp
 )
 
 GUNITTEST_DATAHANDLER(
     NAME DataHandlerTest
     FILES DataHandlerTest.cpp
+          ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
 )

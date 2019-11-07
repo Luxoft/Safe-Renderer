@@ -102,22 +102,10 @@ public:
      */
     void SetTimeout(U32 timeout);
 
-    /**
-     * Use provided ODIRecorder object to write all received and transmitted data to
-     * if no ODIRecorder was set previously.
-     *
-     * @attention Takes ownership of given pointer.
-     *
-     * @param pRecorder pointer to ODIRecorder object
-     *
-     * @return @c true if recorder was set, @c false otherwise
-     */
-    bool SetODIRecorder(ODIRecorder* pRecorder);
-
     // IMsgDispatcher
-    LSRError registerMsgReceiver(IMsgReceiver* pMsgReceiver, const U8 messageType,
-        U32 minPayload = IMsgDispatcher::NO_PAYLOAD_LIMIT, U32 maxPayload = IMsgDispatcher::NO_PAYLOAD_LIMIT) P_OVERRIDE;
-    LSRError unregisterMsgReceiver(IMsgReceiver* pMsgReceiver, U8 messageType) P_OVERRIDE;
+    LSRError registerMsgReceiver(IMsgReceiver* const pMsgReceiver, const U8 messageType,
+        const U32 minPayload = IMsgDispatcher::NO_PAYLOAD_LIMIT, const U32 maxPayload = IMsgDispatcher::NO_PAYLOAD_LIMIT) P_OVERRIDE;
+    LSRError unregisterMsgReceiver(IMsgReceiver* const pMsgReceiver, const U8 messageType) P_OVERRIDE;
     void unregisterAllMsgReceivers() P_OVERRIDE;
 
     /**
@@ -129,7 +117,7 @@ public:
      *                  take longer time depending on callback functions.
      */
 
-    LSRError handleIncomingData( U32 msTimeout) P_OVERRIDE;
+    LSRError handleIncomingData(const U32 msTimeout) P_OVERRIDE;
 
     /**
      * Create a connection over TCP/IP. Note: The Function uses a non blocking socket
@@ -187,7 +175,6 @@ private:
     //Debug variables and functions
     Socket m_debugSocket;
     U32 m_timeout;
-    ODIRecorder* m_pODIRecorder;
 };
 
 inline void ODIComSession::SetTimeout(U32 timeout)

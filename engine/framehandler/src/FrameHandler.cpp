@@ -32,12 +32,14 @@
 
 #include <WindowDefinition.h>
 #include <DisplaySizeType.h>
+#include "Assertion.h"
 
 namespace lsr
 {
 
 FrameHandler::FrameHandler(Database& db, IDataHandler& dataHandler, DisplayManager& dsp)
-    : m_db(db)
+    : NonCopyable<FrameHandler>()
+    , m_db(db)
     , m_widgetPool()
     , m_dataHandler(dataHandler)
     , m_dataContext(dataHandler)
@@ -50,7 +52,7 @@ FrameHandler::FrameHandler(Database& db, IDataHandler& dataHandler, DisplayManag
 
 FrameHandler::~FrameHandler()
 {
-    Window::dispose(m_widgetPool, m_pWindow);
+    static_cast<void>(Window::dispose(m_widgetPool, m_pWindow));  // ignore return value
 }
 
 bool FrameHandler::start()
@@ -59,18 +61,18 @@ bool FrameHandler::start()
 
     if (m_pWindow != NULL)
     {
-        Window::dispose(m_widgetPool, m_pWindow);
+        static_cast<void>(Window::dispose(m_widgetPool, m_pWindow));  // ignore return value
         m_pWindow = NULL;
     }
 
-    const HMIGlobalSettingsType* pSettings = m_db.getDdh()->GetHMIGlobalSettings();
+    const HMIGlobalSettingsType* const pSettings = m_db.getDdh()->GetHMIGlobalSettings();
     ASSERT(pSettings != NULL);
-    const DisplaySizeType* pDisplaySize = pSettings->GetDisplaySize();
+    const DisplaySizeType* const pDisplaySize = pSettings->GetDisplaySize();
     ASSERT(pDisplaySize != NULL);
 
     WindowDefinition winDef;
-    winDef.width = pDisplaySize->GetWidth();
-    winDef.height = pDisplaySize->GetHeight();
+    winDef.width = static_cast<I32>(pDisplaySize->GetWidth());
+    winDef.height = static_cast<I32>(pDisplaySize->GetHeight());
     winDef.xPos = 0;
     winDef.yPos = 0;
     winDef.id = 0U; // for multi display support
@@ -80,7 +82,7 @@ bool FrameHandler::start()
     return (m_pWindow != NULL);
 }
 
-void FrameHandler::update(U32 monotonicTimeMs)
+void FrameHandler::update(const U32 monotonicTimeMs)
 {
     ASSERT(NULL != m_pWindow);
 

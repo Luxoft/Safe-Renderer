@@ -28,6 +28,15 @@
 #include "AreaType.h"
 #include <algorithm>
 
+
+namespace
+{
+
+const I32 FIXED_POINT_BITS = 4; ///< Number of fraction bits in the internal sub pixel resolution representation of a coordinate
+
+} // anonymous namespace
+
+
 namespace lsr
 {
 
@@ -39,16 +48,16 @@ Area::Area():
 {
 }
 
-Area::Area(const AreaType* pArea)
+Area::Area(const AreaType* const pArea)
 {
     setArea(pArea);
 }
 
-Area::Area(const Area& area):
-    m_x(area.m_x),
-    m_y(area.m_y),
-    m_width(area.m_width),
-    m_height(area.m_height)
+Area::Area(const Area& other):
+    m_x(other.m_x),
+    m_y(other.m_y),
+    m_width(other.m_width),
+    m_height(other.m_height)
 {
 }
 
@@ -124,7 +133,7 @@ I32 Area::getHeightFP() const
     return m_height;
 }
 
-void Area::setArea(const AreaType *pArea)
+void Area::setArea(const AreaType* const pArea)
 {
     m_x = fromIntegerToFP(static_cast<I32>(pArea->GetXCoord()));
     m_y = fromIntegerToFP(static_cast<I32>(pArea->GetYCoord()));
@@ -278,7 +287,7 @@ I32 Area::getRightFP() const
 }
 
 
-bool Area::isOverlapping(const Area& area) const
+bool Area::isOverlapping(const Area& other) const
 {
     /*http://stackoverflow.com/questions/306316/determine-if-two-rectangles-overlap-each-other
 
@@ -311,8 +320,8 @@ bool Area::isOverlapping(const Area& area) const
     A's top above B's bottom And
     A's bottom below B's Top*/
 
-    return (m_x < (area.m_x + area.m_width) && (m_x + m_width) > area.m_x &&
-            m_y < (area.m_y + area.m_height) && (m_y + m_height) > area.m_y);
+    return ((m_x < (other.m_x + other.m_width)) && ((m_x + m_width) > other.m_x) &&
+            (m_y < (other.m_y + other.m_height)) && ((m_y + m_height) > other.m_y));
 
 }
 

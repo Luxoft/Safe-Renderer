@@ -28,14 +28,9 @@
 ******************************************************************************/
 
 #include "MockDataHandler.h"
-#include "TestDataContext.h"
-
-#include <ExpressionTermTypeFactory.h>
-#include <ExpressionTypeFactory.h>
-#include <BitmapIdTableTypeFactory.h>
-#include <EnumerationBitmapMapTypeFactory.h>
 
 #include <IDataHandler.h>
+#include <DataContext.h>
 
 #include <gtest/gtest.h>
 
@@ -43,8 +38,9 @@ class ExpressionTestFixture : public ::testing::Test
 {
 protected:
     ExpressionTestFixture()
+        : m_dataHandler()
+        , m_context(m_dataHandler)
     {
-        m_context.setHandler(&m_dataHandler);
     }
 
     void SetUp()
@@ -55,14 +51,8 @@ protected:
     {
     }
 
-    void corruptHandler()
-    {
-        m_context.setHandler(NULL);
-    }
-
     MockDataHandler m_dataHandler;
-    TestDataContext m_context;
-    ExpressionTermTypeFactory m_termFactory;
+    lsr::DataContext m_context;
 };
 
 #endif // LUXOFTSAFERENDERER_EXPRESSIONTESTFIXTURE_H

@@ -26,112 +26,95 @@
 
 #include "WidgetPoolHelper.h"
 #include "WidgetPoolCorrupter.h"
-#include "DdhStaticBitmapFieldBuilder.h"
-#include "DdhReferenceBitmapFieldBuilder.h"
-#include "DdhPanelBuilder.h"
-#include "DdhPageBuilder.h"
-#include "DdhBuilder.h"
 
 #include <ResourceBuffer.h>
 #include <Database.h>
 #include <DisplaySizeType.h>
+#include <StaticBitmapFieldType.h>
+#include <ReferenceBitmapFieldType.h>
+#include <AreaType.h>
+#include <PanelType.h>
 
 #include <DisplayManager.h>
 #include <WindowDefinition.h>
 
-#include <TestDataContext.h>
+#include <DataContext.h>
 #include <MockDataHandler.h>
 
+#include <Telltales.hpp>
 #include <LsrLimits.h>
 
 #include <gtest/gtest.h>
+
+using namespace lsr;
 
 TEST(WidgetPoolTest, CreateMaxBitmaps)
 {
     lsr::WidgetPool widgetPool;
     WidgetPoolHelper helper(widgetPool);
-    framehandlertests::DdhStaticBitmapFieldBuilder builder;
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
 
-    lsr::ResourceBuffer binBuffer;
-    lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
-    lsr::AreaType area;
-    builder.create(area, true, 23U);
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    const StaticBitmapFieldType bmpField = { &area, &visible, &bmp };
 
-    helper.fillUpWithBitmaps(builder.getDdh(), db, &context);
+    helper.fillUpWithBitmaps(&bmpField, db, &context);
 
     EXPECT_TRUE(helper.isBitMapPoolFilled());
 }
 
 TEST(WidgetPoolTest, CreateMaxReferenceBitmaps)
 {
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
+    const ReferenceBitmapFieldType bmpField = { 32U, &area, &visible, &bmp };
+
     lsr::WidgetPool widgetPool;
     WidgetPoolHelper helper(widgetPool);
-    framehandlertests::DdhReferenceBitmapFieldBuilder builder;
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
 
-    lsr::ResourceBuffer binBuffer;
     lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
-    lsr::AreaType area;
-    builder.create(23U, area, true, 23U);
-
-    helper.fillUpWithReferenceBitmaps(builder.getDdh(), db, &context);
+    helper.fillUpWithReferenceBitmaps(&bmpField, db, &context);
 
     EXPECT_TRUE(helper.isReferenceBitMapPoolFilled());
 }
 
 TEST(WidgetPoolTest, CreateMaxPanels)
 {
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const PanelType tpanel = { &area, &visible, NULL, 0 };
+
     lsr::WidgetPool widgetPool;
     WidgetPoolHelper helper(widgetPool);
-    framehandlertests::DdhPanelBuilder builder;
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
 
-    lsr::ResourceBuffer binBuffer;
     lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
-    lsr::AreaType area;
-    builder.create(area, true, 0U);
-
-    helper.fillUpWithPanels(builder.getDdh(), db, &context);
+    helper.fillUpWithPanels(&tpanel, db, &context);
 
     EXPECT_TRUE(helper.isPanelPoolFilled());
 }
 
 TEST(WidgetPoolTest, CreateMaxFrames)
 {
-    lsr::AreaType area;
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.create(area, true, 2U);
-
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
-
-    lsr::DisplaySizeType displaySize;
-
-    framehandlertests::DdhBuilder ddhBuilder;
-    ddhBuilder.create(panelBuilder, pageBuilder, displaySize);
-
-    lsr::ResourceBuffer binBuffer(ddhBuilder.getDdh(), ddhBuilder.getSize());
     lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     lsr::WidgetPool widgetPool;
     WidgetPoolHelper helper(widgetPool);
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
 
     helper.fillUpWithFrames(db, 1U, NULL, &context);
 
@@ -140,24 +123,12 @@ TEST(WidgetPoolTest, CreateMaxFrames)
 
 TEST(WidgetPoolTest, CreateMaxWindows)
 {
-    lsr::AreaType area;
-    framehandlertests::DdhPanelBuilder panelBuilder;
-    panelBuilder.create(area, true, 2U);
-
-    framehandlertests::DdhPageBuilder pageBuilder;
-    pageBuilder.create(1U, 1U);
-
-    framehandlertests::DdhBuilder ddhBuilder;
-    lsr::DisplaySizeType displaySize;
-    ddhBuilder.create(panelBuilder, pageBuilder, displaySize);
-
-    lsr::ResourceBuffer binBuffer(ddhBuilder.getDdh(), ddhBuilder.getSize());
     lsr::ResourceBuffer imgBuffer;
-    lsr::Database db(binBuffer, imgBuffer);
+    lsr::Database db(Telltales::getDDH());
 
     lsr::WindowDefinition winDef;
-    winDef.width = displaySize.GetWidth();
-    winDef.height = displaySize.GetHeight();
+    winDef.width = 400;
+    winDef.height = 240;
     winDef.xPos = 0;
     winDef.yPos = 0;
     winDef.id = 0;
@@ -166,8 +137,7 @@ TEST(WidgetPoolTest, CreateMaxWindows)
     lsr::WidgetPool widgetPool;
     WidgetPoolHelper helper(widgetPool);
     MockDataHandler dataHandler;
-    TestDataContext context;
-    context.setHandler(&dataHandler);
+    DataContext context(dataHandler);
 
     helper.fillUpWithWindows(db, dm, winDef, &context);
 

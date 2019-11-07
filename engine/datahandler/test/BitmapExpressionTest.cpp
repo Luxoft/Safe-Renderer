@@ -24,8 +24,6 @@
 **
 ******************************************************************************/
 
-#include "ExpressionTermTypeFactory.h"
-#include "MockListener.h"
 #include "MockDataHandler.h"
 #include "ExpressionTestFixture.h"
 
@@ -40,14 +38,10 @@ using ::testing::Return;
 
 TEST_F(ExpressionTestFixture, BitmapExprGetValueTest)
 {
-    const FUClassId expectedFuId = 0xAABB;
-    const DataId expectedDataId = 0xBBAA;
+    const lsr::DynamicData expected(0xAABB, 0xBBAA);
 
-    lsr::DynamicDataType dataType;
-    dataType.fUClassId = expectedFuId;
-    dataType.dataId = expectedDataId;
-
-    m_termFactory.createDynamicDataExprTerm(dataType);
+    lsr::DynamicDataType dataType = { expected.getCombined(), lsr::DATATYPE_INTEGER };
+    lsr::ExpressionTermType term = { lsr::ExpressionTermType::DYNAMICDATA_CHOICE, 0, &dataType };
 
     const lsr::BitmapId expectedId = 5U;
     const lsr::Number expectedValue(static_cast<U32>(expectedId), lsr::DATATYPE_INTEGER);
@@ -55,139 +49,24 @@ TEST_F(ExpressionTestFixture, BitmapExprGetValueTest)
     m_dataHandler.setNumber(expectedValue);
 
     lsr::BitmapExpression expr;
-    expr.setup(m_termFactory.getDdh(), &m_context, NULL);
+    expr.setup(&term, &m_context);
 
     lsr::BitmapId actualId;
     EXPECT_EQ(lsr::DataStatus::VALID, expr.getValue(actualId));
     EXPECT_EQ(expectedId, actualId);
 
     // Let's check that the request to datahandler was correct.
-    EXPECT_EQ(expectedFuId, m_dataHandler.getLastFuId());
-    EXPECT_EQ(expectedDataId, m_dataHandler.getLastDataId());
-}
-
-TEST_F(ExpressionTestFixture, BitmapExprGetValueWithListenerTest)
-{
-    const FUClassId expectedFuId = 0xAABB;
-    const DataId expectedDataId = 0xBBAA;
-
-    lsr::DynamicDataType dataType;
-    dataType.fUClassId = expectedFuId;
-    dataType.dataId = expectedDataId;
-
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    const lsr::BitmapId expectedId = 5U;
-    const lsr::Number expectedValue(static_cast<U32>(expectedId), lsr::DATATYPE_INTEGER);
-    m_dataHandler.setNumber(expectedValue);
-
-    lsr::BitmapExpression expr;
-    MockListener listener;
-    expr.setup(m_termFactory.getDdh(), &m_context, &listener);
-
-    // As there is listener, there will be no request to datahandler about new value
-    lsr::BitmapId actualId = expectedId * 2; //to get some value differ to expectedId
-    EXPECT_EQ(lsr::DataStatus::NOT_AVAILABLE, expr.getValue(actualId));
-    EXPECT_NE(expectedId, actualId);
-
-    // emit signal about updated value
-    lsr::IDataHandler::IListener* changeListener = &expr;
-    changeListener->onDataChange();
-
-    // Lets check the request to datahandler was correct.
-    EXPECT_EQ(expectedFuId, m_dataHandler.getLastFuId());
-    EXPECT_EQ(expectedDataId, m_dataHandler.getLastDataId());
-
-    // value should be updated
-    EXPECT_EQ(lsr::DataStatus::VALID, expr.getValue(actualId));
-    EXPECT_EQ(expectedId, actualId);
+    EXPECT_EQ(expected.getFUClassId(), m_dataHandler.getLastFuId());
+    EXPECT_EQ(expected.getDataId(), m_dataHandler.getLastDataId());
 }
 
 TEST_F(ExpressionTestFixture, BitmapExprGetValueFailedTest)
 {
-    m_termFactory.createWrongExprTerm(55U);
+    lsr::ExpressionTermType term = { lsr::ExpressionTermType::NONE, 55U, NULL };
 
     lsr::BitmapExpression expr;
-    expr.setup(m_termFactory.getDdh(), &m_context, NULL);
+    expr.setup(&term, &m_context);
 
     lsr::BitmapId actualId;
     EXPECT_EQ(lsr::DataStatus::INCONSISTENT, expr.getValue(actualId));
-}
-
-TEST_F(ExpressionTestFixture, BitmapExprSubscriptionTest)
-{
-    lsr::DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    MockListener listener;
-    lsr::BitmapExpression expr;
-
-    EXPECT_CALL(m_dataHandler, subscribeData(dataType.GetFUClassId(),
-                                             dataType.GetDataId(),
-                                             static_cast<lsr::IDataHandler::IListener*>(&expr)))
-        .WillOnce(Return(true));
-
-    // Here should be subscription
-    expr.setup(m_termFactory.getDdh(), &m_context, &listener);
-}
-
-TEST_F(ExpressionTestFixture, BitmapExprUnsubscriptionTest)
-{
-    lsr::DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    MockListener listener;
-    lsr::BitmapExpression expr;
-
-    expr.setup(m_termFactory.getDdh(), &m_context, &listener);
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(dataType.GetFUClassId(),
-                                               dataType.GetDataId(),
-                                               static_cast<lsr::IDataHandler::IListener*>(&expr)))
-        .Times(1);
-
-    // Here should be unsubscription
-    expr.dispose();
-}
-
-TEST_F(ExpressionTestFixture, BitmapExprNotificationTest)
-{
-    lsr::DynamicDataType dataType;
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    MockListener listener;
-    lsr::BitmapExpression expr;
-
-    expr.setup(m_termFactory.getDdh(), &m_context, &listener);
-
-    EXPECT_CALL(listener, notifyDataChange(_))
-        .Times(1);
-
-    // Here should be notification
-    lsr::IDataHandler::IListener* changeListener = &expr;
-    changeListener->onDataChange();
-}
-
-TEST_F(ExpressionTestFixture, BitmapExprNotificationTestWithoutListener)
-{
-    lsr::DynamicDataType dataType;
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    MockListener listener;
-    lsr::BitmapExpression expr;
-
-    expr.setup(m_termFactory.getDdh(), &m_context, NULL);
-
-    EXPECT_CALL(listener, notifyDataChange(_))
-        .Times(0);
-
-    // Here should be no notification
-    lsr::IDataHandler::IListener* changeListener = &expr;
-    changeListener->onDataChange();
 }

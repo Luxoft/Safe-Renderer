@@ -58,8 +58,6 @@ namespace lsr
     #endif
 #endif
 
-class ODIRecorder;
-
 
 /**
 *
@@ -138,9 +136,8 @@ public:
      * Creates a new instance of the class.
      *
      * @param[in] dataBufferSize the size of the reciving data buffer.
-     * @param[in] pODIRecorder optional instance for recording ODI data
      */
-    explicit MsgTransceiverTCP(U32 dataBufferSize, ODIRecorder* pODIRecorder = 0);
+    explicit MsgTransceiverTCP(U32 dataBufferSize);
 
     /**
      * The destructor of the class.
@@ -204,7 +201,7 @@ public:
     Socket GetSocket() {return m_socket;}
 
     // IMsgTransmitter
-    virtual LSRError transmitMessage(const U8* data, U32 dataLen) P_OVERRIDE;
+    virtual LSRError transmitMessage(const U8* const data, const U32 dataLen) P_OVERRIDE;
 
     // IBufferHandler
     virtual U8* ClaimDataBuffer();

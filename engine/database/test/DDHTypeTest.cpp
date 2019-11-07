@@ -27,55 +27,61 @@
 #include <gtest/gtest.h>
 
 #include "DDHType.h"
+#include "PanelDatabaseType.h"
+#include "PageDatabaseType.h"
 
 using lsr::DDHType;
+using lsr::PageDatabaseType;
+using lsr::PanelDatabaseType;
 
 
 TEST(DDHType, versionCheck)
 {
+    std::string serializerVersionError = "Data has been serialized with another version of the serializer than what the HMI Engine expects (Expecting Serializer version: 5.4.0)";
+    std::string schemaVersionError = "Data has been generated from another schema version than the HMI Engine expects (Expecting Schema Version: 5.4.x)";
+    std::string schemaChecksumError = "Data has been generated from a schema version with another checksum than the HMI Engine expects (Expecting Schema checksum: 0x49d84938)";
     const U32 arbitraryValue = 42;
-    U8 buf[sizeof(DDHType)] = { 0 };
-    DDHType* ddh = reinterpret_cast<DDHType*>(buf);
-    EXPECT_FALSE(ddh->IsVersionOK());
-    EXPECT_EQ(DDHType::serializerVersionError, ddh->GetErrorMessage());
-
-    ddh->schemaChecksum = DDHType::SCHEMA_CHECKSUM;
-    EXPECT_FALSE(ddh->IsVersionOK());
-    EXPECT_EQ(DDHType::serializerVersionError, ddh->GetErrorMessage());
-
-    ddh->schemaChecksum = arbitraryValue;
-    ddh->schemaVersion = DDHType::SCHEMA_VERSION;
-    EXPECT_FALSE(ddh->IsVersionOK());
-    EXPECT_EQ(DDHType::serializerVersionError, ddh->GetErrorMessage());
-
-    ddh->schemaChecksum = arbitraryValue;
-    ddh->schemaVersion = arbitraryValue;
-    ddh->serializerVersion = DDHType::SERIALIZER_VERSION;
-    EXPECT_FALSE(ddh->IsVersionOK());
-    EXPECT_EQ(DDHType::schemaVersionError, ddh->GetErrorMessage());
-
-    ddh->schemaChecksum = DDHType::SCHEMA_CHECKSUM;
-    ddh->schemaVersion = arbitraryValue;
-    ddh->serializerVersion = DDHType::SERIALIZER_VERSION;
-    EXPECT_FALSE(ddh->IsVersionOK());
-    EXPECT_EQ(DDHType::schemaVersionError, ddh->GetErrorMessage());
-
-    ddh->schemaChecksum = arbitraryValue;
-    ddh->schemaVersion = DDHType::SCHEMA_VERSION;
-    ddh->serializerVersion = DDHType::SERIALIZER_VERSION;
-    EXPECT_FALSE(ddh->IsVersionOK());
-    EXPECT_EQ(DDHType::schemaChecksumError, ddh->GetErrorMessage());
-
-    ddh->schemaChecksum = DDHType::SCHEMA_CHECKSUM;
-    EXPECT_TRUE(ddh->IsVersionOK());
-    EXPECT_EQ(std::string(), ddh->GetErrorMessage());
+    {
+        DDHType ddh = { 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, 0U };
+        EXPECT_FALSE(ddh.IsVersionOK());
+        EXPECT_EQ(serializerVersionError, ddh.GetErrorMessage());
+    }
+    {
+        DDHType ddh = { 0, DDHType::SCHEMA_CHECKSUM, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, 0U };
+        EXPECT_FALSE(ddh.IsVersionOK());
+        EXPECT_EQ(serializerVersionError, ddh.GetErrorMessage());
+    }
+    {
+        DDHType ddh = { 0, arbitraryValue, DDHType::SCHEMA_VERSION, 0, NULL, NULL, NULL, NULL, NULL, NULL, 0U };
+        EXPECT_FALSE(ddh.IsVersionOK());
+        EXPECT_EQ(serializerVersionError, ddh.GetErrorMessage());
+    }
+    {
+        DDHType ddh = { 0, arbitraryValue, arbitraryValue, DDHType::SERIALIZER_VERSION, NULL, NULL, NULL, NULL, NULL, NULL, 0U };
+        EXPECT_FALSE(ddh.IsVersionOK());
+        EXPECT_EQ(schemaVersionError, ddh.GetErrorMessage());
+    }
+    {
+        DDHType ddh = { 0, DDHType::SCHEMA_CHECKSUM, arbitraryValue, DDHType::SERIALIZER_VERSION, NULL, NULL, NULL, NULL, NULL, NULL, 0U };
+        EXPECT_FALSE(ddh.IsVersionOK());
+        EXPECT_EQ(schemaVersionError, ddh.GetErrorMessage());
+    }
+    {
+        DDHType ddh = { 0, arbitraryValue, DDHType::SCHEMA_VERSION, DDHType::SERIALIZER_VERSION, NULL, NULL, NULL, NULL, NULL, NULL, 0U };
+        EXPECT_FALSE(ddh.IsVersionOK());
+        EXPECT_EQ(schemaChecksumError, ddh.GetErrorMessage());
+    }
+    {
+        DDHType ddh = { 0, DDHType::SCHEMA_CHECKSUM, DDHType::SCHEMA_VERSION, DDHType::SERIALIZER_VERSION, NULL, NULL, NULL, NULL, NULL, NULL, 0U };
+        EXPECT_TRUE(ddh.IsVersionOK());
+        EXPECT_EQ(std::string(), ddh.GetErrorMessage());
+    }
 }
 
 TEST(DDHType, emptyReferences)
 {
-    DDHType ddh = { 0 };
+    DDHType ddh = { 0, DDHType::SCHEMA_CHECKSUM, DDHType::SCHEMA_VERSION, DDHType::SERIALIZER_VERSION, NULL, NULL, NULL, NULL, NULL, NULL, 0U };
     EXPECT_TRUE(NULL == ddh.GetColorDatabase());
-    EXPECT_TRUE(NULL == ddh.GetFUDatabase());
     EXPECT_TRUE(NULL == ddh.GetPageDatabase());
     EXPECT_TRUE(NULL == ddh.GetPanelDatabase());
     EXPECT_TRUE(NULL == ddh.GetSkinDatabase());
@@ -84,16 +90,13 @@ TEST(DDHType, emptyReferences)
 
 TEST(DDHType, references)
 {
+    PageDatabaseType pageDB = { NULL, 0U };
+    PanelDatabaseType panelDB = { NULL, 0U };
     DDHType ddh = {
             0, 0, 0, 0, // checksums, versions
-            1024, 2048, 3096, 4192, 5120, 6144 // offsets
+            &pageDB, &panelDB, NULL, NULL, NULL, NULL, 0u
     };
-    uintptr_t base = reinterpret_cast<uintptr_t>(&ddh);
-    EXPECT_EQ(base + ddh.colorDatabaseOffset * 4u, reinterpret_cast<uintptr_t>(ddh.GetColorDatabase()));
-    EXPECT_EQ(base + ddh.fUDatabaseOffset * 4u, reinterpret_cast<uintptr_t>(ddh.GetFUDatabase()));
-    EXPECT_EQ(base + ddh.pageDatabaseOffset * 4u, reinterpret_cast<uintptr_t>(ddh.GetPageDatabase()));
-    EXPECT_EQ(base + ddh.panelDatabaseOffset * 4u, reinterpret_cast<uintptr_t>(ddh.GetPanelDatabase()));
-    EXPECT_EQ(base + ddh.skinDatabaseOffset * 4u, reinterpret_cast<uintptr_t>(ddh.GetSkinDatabase()));
-    EXPECT_EQ(base + ddh.hMIGlobalSettingsOffset * 4u, reinterpret_cast<uintptr_t>(ddh.GetHMIGlobalSettings()));
+    EXPECT_EQ(&panelDB, ddh.GetPanelDatabase());
+    EXPECT_EQ(&pageDB, ddh.GetPageDatabase());
 }
 

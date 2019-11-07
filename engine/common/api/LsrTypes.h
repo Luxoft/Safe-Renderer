@@ -27,7 +27,7 @@
 **
 ******************************************************************************/
 
-#include <stdint.h>
+#include <stdint.h>  // <cstdint> cannot be used (C++11)
 #include <cstring>
 
 #if(_MSC_VER >= 1800 || __cplusplus >= 201103L)
@@ -84,7 +84,7 @@
 
 typedef int8_t I8;
 typedef uint8_t U8;
-typedef unsigned short C16;
+typedef uint16_t C16;
 typedef int16_t I16;
 typedef uint16_t U16;
 typedef int32_t I32;

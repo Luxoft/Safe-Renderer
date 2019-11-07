@@ -37,7 +37,7 @@ BitmapExpression::BitmapExpression()
 DataStatus BitmapExpression::getValue(BitmapId& value) const
 {
     Number tmpValue;
-    DataStatus status = NumberExpression::getValue(tmpValue);
+    const DataStatus status = NumberExpression::getValue(tmpValue);
 
     if (DataStatus::VALID == status)
     {

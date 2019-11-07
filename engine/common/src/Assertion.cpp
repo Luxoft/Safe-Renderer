@@ -27,13 +27,17 @@
 #include "Assertion.h"
 #include <pil.h>
 
+#ifdef NDEBUG
+
+#else
+
 namespace lsr
 {
 
 namespace impl
 {
 
-bool executeAssert(const char* msg, const char* file, int line)
+bool executeAssert(const char* const msg, const char* const file, const int32_t line)
 {
     pilAssert(msg, file, line);
     return false;
@@ -43,3 +47,4 @@ bool executeAssert(const char* msg, const char* file, int line)
 
 } // namespace impl
 
+#endif // NDEBUG

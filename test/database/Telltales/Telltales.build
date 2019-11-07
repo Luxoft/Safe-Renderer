@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <build:BuildSettings xmlns:build="http://www.populus.luxoft.com/build">
   <BuildOptions>
     <SerializeDDH>true</SerializeDDH>
     <SerializeFontsAndBitmaps>true</SerializeFontsAndBitmaps>
     <SerializeLanguages>false</SerializeLanguages>
-    <SerializePriorities>false</SerializePriorities>
     <GenerateCharUsage>false</GenerateCharUsage>
     <GenerateNameToIDMap>false</GenerateNameToIDMap>
     <GenerateSerializationLog>false</GenerateSerializationLog>
@@ -32,4 +31,14 @@
       <CmdLineOptions>--processing=off --output-format=32 --pixel-layout=bgr</CmdLineOptions>
     </ImagePreprocessor>
   </PlatformOptions>
+  <ImageGroupList>
+    <ImageGroup>
+      <Name>Palette</Name>
+      <isTextureAtlas>false</isTextureAtlas>
+      <CommandLineArguments>--processing=palette --output-format=32 --bitdepth=2 --align=1</CommandLineArguments>
+      <ImagePath>\Telltales\Bitmaps\Parking_Break_palette.png</ImagePath>
+      <ImagePath>\Telltales\Bitmaps\Airbag_Warning_palette.png</ImagePath>
+      <ImagePath>\Telltales\Bitmaps\palette.png</ImagePath>
+    </ImageGroup>
+  </ImageGroupList>
 </build:BuildSettings>

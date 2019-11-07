@@ -1,5 +1,5 @@
-#ifndef LUXOFTSAFERENDERER_DATACONTEX_H
-#define LUXOFTSAFERENDERER_DATACONTEX_H
+#ifndef LUXOFTSAFERENDERER_DATACONTEXT_H
+#define LUXOFTSAFERENDERER_DATACONTEXT_H
 
 /******************************************************************************
 **
@@ -39,12 +39,15 @@ namespace lsr
 class DataContext
 {
 public:
-    DataContext();
+    DataContext(IDataHandler& dataHandler);
 
     /**
      * @return pointer to @c IDataHandler.
      */
-    virtual IDataHandler* getDataHandler() const = 0;
+    IDataHandler& getDataHandler() const
+    {
+        return m_dataHandler;
+    }
 
     /**
      * Method increases the nesting counter.
@@ -63,20 +66,18 @@ public:
      */
     U32 getNestingCounter() const;
 
-    virtual ~DataContext();
 
 private:
     DataContext(const DataContext&);
     DataContext& operator=(const DataContext&);
 
+    IDataHandler& m_dataHandler;
     U32 m_nestingCounter;
 };
 
-inline DataContext::DataContext()
-    : m_nestingCounter(0U)
-{}
-
-inline DataContext::~DataContext()
+inline DataContext::DataContext(IDataHandler& dataHandler)
+    : m_dataHandler(dataHandler)
+    , m_nestingCounter(0U)
 {}
 
 inline void DataContext::increaseNesting()
@@ -96,4 +97,4 @@ inline U32 DataContext::getNestingCounter() const
 
 } // namespace lsr
 
-#endif // LUXOFTSAFERENDERER_DATACONTEX_H
+#endif // LUXOFTSAFERENDERER_DATACONTEXT_H

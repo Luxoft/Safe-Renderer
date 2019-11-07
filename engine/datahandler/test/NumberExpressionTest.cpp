@@ -24,7 +24,6 @@
 **
 ******************************************************************************/
 
-#include "MockListener.h"
 #include "MockDataHandler.h"
 #include "ExpressionTestFixture.h"
 
@@ -41,152 +40,34 @@ using ::testing::Return;
 
 TEST_F(ExpressionTestFixture, NumberExprGetValueTest)
 {
-    FUClassId expectedFuId = 0xAABB;
-    DataId expectedDataId = 0xBBAA;
+    const DynamicData expected(0xAABB, 0xBBAA);
 
-    DynamicDataType dataType;
-    dataType.fUClassId = expectedFuId;
-    dataType.dataId = expectedDataId;
-
-    m_termFactory.createDynamicDataExprTerm(dataType);
+    const DynamicDataType dataType = { expected.getCombined(), DATATYPE_INTEGER };
+    const ExpressionTermType term = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
 
     const Number expectedValue(5U, DATATYPE_INTEGER);
 
     m_dataHandler.setNumber(expectedValue);
 
     NumberExpression expr;
-    expr.setup(m_termFactory.getDdh(), &m_context, NULL);
+    expr.setup(&term, &m_context);
 
     Number actualValue;
     EXPECT_EQ(DataStatus::VALID, expr.getValue(actualValue));
     EXPECT_EQ(expectedValue, actualValue);
 
     // Let's check that the request to lsr was correct.
-    EXPECT_EQ(expectedFuId, m_dataHandler.getLastFuId());
-    EXPECT_EQ(expectedDataId, m_dataHandler.getLastDataId());
-}
-
-TEST_F(ExpressionTestFixture, NumberExprGetValueWithListenerTest)
-{
-    FUClassId expectedFuId = 0xAABB;
-    DataId expectedDataId = 0xBBAA;
-
-    DynamicDataType dataType;
-    dataType.fUClassId = expectedFuId;
-    dataType.dataId = expectedDataId;
-
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    const Number expectedValue(5U, DATATYPE_INTEGER);
-    m_dataHandler.setNumber(expectedValue);
-
-    NumberExpression expr;
-    MockListener listener;
-    expr.setup(m_termFactory.getDdh(), &m_context, &listener);
-
-    // As there is listener, there will be no request to lsr about new value
-    Number actualValue;
-    EXPECT_EQ(DataStatus::NOT_AVAILABLE, expr.getValue(actualValue));
-    EXPECT_NE(expectedValue.getU32(), actualValue.getU32());
-
-    // emit signal about updated value
-    IDataHandler::IListener* changeListener = &expr;
-    changeListener->onDataChange();
-
-    // Lets check the request to lsr was correct.
-    EXPECT_EQ(expectedFuId, m_dataHandler.getLastFuId());
-    EXPECT_EQ(expectedDataId, m_dataHandler.getLastDataId());
-
-    // value should be updated
-    EXPECT_EQ(DataStatus::VALID, expr.getValue(actualValue));
-    EXPECT_EQ(expectedValue, actualValue);
+    EXPECT_EQ(expected.getFUClassId(), m_dataHandler.getLastFuId());
+    EXPECT_EQ(expected.getDataId(), m_dataHandler.getLastDataId());
 }
 
 TEST_F(ExpressionTestFixture, NumberExprGetValueFailedTest)
 {
-    m_termFactory.createWrongExprTerm(55U);
+    const ExpressionTermType term = { ExpressionTermType::NONE, 55U, NULL };
 
     NumberExpression expr;
-    expr.setup(m_termFactory.getDdh(), &m_context, NULL);
+    expr.setup(&term, &m_context);
 
     Number actualValue;
     EXPECT_EQ(DataStatus::INCONSISTENT, expr.getValue(actualValue));
-}
-
-TEST_F(ExpressionTestFixture, NumberExprSubscriptionTest)
-{
-    DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    MockListener listener;
-    NumberExpression expr;
-
-    EXPECT_CALL(m_dataHandler, subscribeData(dataType.GetFUClassId(),
-                                             dataType.GetDataId(),
-                                             static_cast<IDataHandler::IListener*>(&expr)))
-        .WillOnce(Return(true));
-
-    // Here should be subscription
-    expr.setup(m_termFactory.getDdh(), &m_context, &listener);
-}
-
-TEST_F(ExpressionTestFixture, NumberExprUnsubscriptionTest)
-{
-    DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    MockListener listener;
-    NumberExpression expr;
-
-    expr.setup(m_termFactory.getDdh(), &m_context, &listener);
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(dataType.GetFUClassId(),
-                                               dataType.GetDataId(),
-                                               static_cast<IDataHandler::IListener*>(&expr)))
-        .Times(1);
-
-    // Here should be unsubscription
-    expr.dispose();
-}
-
-TEST_F(ExpressionTestFixture, NumberExprNotificationTest)
-{
-    DynamicDataType dataType;
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    MockListener listener;
-    NumberExpression expr;
-
-    expr.setup(m_termFactory.getDdh(), &m_context, &listener);
-
-    EXPECT_CALL(listener, notifyDataChange(_))
-        .Times(1);
-
-    // Here should be notification
-    IDataHandler::IListener* changeListener = &expr;
-    changeListener->onDataChange();
-}
-
-TEST_F(ExpressionTestFixture, NumberExprNotificationTestWithoutListener)
-{
-    DynamicDataType dataType;
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    MockListener listener;
-    NumberExpression expr;
-
-    expr.setup(m_termFactory.getDdh(), &m_context, NULL);
-
-    EXPECT_CALL(listener, notifyDataChange(_))
-        .Times(0);
-
-    // Here should be no notification
-    IDataHandler::IListener* changeListener = &expr;
-    changeListener->onDataChange();
 }

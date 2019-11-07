@@ -74,35 +74,35 @@ private:
 };
 
 template <std::size_t MarkerSize>
-PoolMarker<MarkerSize>::PoolMarker(const U8 data)
+inline PoolMarker<MarkerSize>::PoolMarker(const U8 data)
 {
-    memset(m_marker, data, MarkerSize);
+    static_cast<void>(std::memset(m_marker, static_cast<I32>(data), MarkerSize));  // ignore return value
 }
 
 template <std::size_t MarkerSize>
-PoolMarker<MarkerSize>::PoolMarker(const PoolMarker<MarkerSize>& rhs)
+inline PoolMarker<MarkerSize>::PoolMarker(const PoolMarker<MarkerSize>& rhs)
 {
     memcpy(m_marker, rhs.m_marker, MarkerSize);
 }
 
 template <std::size_t MarkerSize>
-const PoolMarker<MarkerSize>& PoolMarker<MarkerSize>::operator=(const PoolMarker<MarkerSize>& rhs)
+inline const PoolMarker<MarkerSize>& PoolMarker<MarkerSize>::operator=(const PoolMarker<MarkerSize>& rhs)
 {
     if (this != &rhs)
     {
-        memcpy(m_marker, rhs.m_marker, MarkerSize);
+        static_cast<void>(std::memcpy(m_marker, rhs.m_marker, MarkerSize));  // ignore return value
     }
     return *this;
 }
 
 template <std::size_t MarkerSize>
-bool PoolMarker<MarkerSize>::operator==(const PoolMarker<MarkerSize>& rhs) const
+inline bool PoolMarker<MarkerSize>::operator==(const PoolMarker<MarkerSize>& rhs) const
 {
     return (0 == memcmp(m_marker, rhs.m_marker, MarkerSize));
 }
 
 template<std::size_t MarkerSize>
-bool PoolMarker<MarkerSize>::isEqualToPattern(const PoolMarker<MarkerSize>& marker,
+inline bool PoolMarker<MarkerSize>::isEqualToPattern(const PoolMarker<MarkerSize>& marker,
                                               const U8 markerPattern)
 {
     const PoolMarker<MarkerSize> tmpMarker(markerPattern);

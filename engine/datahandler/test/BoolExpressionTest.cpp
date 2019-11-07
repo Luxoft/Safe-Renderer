@@ -24,7 +24,6 @@
 **
 ******************************************************************************/
 
-#include "MockListener.h"
 #include "MockDataHandler.h"
 #include "ExpressionTestFixture.h"
 
@@ -39,76 +38,24 @@ using namespace lsr;
 
 TEST_F(ExpressionTestFixture, BoolExprGetValueTest)
 {
-    bool expectedValue = true;
-    m_termFactory.createBoolExprTerm(expectedValue);
+    ExpressionTermType term = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
 
     BoolExpression expr;
-    expr.setup(m_termFactory.getDdh(), &m_context);
+    expr.setup(&term, &m_context);
 
     bool actualValue = false;
     EXPECT_EQ(DataStatus::VALID, expr.getValue(actualValue));
 
-    EXPECT_EQ(expectedValue, actualValue);
+    EXPECT_TRUE(actualValue);
 }
 
 TEST_F(ExpressionTestFixture, BoolExprGetValueWithWrongValueTest)
 {
-    m_termFactory.createWrongExprTerm(55U);
+    ExpressionTermType term = { ExpressionTermType::NONE, 55U, NULL };
 
     BoolExpression expr;
-    expr.setup(m_termFactory.getDdh(), &m_context);
+    expr.setup(&term, &m_context);
 
     bool actualValue = false;
     EXPECT_EQ(DataStatus::INCONSISTENT, expr.getValue(actualValue));
-}
-
-TEST_F(ExpressionTestFixture, BoolExprSubscriptionTest)
-{
-    DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    BoolExpression expr;
-
-    EXPECT_CALL(m_dataHandler, subscribeData(dataType.GetFUClassId(),
-                                             dataType.GetDataId(),
-                                             NULL))
-        .Times(1);
-
-    expr.setup(m_termFactory.getDdh(), &m_context);
-}
-
-TEST_F(ExpressionTestFixture, BoolExprUnsubscriptionTest)
-{
-    DynamicDataType dataType;
-    dataType.fUClassId = 13U;
-    dataType.dataId = 52U;
-
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    BoolExpression expr;
-    expr.setup(m_termFactory.getDdh(), &m_context);
-
-    EXPECT_CALL(m_dataHandler, unsubscribeData(dataType.GetFUClassId(),
-                                               dataType.GetDataId(),
-                                               NULL))
-        .Times(1);
-
-    expr.dispose();
-}
-
-// To fill gap of code coverage
-TEST_F(ExpressionTestFixture, BoolExprNotificationTest)
-{
-    DynamicDataType dataType;
-    m_termFactory.createDynamicDataExprTerm(dataType);
-
-    BoolExpression expr;
-    expr.setup(m_termFactory.getDdh(), &m_context);
-
-    // Here should be notification
-    IDataHandler::IListener* changeListener = &expr;
-    changeListener->onDataChange();
 }

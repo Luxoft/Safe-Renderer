@@ -31,6 +31,7 @@ include_directories(
     "${gmock_SOURCE_DIR}"
     "${gtest_SOURCE_DIR}/include"
     "${gtest_SOURCE_DIR}"
+    ${LSRROOT}/test/database/Telltales/Output
 )
 
 if(NOT DEFINED GUNITTEST_PREFIX)

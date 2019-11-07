@@ -42,7 +42,7 @@ public:
      * Creates a black transparent color
      */
     Color():
-        m_value(0)
+        m_value(0U)
     {}
 
     /**
@@ -52,10 +52,10 @@ public:
      * @param blue blue component
      * @param alpha alpha blend value (opacity)
      */
-    Color(U8 red, U8 green, U8 blue, U8 alpha):
-        m_value((static_cast <U32> (alpha) << 24) |
-                (static_cast <U32> (blue)  << 16) |
-                (static_cast <U32> (green) << 8) |
+    Color(const U8 red, const U8 green, const U8 blue, const U8 alpha):
+        m_value((static_cast <U32> (alpha) << 24U) |
+                (static_cast <U32> (blue)  << 16U) |
+                (static_cast <U32> (green) << 8U) |
                  static_cast <U32> (red) )
     {}
 
@@ -63,7 +63,7 @@ public:
      * Creates a color from a raw ODI value
      * @param value ODI representation
      */
-    static Color fromColorValue(U32 value)
+    static Color fromColorValue(const U32 value)
     {
         Color ret;
         ret.m_value = value;
@@ -83,7 +83,7 @@ public:
      */
     inline U8 getGreen() const
     {
-        return static_cast <U8> ((m_value & 0x0000ff00U) >> 8);
+        return static_cast <U8> ((m_value & 0x0000ff00U) >> 8U);
     }
 
     /**
@@ -91,7 +91,7 @@ public:
      */
     inline U8 getBlue() const
     {
-        return static_cast <U8> ((m_value & 0x00ff0000U) >> 16);
+        return static_cast <U8> ((m_value & 0x00ff0000U) >> 16U);
     }
 
     /**
@@ -99,7 +99,7 @@ public:
      */
     inline U8 getAlpha() const
     {
-        return static_cast <U8> ((m_value & 0xff000000U) >> 24);
+        return static_cast <U8> ((m_value & 0xff000000U) >> 24U);
     }
 
     /**
@@ -114,7 +114,7 @@ public:
      * Set the Color from a ODI representation value
      * @param colorValue ODI representation of the color
      */
-    void setRawValue(U32 colorValue)
+    void setRawValue(const U32 colorValue)
     {
         m_value = colorValue;
     }

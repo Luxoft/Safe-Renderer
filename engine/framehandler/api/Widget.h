@@ -61,7 +61,7 @@ public:
      * @return @c LSR_NO_ERROR if dispose was successful, and other values of
      *         @c LSRError in other cases.
      */
-    static LSRError dispose(WidgetPool& widgetPool, Widget* pWidget);
+    static LSRError dispose(WidgetPool& widgetPool, Widget* const pWidget);
 
     /**
      * Informs the widget about the monotonic system time
@@ -101,7 +101,7 @@ public:
      * @return NULL pointer if @c index is out of [0, @c numChildren],
      *         correct pointer to @c Widget otherwise.
      */
-    Widget* childAt(std::size_t index) const;
+    Widget* childAt(const std::size_t index) const;
 
     /**
      * @return the number of child widgets.
@@ -152,20 +152,20 @@ protected:
      * @return @c true if object was successfully added, @c false
      *         if maximum count of children has already reached.
      */
-    bool addChild(Widget* pChild);
+    bool addChild(Widget* const pChild);
 
     /**
      * @param[in] area area in relative coordinates to widgets parent
      */
     void setArea(const Area& area);
-    bool setArea(const AreaType* pDdhArea);
+    bool setArea(const AreaType* const pDdhArea);
 
     /**
      * Save error in the widget.
      *
      * @param[in] error error value which should be saved.
      */
-    void setError(LSRError error);
+    void setError(const LSRError error);
 
     /**
      * Method should be used for updating (evaluating) internal widgets parameters such as
@@ -223,7 +223,7 @@ protected:
      *
      * @param[in] pExpr pointer to visibility expression. See @c BoolExpression.
      */
-    void setVisibilityExpression(const BoolExpression* pExpr);
+    void setVisibilityExpression(const BoolExpression* const pExpr);
 
     /**
      * Method tries to get value from @c Expression @c T.
@@ -278,7 +278,7 @@ inline const Area& Widget::getArea() const
     return m_area;
 }
 
-inline void Widget::setError(LSRError error)
+inline void Widget::setError(const LSRError error)
 {
     m_error = error;
 }
@@ -288,7 +288,7 @@ inline bool Widget::isVisible() const
     return m_isVisible;
 }
 
-inline void Widget::setVisibilityExpression(const BoolExpression* pExpr)
+inline void Widget::setVisibilityExpression(const BoolExpression* const pExpr)
 {
     m_pVisibilityExpr = pExpr;
 }
@@ -297,7 +297,7 @@ template <class T, class K>
 bool Widget::tryToUpdateValue(const T& expr, K& value)
 {
     bool res = false;
-    DataStatus status = expr.getValue(value);
+    const DataStatus status = expr.getValue(value);
     if (status == DataStatus::VALID)
     {
         res = true;

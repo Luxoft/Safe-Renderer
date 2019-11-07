@@ -72,6 +72,51 @@ static size_t g_usedContexts;
 static size_t g_usedWindows;
 static size_t g_usedTextures;
 
+static uint32_t getBpp(GILFormat format)
+{
+    switch (format)
+    {
+    case GIL_FORMAT_P_2_ARGB_8888:
+    case GIL_FORMAT_P_2_BGRA_8888:
+    case GIL_FORMAT_P_2_RGBA_8888:
+    case GIL_FORMAT_P_2_RGB_888:
+    case GIL_FORMAT_P_2_RGB_565:
+        return 2;
+    case GIL_FORMAT_P_4_ARGB_8888:
+    case GIL_FORMAT_P_4_BGRA_8888:
+    case GIL_FORMAT_P_4_RGBA_8888:
+    case GIL_FORMAT_P_4_RGB_888:
+    case GIL_FORMAT_P_4_RGB_565:
+        return 4;
+    case GIL_FORMAT_P_8_ARGB_8888:
+    case GIL_FORMAT_P_8_BGRA_8888:
+    case GIL_FORMAT_P_8_RGBA_8888:
+    case GIL_FORMAT_P_8_RGB_888:
+    case GIL_FORMAT_P_8_RGB_565:
+    case GIL_FORMAT_A_8:
+        return 8;
+    case GIL_FORMAT_RGB_565:
+    case GIL_FORMAT_BGR_565:
+        return 16;
+    case GIL_FORMAT_RGB_888:
+    case GIL_FORMAT_BGR_888:
+        return 24;
+    case GIL_FORMAT_ARGB_8888:
+    case GIL_FORMAT_BGRA_8888:
+    case GIL_FORMAT_RGBA_8888:
+    case GIL_FORMAT_INVALID:
+        break;
+    //no default clause to cause compiler warning if new format is added
+    }
+    return 32;
+}
+
+static uint32_t getBufferSize(uint32_t width, uint32_t height, GILFormat format)
+{
+    uint32_t bpp = getBpp(format);
+    return (width * height * bpp) / 8U;
+}
+
 void gilInit(GILConfig config)
 {
     fprintf(stdout, "gilInit()\n");
@@ -139,31 +184,46 @@ GILTexture gilCreateTexture(GILContext context)
     return tx;
 }
 
-GILBoolean gilLoadTexture(GILTexture t, uint32_t width, uint32_t height, GILFormat format, GILBoolean copy, const void* data)
+GILBoolean gilTexPixels(GILTexture t, uint32_t width, uint32_t height, GILFormat format, const void* data)
 {
     GILBoolean ret = GIL_TRUE;
-    uint32_t pixelSize = 4;
-    if (format < GIL_FORMAT_1_BPP)
-    {
-        pixelSize = 1;
-    }
-    else if (format < GIL_FORMAT_2_BPP)
-    {
-        pixelSize = 2;
-    }
-    else if (format < GIL_FORMAT_3_BPP)
-    {
-        pixelSize = 3;
-    }
-    else
-    {
-        pixelSize = 4;
-    }
-    const uint32_t crc = calcCrc32Complete(data, width*height * pixelSize);
-    fprintf(stdout, "gilLoadTexture(%d, %d, %d, %d, %d, 0x%X) ret :%d\n", t ? t->id : 0, width, height, format, copy, crc, ret);
+    uint32_t bufSize = getBufferSize(width, height, format);
+    const uint32_t crc = calcCrc32Complete(data, bufSize);
+    fprintf(stdout, "gilTexPixels(%d, %u, %u, %d, %u) ret :%d\n",
+            t ? t->id : 0, width, height, format, crc, ret);
     t->crc = crc;
     t->width = width;
     t->height = height;
+    return ret;
+}
+
+GILBoolean gilTexPalette4(GILTexture t, const void* palette, uint32_t size)
+{
+    GILBoolean ret = GIL_TRUE;
+    fprintf(stdout, "gilTexPalette4(");
+    const uint32_t* palette32 = (const uint32_t*)(palette);
+    uint32_t i = 0U;
+    for (; i < size; ++i)
+    {
+        fprintf(stdout, "0x%X, ", palette32[i]);
+    }
+    fprintf(stdout, ") ret :%d\n", ret);
+    return ret;
+}
+
+GILBoolean gilTexPalette3(GILTexture t, const void* palette, uint32_t size)
+{
+    GILBoolean ret = GIL_TRUE;
+    fprintf(stdout, "gilTexPalette3(");
+    fprintf(stdout, ") ret :%d\n", ret);
+    return ret;
+}
+
+GILBoolean gilTexPalette2(GILTexture t, const void* palette, uint32_t size)
+{
+    GILBoolean ret = GIL_TRUE;
+    fprintf(stdout, "gilTexPalette2(");
+    fprintf(stdout, ") ret :%d\n", ret);
     return ret;
 }
 
@@ -239,4 +299,9 @@ GILBoolean gilHandleWindowEvents(GILContext context)
     GILBoolean ret = GIL_FALSE;
     fprintf(stdout, "gilHandleWindowEvents(%d) ret:%d\n", context ? context->id : 0, ret);
     return ret;
+}
+
+void gilSync(GILContext context)
+{
+    fprintf(stdout, "gilSync(%d)\n", context ? context->id : 0);
 }

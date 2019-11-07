@@ -30,47 +30,26 @@
 #include <Expression.h>
 
 #include <gtest/gtest.h>
+using namespace lsr;
 
 class ExpressionRedundancyTest : public ExpressionTestFixture
 {
-protected:
-    ExpressionRedundancyTest()
-    {
-    }
-
-    void prepareExpression(U32 value1, U32 value2, U32 value3)
-    {
-        ExpressionTypeFactory exprFactory;
-        exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_REDUNDANCY, 3U);
-
-        ExpressionTermTypeFactory term1;
-        term1.createIntegerExprTerm(value1);
-
-        ExpressionTermTypeFactory term2;
-        term2.createIntegerExprTerm(value2);
-
-        ExpressionTermTypeFactory term3;
-        term3.createIntegerExprTerm(value3);
-
-        exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-        exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-        exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-        m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-    }
 };
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnValidValueTest)
 {
-    const U32 expected = 5U;
-    prepareExpression(expected, expected, expected);
+    ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType t2 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
+    const U32 expected = 5U;
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::VALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -78,15 +57,18 @@ TEST_F(ExpressionRedundancyTest, RedundancyReturnValidValueTest)
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest1)
 {
-    const U32 expected = 5U;
-    prepareExpression(10U, expected, expected);
+    ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 10U, NULL };
+    ExpressionTermType t2 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
+    const U32 expected = 5U;
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::INVALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -94,15 +76,19 @@ TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest1)
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest2)
 {
+    ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType t2 = { ExpressionTermType::INTEGER_CHOICE, 10U, NULL };
+    ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
+
     const U32 expected = 5U;
-    prepareExpression(expected, 10U, expected);
 
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::INVALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -110,15 +96,19 @@ TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest2)
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest3)
 {
+    ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType t2 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 10U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
+
     const U32 expected = 5U;
-    prepareExpression(expected, expected, 10U);
 
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::INVALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -126,14 +116,17 @@ TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest3)
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest4)
 {
-    prepareExpression(5U, 6U, 7U);
+    ExpressionTermType t1 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType t2 = { ExpressionTermType::INTEGER_CHOICE, 6U, NULL };
+    ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 7U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     const lsr::Number expectedValue(5U, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::INVALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -141,35 +134,21 @@ TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest4)
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest5)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_REDUNDANCY, 3U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    ExpressionTermType t1 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    ExpressionTermType t2 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     m_dataHandler.setInvalidNumber(lsr::Number(10U, lsr::DATATYPE_INTEGER));
 
     const U32 expected = 5U;
-    lsr::DynamicDataType type;
-
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(expected);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(expected);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::INVALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -177,35 +156,21 @@ TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest5)
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest6)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_REDUNDANCY, 3U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    ExpressionTermType t1 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    ExpressionTermType t2 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     const U32 expected = 10U;
-
     m_dataHandler.setInvalidNumber(lsr::Number(expected, lsr::DATATYPE_INTEGER));
-
-    lsr::DynamicDataType type;
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(5U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
 
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::INVALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -213,35 +178,21 @@ TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest6)
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest7)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_REDUNDANCY, 3U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    ExpressionTermType t1 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    ExpressionTermType t2 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    ExpressionTermType t3 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     const U32 expected = 10U;
-
     m_dataHandler.setInvalidNumber(lsr::Number(expected, lsr::DATATYPE_INTEGER));
-
-    lsr::DynamicDataType type;
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term3;
-    term3.createDynamicDataExprTerm(type);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
 
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::INVALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -249,35 +200,21 @@ TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest7)
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest8)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_REDUNDANCY, 3U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    const ExpressionTermType t1 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    const ExpressionTermType t2 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    const ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     m_dataHandler.setOutDatedNumber(lsr::Number(10U, lsr::DATATYPE_INTEGER));
 
     const U32 expected = 5U;
-    lsr::DynamicDataType type;
-
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createIntegerExprTerm(expected);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(expected);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
-
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::INVALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -285,35 +222,21 @@ TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest8)
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest9)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_REDUNDANCY, 3U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    const ExpressionTermType t1 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    const ExpressionTermType t2 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    const ExpressionTermType t3 = { ExpressionTermType::INTEGER_CHOICE, 5U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     const U32 expected = 10U;
-
     m_dataHandler.setOutDatedNumber(lsr::Number(expected, lsr::DATATYPE_INTEGER));
-
-    lsr::DynamicDataType type;
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term3;
-    term3.createIntegerExprTerm(5U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
 
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::INVALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -321,35 +244,21 @@ TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest9)
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest10)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_REDUNDANCY, 3U);
+    const DynamicDataType dynData = { 0U, DATATYPE_INTEGER };
+    const ExpressionTermType t1 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    const ExpressionTermType t2 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    const ExpressionTermType t3 = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dynData };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     const U32 expected = 10U;
-
     m_dataHandler.setOutDatedNumber(lsr::Number(expected, lsr::DATATYPE_INTEGER));
-
-    lsr::DynamicDataType type;
-    ExpressionTermTypeFactory term1;
-    term1.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term2;
-    term2.createDynamicDataExprTerm(type);
-
-    ExpressionTermTypeFactory term3;
-    term3.createDynamicDataExprTerm(type);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
 
     const lsr::Number expectedValue(expected, lsr::DATATYPE_INTEGER);
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::INVALID, actualStatus);
     EXPECT_EQ(expectedValue, actualValue);
@@ -357,29 +266,16 @@ TEST_F(ExpressionRedundancyTest, RedundancyReturnInValidValueTest10)
 
 TEST_F(ExpressionRedundancyTest, RedundancyReturnInconsistentFlagTest1)
 {
-    ExpressionTypeFactory exprFactory;
-    exprFactory.createExpr(lsr::EXPRESSION_OPERATOR_REDUNDANCY, 3U);
-
-    ExpressionTermTypeFactory term1;
-    term1.createWrongExprTerm(10U);
-
-    ExpressionTermTypeFactory term2;
-    term2.createWrongExprTerm(5U);
-
-    ExpressionTermTypeFactory term3;
-    term3.createWrongExprTerm(5U);
-
-    exprFactory.addExprTerm(term1.getDdh(), term1.getSize());
-    exprFactory.addExprTerm(term2.getDdh(), term2.getSize());
-    exprFactory.addExprTerm(term3.getDdh(), term3.getSize());
-
-    m_termFactory.createExpressionExprTerm(exprFactory.getDdh(), exprFactory.getSize());
+    const ExpressionTermType t1 = { ExpressionTermType::NONE, 10U, NULL };
+    const ExpressionTermType t2 = { ExpressionTermType::NONE, 5U, NULL };
+    const ExpressionTermType t3 = { ExpressionTermType::NONE, 5U, NULL };
+    const ExpressionTermType* parameters[] = { &t1, &t2, &t3 };
+    const ExpressionType expr = { EXPRESSION_OPERATOR_REDUNDANCY, parameters, 3 };
+    const ExpressionTermType term = { ExpressionTermType::EXPRESSION_CHOICE, 0U, &expr };
 
     lsr::Number actualValue;
     lsr::DataStatus actualStatus =
-        lsr::Expression::getNumber(m_termFactory.getDdh(),
-                                           &m_context,
-                                           actualValue);
+        lsr::Expression::getNumber(&term, &m_context, actualValue);
 
     EXPECT_EQ(lsr::DataStatus::INCONSISTENT, actualStatus);
 }

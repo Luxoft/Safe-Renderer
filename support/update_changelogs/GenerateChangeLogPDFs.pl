@@ -3,8 +3,8 @@
 =head1 NAME
   GenerateChangeLogPDFs.pl
 
-  Generate PDF files and put them in root folder of PopulusSC for
-  * PopulusSC\changelog\main.xml
+  Generate PDF files and put them in root folder of repository for
+  * changelog\main.xml
 
 =head1 USAGE
   perl GenerateChangeLogPDFs.pl
@@ -35,7 +35,7 @@ sub GetVariables () {
 
     # read parameters into hash
     my %vars = ();
-    open(my $fh, '<', '../../config/DocBookConfig.ent') or die("Can't open 'PopulusSC/config/DocBookConfig.ent' for reading: $!\n");
+    open(my $fh, '<', '../../config/DocBookConfig.ent') or die("Can't open 'config/DocBookConfig.ent' for reading: $!\n");
     while (my $line = <$fh>) {
         if ($line =~ /^\s*<!ENTITY\s+(\S+)\s+"(\S+)">/) {
             $vars{$1} = $2;
@@ -48,7 +48,7 @@ sub GetVariables () {
         'ChangeLogDate',
         'ChangeLogRelease',
         'ChangeLogIssuer',
-        'ChangeLogProduct_PopulusSC',
+        'ChangeLogProduct_LSR',
         'CopyrightYear',
     );
     my %validNames = map { $_ => 1 } @validNames;
@@ -84,7 +84,7 @@ unless (chdir($scriptDir)) {
 
 my $vars = GetVariables();
 my %files = (
-    '..\doc\changelog\main.xml'    => "LXFT.POPULUS.SCL.$$vars{'ChangeLogRelease'}-(Populus Safety Critical Changelog).pdf",
+    '..\doc\changelog\main.xml'    => "LXFT.LSR.SCL.$$vars{'ChangeLogRelease'}-(Luxoft Safe Renderer Changelog).pdf",
 );
 
 print "Converting main changelog XML into PDF...\n";
