@@ -5,6 +5,7 @@
 **
 **   File:        BitmapStateDefinitionType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,28 +32,33 @@
 
 namespace lsr
 {
-struct LsrImage;
 
+/**
+ * BitmapStateDefinitionType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct BitmapStateDefinitionType
 {
-    const U16 stateBitmapId;
-    const LsrImage* const file;
+    const U16 m_stateBitmapId;
+    const LsrImage* const m_file;
 
 
     /**
      * Returns the value of the stateBitmapId attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetStateBitmapId() const
     {
-        return stateBitmapId;
+        return m_stateBitmapId;
     }
 
     /**
      * Returns the value of the file attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const LsrImage* GetFile() const
     {
-        return file;
+        return m_file;
     }
 
 };

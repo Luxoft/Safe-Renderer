@@ -5,6 +5,7 @@
 **
 **   File:        PanelType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,42 +32,46 @@
 
 namespace lsr
 {
-struct AreaType;
-struct ExpressionTermType;
-struct BaseFieldChoiceType;
 
+/**
+ * PanelType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct PanelType
 {
-    const AreaType* const area;
-    const ExpressionTermType* const visible;
-    const BaseFieldChoiceType* const *field;
-    const U16 fieldCount;
+    const AreaType* const m_area;
+    const ExpressionTermType* const m_visible;
+    const BaseFieldChoiceType* const* const m_field;
+    const U16 m_fieldCount;
 
 
     /**
      * Returns a pointer to the area child reference.
      * Defines the area of the element relative to the upper left corner of its parent
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const AreaType* GetArea() const
     {
-        return area;
+        return m_area;
     }
 
     /**
      * Returns a pointer to the visible child reference.
      * Controls the visibility of the element. It can make sense to have a field invisible if it is also enabled because when it receives focus, it becomes visible and when it loses focus, it becomes invisible again
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const ExpressionTermType* GetVisible() const
     {
-        return visible;
+        return m_visible;
     }
 
     /**
      * Returns the number of field elements.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetFieldCount() const
     {
-        return fieldCount;
+        return m_fieldCount;
     }
 
     /**
@@ -74,9 +79,11 @@ struct PanelType
      * This method checks the index and returns NULL if the item index exceeds the element count.
      * The list of fields in the panel. The fields are drawn in the order they appear in the list
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const BaseFieldChoiceType* GetField(const U16 i) const
     {
-        return (i < fieldCount) ? field[i] : NULL;
+        // coverity[misra_cpp_2008_rule_5_0_15_violation]
+        return (i < m_fieldCount) ? m_field[i] : NULL;
     }
 
 };

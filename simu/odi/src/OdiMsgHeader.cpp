@@ -58,7 +58,7 @@ InputStream& operator>>(InputStream& stream, OdiMsgHeader& header)
     stream >> tmp;
     if (!messageutils::checkOdiMsgType(tmp))
     {
-        stream.setError(LSR_COMM_INVALID_FIELD_IN_MSG);
+        stream.setError(COM_INVALID_FIELD_IN_MSG);
     }
     else
     {

@@ -29,7 +29,7 @@
 
 #include "Pool.h"
 #include "LsrTypes.h"
-#include "LSRError.h"
+#include "LSREngineError.h"
 
 #include <cstddef>
 
@@ -72,13 +72,13 @@ public:
      * Constructor will be called.
      *
      * @param[out] error the error value which should be set during operation execution.
-     *                   If this value is equal to @c LSR_NO_ERROR, operation
+     *                   If this value is equal to @c LSR_NO_ENGINE_ERROR, operation
      *                   finished successfully, and failed in other cases.
      *
      * @return pointer to the instance of type @c T.
-     *         Returned pointer is not equal to NULL only if @c error == @c LSR_NO_ERROR.
+     *         Returned pointer is not equal to NULL only if @c error == @c LSR_NO_ENGINE_ERROR.
      */
-    inline T* createObject(LSRError& error)
+    inline T* createObject(LSREngineError& error)
     {
         T* res = NULL;
         void* ptr = m_pool.allocate(error);
@@ -94,15 +94,15 @@ public:
      * Constructor with one parameter will be called.
      *
      * @param[out] error the error value which should be set during allocation.
-     *                   If this value is equal to @c LSR_NO_ERROR, operation
+     *                   If this value is equal to @c LSR_NO_ENGINE_ERROR, operation
      *                   finished successfully, and failed in other cases.
      * @param[in]  arg1 some argument which is needed for constructor.
      *
      * @return pointer to the instance of type @c T.
-     *         Returned pointer is not equal to NULL only if @c error == @c LSR_NO_ERROR.
+     *         Returned pointer is not equal to NULL only if @c error == @c LSR_NO_ENGINE_ERROR.
      */
     template<class TArg1>
-    inline T* createObject(LSRError& error, TArg1 arg1)
+    inline T* createObject(LSREngineError& error, TArg1 arg1)
     {
         T* res = NULL;
         void* ptr = m_pool.allocate(error);
@@ -114,7 +114,7 @@ public:
     }
 
     template<class TArg1, class TArg2>
-    inline T* createObject(LSRError& error, TArg1 arg1, TArg2 arg2)
+    inline T* createObject(LSREngineError& error, TArg1 arg1, TArg2 arg2)
     {
         T* res = NULL;
         void* ptr = m_pool.allocate(error);
@@ -126,7 +126,7 @@ public:
     }
 
     template<class TArg1, class TArg2, class TArg3>
-    inline T* createObject(LSRError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3)
+    inline T* createObject(LSREngineError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3)
     {
         T* res = NULL;
         void* ptr = m_pool.allocate(error);
@@ -138,7 +138,7 @@ public:
     }
 
     template<class TArg1, class TArg2, class TArg3, class TArg4>
-    inline T* createObject(LSRError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4)
+    inline T* createObject(LSREngineError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4)
     {
         T* res = NULL;
         void* ptr = m_pool.allocate(error);
@@ -150,7 +150,7 @@ public:
     }
 
     template<class TArg1, class TArg2, class TArg3, class TArg4, class TArg5>
-    inline T* createObject(LSRError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5)
+    inline T* createObject(LSREngineError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5)
     {
         T* res = NULL;
         void* ptr = m_pool.allocate(error);
@@ -164,7 +164,7 @@ public:
     template<class TArg1, class TArg2,
              class TArg3, class TArg4,
              class TArg5, class TArg6>
-    inline T* createObject(LSRError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6)
+    inline T* createObject(LSREngineError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5, TArg6 arg6)
     {
         T* res = NULL;
         void* ptr = m_pool.allocate(error);
@@ -179,7 +179,7 @@ public:
              class TArg3, class TArg4,
              class TArg5, class TArg6,
              class TArg7>
-    inline T* createObject(LSRError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4,
+    inline T* createObject(LSREngineError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4,
                            TArg5 arg5, TArg6 arg6, TArg7 arg7)
     {
         T* res = NULL;
@@ -195,7 +195,7 @@ public:
              class TArg3, class TArg4,
              class TArg5, class TArg6,
              class TArg7, class TArg8>
-    inline T* createObject(LSRError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4,
+    inline T* createObject(LSREngineError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4,
                            TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8)
     {
         T* res = NULL;
@@ -212,7 +212,7 @@ public:
              class TArg5, class TArg6,
              class TArg7, class TArg8,
              class TArg9>
-    inline T* createObject(LSRError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4,
+    inline T* createObject(LSREngineError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4,
                            TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8, TArg9 arg9)
     {
         T* res = NULL;
@@ -229,7 +229,7 @@ public:
              class TArg5, class TArg6,
              class TArg7, class TArg8,
              class TArg9, class TArg10>
-    inline T* createObject(LSRError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4,
+    inline T* createObject(LSREngineError& error, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4,
                            TArg5 arg5, TArg6 arg6, TArg7 arg7, TArg8 arg8,
                            TArg9 arg9, TArg10 arg10)
     {
@@ -248,12 +248,12 @@ public:
      *
      * @param[in] instance the instance of type @c T which should be freed.
      *
-     * @return @c LSR_NO_ERROR if object deletion was successful, and other values of
-     *         @c LSRError in other cases.
+     * @return @c LSR_NO_ENGINE_ERROR if object deletion was successful, and other values of
+     *         @c LSREngineError in other cases.
      */
-    LSRError deleteObject(T* instance)
+    LSREngineError deleteObject(T* instance)
     {
-        LSRError res = LSR_NO_ERROR;
+        LSREngineError res = LSR_NO_ENGINE_ERROR;
         if(NULL != instance && m_pool.isAllocated(instance))
         {
             instance->~T();

@@ -56,7 +56,7 @@ InputStream& operator>>(InputStream& stream, MessageHeader& header)
     stream >> tmpType;
     if (!messageutils::checkMsgType(tmpType))
     {
-        stream.setError(LSR_COMM_INVALID_FIELD_IN_MSG);
+        stream.setError(COM_INVALID_FIELD_IN_MSG);
     }
     else
     {

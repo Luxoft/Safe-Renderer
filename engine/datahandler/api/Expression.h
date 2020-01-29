@@ -33,6 +33,7 @@
 #include "DataStatus.h"
 
 #include <ExpressionTermType.h>
+#include <NonCopyable.h>
 
 namespace lsr
 {
@@ -53,7 +54,7 @@ namespace lsr
  *
  * @reqid SW_ENG_048, SW_ENG_049, SW_ENG_051, SW_ENG_053, SW_ENG_064
  */
-class Expression
+class Expression : private NonCopyable
 {
 public:
     /**
@@ -82,10 +83,13 @@ public:
                                 DataContext* const pContext,
                                 Number& value);
 
-    virtual ~Expression() {}
-
 protected:
-    Expression() {}
+    Expression()
+    : NonCopyable()
+    {
+    }
+
+   virtual ~Expression() {}
 
 private:
     /**

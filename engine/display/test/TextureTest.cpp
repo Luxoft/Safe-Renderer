@@ -39,15 +39,16 @@ class TextureTest : public ::testing::Test
 {
     void SetUp() P_OVERRIDE
     {
-        gilMock = new MockGILStrict();
+        gilMock = &gil;
     }
 
     void TearDown() P_OVERRIDE
     {
-        delete gilMock;
+        gilMock = NULL;
     }
 
 protected:
+    MockGILStrict gil;
     Texture tx;
     gil_context_t ctx;
     gil_texture_t giltx;
@@ -89,8 +90,8 @@ TEST_F(TextureTest, rgb565)
         data,
     };
     InSequence seq;
-    EXPECT_CALL(*gilMock, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
-    EXPECT_CALL(*gilMock, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_RGB_565, data));
+    EXPECT_CALL(gil, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
+    EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_RGB_565, data));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
 }
@@ -112,8 +113,8 @@ TEST_F(TextureTest, rgb888)
         data,
     };
     InSequence seq;
-    EXPECT_CALL(*gilMock, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
-    EXPECT_CALL(*gilMock, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_RGB_888, data));
+    EXPECT_CALL(gil, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
+    EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_RGB_888, data));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
 }
@@ -135,8 +136,8 @@ TEST_F(TextureTest, bgr888)
         data,
     };
     InSequence seq;
-    EXPECT_CALL(*gilMock, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
-    EXPECT_CALL(*gilMock, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_BGR_888, data));
+    EXPECT_CALL(gil, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
+    EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_BGR_888, data));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
 }
@@ -158,8 +159,8 @@ TEST_F(TextureTest, rgba8888)
         data,
     };
     InSequence seq;
-    EXPECT_CALL(*gilMock, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
-    EXPECT_CALL(*gilMock, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_RGBA_8888, data));
+    EXPECT_CALL(gil, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
+    EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_RGBA_8888, data));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
 }
@@ -181,8 +182,8 @@ TEST_F(TextureTest, bgra8888)
         data,
     };
     InSequence seq;
-    EXPECT_CALL(*gilMock, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
-    EXPECT_CALL(*gilMock, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_BGRA_8888, data));
+    EXPECT_CALL(gil, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
+    EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_BGRA_8888, data));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
 }
@@ -225,9 +226,9 @@ TEST_F(TextureTest, rgb565_palette_2bpp)
         data,
     };
     InSequence seq;
-    EXPECT_CALL(*gilMock, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
-    EXPECT_CALL(*gilMock, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_P_2_RGB_565, data));
-    EXPECT_CALL(*gilMock, gilTexPalette2(&giltx, palette, 4));
+    EXPECT_CALL(gil, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
+    EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_P_2_RGB_565, data));
+    EXPECT_CALL(gil, gilTexPalette2(&giltx, palette, 4));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
 }
@@ -250,9 +251,9 @@ TEST_F(TextureTest, rgb888_palette_2bpp)
         data,
     };
     InSequence seq;
-    EXPECT_CALL(*gilMock, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
-    EXPECT_CALL(*gilMock, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_P_2_RGB_888, data));
-    EXPECT_CALL(*gilMock, gilTexPalette3(&giltx, palette, 4));
+    EXPECT_CALL(gil, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
+    EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_P_2_RGB_888, data));
+    EXPECT_CALL(gil, gilTexPalette3(&giltx, palette, 4));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
 }
@@ -297,9 +298,9 @@ TEST_F(TextureTest, rgba8888_palette_2bpp)
         data,
     };
     InSequence seq;
-    EXPECT_CALL(*gilMock, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
-    EXPECT_CALL(*gilMock, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_P_2_RGBA_8888, data));
-    EXPECT_CALL(*gilMock, gilTexPalette4(&giltx, palette, 4));
+    EXPECT_CALL(gil, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
+    EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_P_2_RGBA_8888, data));
+    EXPECT_CALL(gil, gilTexPalette4(&giltx, palette, 4));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
 }
@@ -322,9 +323,9 @@ TEST_F(TextureTest, bgra8888_palette_2bpp)
         data,
     };
     InSequence seq;
-    EXPECT_CALL(*gilMock, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
-    EXPECT_CALL(*gilMock, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_P_2_BGRA_8888, data));
-    EXPECT_CALL(*gilMock, gilTexPalette4(&giltx, palette, 4));
+    EXPECT_CALL(gil, gilCreateTexture(&ctx)).WillOnce(Return(&giltx));
+    EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_P_2_BGRA_8888, data));
+    EXPECT_CALL(gil, gilTexPalette4(&giltx, palette, 4));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
 }

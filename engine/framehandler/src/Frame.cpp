@@ -48,36 +48,36 @@ Frame::Frame(const PageType* const pDdh)
 {
 }
 
-bool Frame::setup(WidgetPool& widgetPool,
+bool Frame::setup(WidgetPool& factory,
                   const Database& db,
                   DataContext* const pContext,
                   LSRErrorCollector& error)
 {
-    bool success = true;
+    bool successful = true;
     const DDHType* const pDdh = db.getDdh();
     ASSERT(NULL != pDdh);
     const HMIGlobalSettingsType* const pSettings = pDdh->GetHMIGlobalSettings();
     ASSERT(pSettings != NULL);
     const DisplaySizeType* const pDisplaySize = pSettings->GetDisplaySize();
     ASSERT(pDisplaySize != NULL);
-    Area area;
-    area.setWidth(static_cast<I32>(pDisplaySize->GetWidth()));
-    area.setHeight(static_cast<I32>(pDisplaySize->GetHeight()));
-    setArea(area);
+    Area rect;
+    rect.setWidth(static_cast<I32>(pDisplaySize->GetWidth()));
+    rect.setHeight(static_cast<I32>(pDisplaySize->GetHeight()));
+    setArea(rect);
 
     const U16 numPanels = m_pDdh->GetSizeOfPanelIdList();
     for (U16 i = 0U; i < numPanels; ++i)
     {
-        const PanelId panelId = m_pDdh->GetPanelIdItem(i);
-        ASSERT(0U != panelId);
+        const PanelId itemPanelId = m_pDdh->GetPanelIdItem(i);
+        ASSERT(0U != itemPanelId);
 
         const PanelDatabaseType* const pPanelDB = pDdh->GetPanelDatabase();
-        ASSERT(NULL != pPanelDB && panelId <= pPanelDB->GetPanelCount());
+        ASSERT((NULL != pPanelDB) && (itemPanelId <= pPanelDB->GetPanelCount()));
 
         // As id's are 1 based, database is 0 based. we should decrement id.
-        const PanelType* const pDdhPanel = pPanelDB->GetPanel(panelId - 1U);
+        const PanelType* const pDdhPanel = pPanelDB->GetPanel(itemPanelId - 1U);
 
-        Panel* pPanel = Panel::create(widgetPool, db, pDdhPanel, pContext, error);
+        Panel* const pPanel = Panel::create(factory, db, pDdhPanel, pContext, error);
         /**
          * While @c MAX_PANELS_COUNT < @c MAX_WIDGET_CHILDREN_COUNT,
          * @c addChild method will always return @c true value.
@@ -85,16 +85,17 @@ bool Frame::setup(WidgetPool& widgetPool,
          */
         if ((NULL == pPanel) || (!addChild(pPanel)))
         {
-            success = false;
+            static_cast<void>(successful);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+            successful = false;
             break;
         }
     }
-    return success;
+    return successful;
 }
 
-Frame* Frame::create(WidgetPool& widgetPool,
+Frame* Frame::create(WidgetPool& factory,
                      const Database& db,
-                     const FrameId frameId,
+                     const FrameId id,
                      Window* /* parent */,
                      DataContext* const pContext,
                      LSRErrorCollector& error)
@@ -105,20 +106,20 @@ Frame* Frame::create(WidgetPool& widgetPool,
     const PageDatabaseType* const pDdhPageDB = pDdh->GetPageDatabase();
     ASSERT(NULL != pDdhPageDB);
 
-    const PageType* const pDdhPage = pDdhPageDB->GetPage(static_cast<U16>(frameId) - 1U);
+    const PageType* const pDdhPage = pDdhPageDB->GetPage(static_cast<U16>(id) - 1U);
     ASSERT(NULL != pDdhPage);
 
-    LSRError tmpError = LSR_NO_ERROR;
-    void* const pRawMemory = widgetPool.framePool().allocate(tmpError);
+    LSREngineError tmpError = LSR_NO_ENGINE_ERROR;
+    void* const pRawMemory = factory.framePool().allocate(tmpError);
     error = tmpError;
 
     Frame* pFrame = new(pRawMemory)Frame(pDdhPage);
     if (NULL != pFrame)
     {
-        if (!pFrame->setup(widgetPool, db, pContext, error))
+        if (!pFrame->setup(factory, db, pContext, error))
         {
             pFrame->~Frame();
-            error = widgetPool.framePool().deallocate(pRawMemory);
+            error = factory.framePool().deallocate(pRawMemory);
             pFrame = NULL;
         }
     }
@@ -130,7 +131,7 @@ void Frame::onUpdate(const U32 monotonicTimeMs)
     static_cast<void>(monotonicTimeMs);  // ignore unused variable
 }
 
-void Frame::onDraw(Canvas& /* canvas */, const Area& /* area */)
+void Frame::onDraw(Canvas& /* dst */, const Area& /* rect */) const
 {}
 
 bool Frame::onVerify(Canvas&, const Area&)
@@ -138,5 +139,4 @@ bool Frame::onVerify(Canvas&, const Area&)
     return true;
 }
 
-
-}
+} // namespace lsr

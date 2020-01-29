@@ -1,5 +1,10 @@
 include(GoogleTest)
 
+add_library(gilMock
+    MockGIL.cpp
+    MockGIL.h
+)
+
 GUNITTEST(NAME "display_gilSample"
     LIBS ${GUNITTEST_DISPLAY_LIBS} ${ENGINE_PROJECT_NAME} pilSample gilSample
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
@@ -7,9 +12,9 @@ GUNITTEST(NAME "display_gilSample"
 )
 
 GUNITTEST(NAME "display_gilMock"
-    LIBS ${GUNITTEST_DISPLAY_LIBS} ${ENGINE_PROJECT_NAME} pilSample
+    LIBS ${GUNITTEST_DISPLAY_LIBS} ${ENGINE_PROJECT_NAME} pilSample gilMock
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    FILES TextureTest.cpp MockGIL.h MockGIL.cpp
+    FILES TextureTest.cpp
 )
 
 # add library with mock implementation.

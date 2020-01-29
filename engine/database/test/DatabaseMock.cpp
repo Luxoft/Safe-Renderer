@@ -35,7 +35,7 @@ namespace lsr
 Database::Database(const DDHType* ddh)
     : m_ddh(ddh)
     , m_bitmapAccess(m_ddh)
-    , m_error(LSR_NO_ERROR)
+    , m_error(LSR_NO_ENGINE_ERROR)
 {
 }
 

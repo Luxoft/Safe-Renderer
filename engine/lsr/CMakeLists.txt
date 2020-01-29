@@ -28,6 +28,7 @@ include_directories(
     ${LSRENGINE}/display/api
     ${LSR_BASE}/api
     ${LSR_BASE}/src
+    ${HMI_PROJECT_PATH}
 )
 
 set(LSR_HEADERS
@@ -37,6 +38,7 @@ set(LSR_HEADERS
 
 set(LSR_SOURCES
     ${LSR_BASE}/src/lsr.cpp
+    ${LSR_BASE}/src/lsr_p.h
     ${LSR_BASE}/src/Engine.cpp
 )
 

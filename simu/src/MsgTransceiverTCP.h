@@ -201,7 +201,7 @@ public:
     Socket GetSocket() {return m_socket;}
 
     // IMsgTransmitter
-    virtual LSRError transmitMessage(const U8* const data, const U32 dataLen) P_OVERRIDE;
+    virtual ComError transmitMessage(const U8* const data, const U32 dataLen) P_OVERRIDE;
 
     // IBufferHandler
     virtual U8* ClaimDataBuffer();

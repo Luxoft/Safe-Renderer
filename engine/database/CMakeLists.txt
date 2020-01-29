@@ -36,6 +36,7 @@ set(DATABASE_HEADERS
     ${DATABASE_BASE}/api/BitmapAccess.h
     ${DATABASE_BASE}/api/Color.h
     ${DATABASE_BASE}/api/Database.h
+    ${DATABASE_BASE}/api/DatabaseTypes.h
     ${DATABASE_BASE}/api/ImageAttributes.h
     ${DATABASE_BASE}/api/LsrImage.h
     ${DATABASE_BASE}/api/ResourceBuffer.h

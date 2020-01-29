@@ -32,10 +32,6 @@
 namespace lsr
 {
 
-struct BaseFieldChoiceType;
-class Database;
-class DataContext;
-
 /**
  * @reqid SW_ENG_076
  */
@@ -43,20 +39,20 @@ class Field : public Widget
 {
 public:
     /**
-     * Method creates a @c Field object with given @c widgetPool according
+     * Method creates a @c Field object with given @c WidgetPool according
      * to configuration @c ddh.
      *
-     * @param[in]  widgetPool pool which provides allocation objects.
+     * @param[in]  factory    pool which provides allocation objects.
      * @param[in]  db         object provides work with database.
      * @param[in]  pDdh       @c FieldType ddh configuration.
      * @param[in]  pContext   data context, which shall be used for evaluation.
-     * @param[out] error      error state will be equal to @c LSR_NO_ERROR if
-     *                        operation succeeded, other @c LSRError values otherwise.
+     * @param[out] error      error state will be equal to @c LSR_NO_ENGINE_ERROR if
+     *                        operation succeeded, other @c LSREngineError values otherwise.
      *
      * @return pointer to @c Field object if initialization of object was successful,
      *         @c NULL otherwise.
      */
-    static Field* create(WidgetPool& widgetPool,
+    static Field* create(WidgetPool& factory,
                          const Database& db,
                          const BaseFieldChoiceType* const pDdh,
                          DataContext* const pContext,

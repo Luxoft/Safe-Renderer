@@ -29,41 +29,40 @@
 
 #include "BitmapAccess.h"
 #include "ddh_defs.h"
-#include "LSRError.h"
+#include "LSREngineError.h"
 #include "StaticBitmap.h"
 
 namespace lsr
 {
-    class ResourceBuffer;
-    struct DDHType;
+class ResourceBuffer;
 
-    class Database
-    {
-    public:
-        Database(const DDHType* const ddh);
+class Database
+{
+public:
+    Database(const DDHType* const ddh);
 
-        LSRError getError() const;
+    LSREngineError getError() const;
 
-        const DDHType* getDdh() const;
+    const DDHType* getDdh() const;
 
-        StaticBitmap getBitmap(const BitmapId id) const;
+    StaticBitmap getBitmap(const BitmapId id) const;
 
-    private:
-        const DDHType* m_ddh;
-        BitmapAccess m_bitmapAccess;
-        LSRError m_error;
-    };
+private:
+    const DDHType* m_ddh;
+    BitmapAccess m_bitmapAccess;
+    LSREngineError m_error;
+};
 
-    inline LSRError Database::getError() const
-    {
-        return m_error;
-    }
+inline LSREngineError Database::getError() const
+{
+    return m_error;
+}
 
-    inline const DDHType* Database::getDdh() const
-    {
-        return m_ddh;
-    }
+inline const DDHType* Database::getDdh() const
+{
+    return m_ddh;
+}
 
-} // namespace database
+} // namespace lsr
 
 #endif // LUXOFTSAFERENDERER_DATABASE_H

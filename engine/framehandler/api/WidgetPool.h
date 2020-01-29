@@ -36,16 +36,13 @@
 #include <ddh_defs.h>
 
 #include <Pool.h>
-#include <LsrLimits.h>
+#include <LSRLimits.h>
 #include <NonCopyable.h>
 
 class WidgetPoolCorrupter;
 
 namespace lsr
 {
-
-struct DDHType;
-class DataContext;
 
 /**
  * This class contains several @c Pool objects for storing different widget objects
@@ -54,7 +51,7 @@ class DataContext;
  *
  * @reqid SW_ENG_069, SW_ENG_075
  */
-class WidgetPool : private NonCopyable<WidgetPool>
+class WidgetPool : private NonCopyable
 {
 public:
     WidgetPool();
@@ -63,44 +60,44 @@ public:
      * Method return state of the pools.
      *
      * @return @c LSR_POOL_IS_CORRUPTED if any of the pool is corrupted (see @c Pool::checkPool),
-     *         @c LSR_NO_ERROR otherwise.
+     *         @c LSR_NO_ENGINE_ERROR otherwise.
      */
-    LSRError getError() const;
+    LSREngineError getError() const;
 
 private:
-    friend Panel* Panel::create(WidgetPool& widgetPool,
+    friend Panel* Panel::create(WidgetPool& factory,
                                 const Database& db,
                                 const PanelType* pDdhPanel,
                                 DataContext* pContext,
                                 LSRErrorCollector& error);
 
-    friend BitmapField* BitmapField::create(WidgetPool& widgetPool,
+    friend BitmapField* BitmapField::create(WidgetPool& factory,
                                             const Database& db,
                                             const StaticBitmapFieldType* pDdh,
                                             DataContext* pContext,
                                             LSRErrorCollector& error);
 
-    friend ReferenceBitmapField* ReferenceBitmapField::create(WidgetPool& widgetPool,
+    friend ReferenceBitmapField* ReferenceBitmapField::create(WidgetPool& factory,
                                             const Database& db,
                                             const ReferenceBitmapFieldType* pDdh,
                                             DataContext* pContext,
                                             LSRErrorCollector& error);
 
-    friend Frame* Frame::create(WidgetPool& widgetPool,
+    friend Frame* Frame::create(WidgetPool& factory,
                                 const Database& db,
-                                FrameId frameId,
+                                FrameId id,
                                 Window* pParent,
                                 DataContext* pContext,
                                 LSRErrorCollector& error);
 
-    friend Window* Window::create(WidgetPool& widgetPool,
+    friend Window* Window::create(WidgetPool& factory,
                                   const Database& db,
                                   DisplayManager& dsp,
                                   const WindowDefinition& winDef,
                                   DataContext* pContext,
                                   LSRErrorCollector& error);
 
-    friend LSRError Widget::dispose(WidgetPool& factory, Widget* pWidget);
+    friend LSREngineError Widget::dispose(WidgetPool& factory, Widget* pWidget);
 
     typedef Pool<Frame, MAX_FRAMES_COUNT> FramePool;
     typedef Pool<Panel, MAX_PANELS_COUNT> PanelPool;
@@ -143,41 +140,46 @@ private:
 };
 
 inline WidgetPool::WidgetPool()
-: NonCopyable<WidgetPool>()
+: NonCopyable()
 {
 }
 
-inline LSRError WidgetPool::getError() const
+inline LSREngineError WidgetPool::getError() const
 {
     return (m_framePool.checkPool() &&
             m_panelPool.checkPool() &&
             m_bitmapFieldPool.checkPool() &&
             m_referenceBitmapFieldPool.checkPool() &&
-            m_windowPool.checkPool()) ? LSR_NO_ERROR : LSR_POOL_IS_CORRUPTED;
+            m_windowPool.checkPool()) ? LSR_NO_ENGINE_ERROR : LSR_POOL_IS_CORRUPTED;
 }
 
 inline WidgetPool::FramePool& WidgetPool::framePool()
 {
+    // coverity[misra_cpp_2008_rule_9_3_2_violation]
     return m_framePool;
 }
 
 inline WidgetPool::PanelPool& WidgetPool::panelPool()
 {
+    // coverity[misra_cpp_2008_rule_9_3_2_violation]
     return m_panelPool;
 }
 
 inline WidgetPool::BitmapFieldPool& WidgetPool::bitmapFieldPool()
 {
+    // coverity[misra_cpp_2008_rule_9_3_2_violation]
     return m_bitmapFieldPool;
 }
 
 inline WidgetPool::ReferenceBitmapFieldPool& WidgetPool::referenceBitmapFieldPool()
 {
+    // coverity[misra_cpp_2008_rule_9_3_2_violation]
     return m_referenceBitmapFieldPool;
 }
 
 inline WidgetPool::WindowPool& WidgetPool::windowPool()
 {
+    // coverity[misra_cpp_2008_rule_9_3_2_violation]
     return m_windowPool;
 }
 

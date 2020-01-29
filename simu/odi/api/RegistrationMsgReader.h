@@ -33,7 +33,7 @@
 
 #include <InputStream.h>
 #include <LsrTypes.h>
-#include <LSRError.h>
+#include <ComError.h>
 
 namespace lsr
 {
@@ -49,7 +49,7 @@ namespace lsr
  *
  * If errors are encountered during deserialization, the error flag inside the stream will be set.
  * See @c InputStream::getError() method.
- * If @c InputStream::getError() returns @c LSR_NO_ERROR value, the value
+ * If @c InputStream::getError() returns @c COM_NO_ERROR value, the value
  * of the parameters can be considered correct;
  * in case the error flag has any other value, the value of the parameters shall be considered incorrect.
  *

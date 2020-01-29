@@ -27,9 +27,10 @@
 **
 ******************************************************************************/
 
-#include <stdint.h>  // <cstdint> cannot be used (C++11)
-#include <stddef.h>  // <cstddef> cannot be used (C interface)
-#include <LSRError.h>
+// coverity[misra_cpp_2008_rule_18_0_1_violation] <cstdint> cannot be used (C++11)
+#include <stdint.h>
+// coverity[misra_cpp_2008_rule_18_0_1_violation] <cstddef> cannot be used (C interface)
+#include <stddef.h>
 
 #ifdef WIN32
 #define LSR_API extern __declspec(dllexport)
@@ -42,15 +43,26 @@ extern "C"
 {
 #endif
 
+// coverity[misra_cpp_2008_rule_7_3_1_violation] C interface
 typedef int32_t LSRBoolean;
-typedef void* LSREngine;
+// coverity[misra_cpp_2008_rule_7_3_1_violation] C interface
+typedef struct lsr_engine_t* LSREngine;
 
 #define LSR_FALSE 0
 #define LSR_TRUE 1
 
 typedef uint32_t LSRFUDataId;
 
-typedef enum LSRDataStatus
+// coverity[misra_cpp_2008_rule_16_2_1_violation] C interface
+// coverity[misra_cpp_2008_rule_16_2_2_violation] C interface
+#define LSR_NO_ERROR 0U
+// coverity[misra_cpp_2008_rule_16_2_1_violation] C interface
+// coverity[misra_cpp_2008_rule_16_2_2_violation] C interface
+#define LSR_UNKNOWN_ERROR 0xffffffffU
+typedef uint32_t LSRError;
+
+// coverity[misra_cpp_2008_rule_7_3_1_violation] C interface
+typedef enum
 {
     LSR_DATA_STATUS_NOT_AVAILABLE = 0,
     LSR_DATA_STATUS_VALID,
@@ -109,17 +121,6 @@ LSR_API LSRBoolean lsrSetBoolean(const LSREngine engine, const LSRFUDataId fuDat
 LSR_API LSRBoolean lsrSetInteger(const LSREngine engine, const LSRFUDataId fuDataId, const int32_t value);
 
 /**
- * Marks an FU data value as invalid
- * (accessing / calculating with invalid data raises an Engine error)
- * This call will be only successful if the given fuDataId is part of a FU interface
- * @param engine lsr engine instance
- * @param fuDataId identifies the data entry of a FU interface (see generated database header)
- * @param value new value to set
- * @param LSR_TRUE on success, LSR_FALSE otherwise
- */
-LSR_API LSRBoolean lsrSetInvalid(const LSREngine engine, const LSRFUDataId fuDataId);
-
-/**
  * Returns a boolean data from a functional unit (FU) interface
  * Returns DATA_STATUS_INCONSISTENT if the requested data is not a boolean type or does not exist in the interface
  * @param engine lsr engine instance
@@ -127,7 +128,7 @@ LSR_API LSRBoolean lsrSetInvalid(const LSREngine engine, const LSRFUDataId fuDat
  * @param[out] return value, if set to NULL only the DataStatus is returned
  * @return DATA_STATUS_INCONSISTENT if the fuDataId does not exist or is not a boolean, otherwise the actual state
  */
-LSR_API LSRDataStatus lsrGetBoolean(const LSREngine engine, const LSRFUDataId fuDataId, LSRBoolean* value);
+LSR_API LSRDataStatus lsrGetBoolean(const LSREngine engine, const LSRFUDataId fuDataId, LSRBoolean* const value);
 
 /**
  * Returns an integer data from a functional unit (FU) interface
@@ -137,7 +138,7 @@ LSR_API LSRDataStatus lsrGetBoolean(const LSREngine engine, const LSRFUDataId fu
  * @param[out] return value, if set to NULL only the DataStatus is returned
  * @return DATA_STATUS_INCONSISTENT if the fuDataId does not exist or is not a boolean, otherwise the actual state
  */
-LSR_API LSRDataStatus lsrGetInteger(const LSREngine engine, const LSRFUDataId fuDataId, int32_t* value);
+LSR_API LSRDataStatus lsrGetInteger(const LSREngine engine, const LSRFUDataId fuDataId, int32_t* const value);
 
 /**
  * Returns the value of the error flag.
@@ -153,6 +154,8 @@ LSR_API LSRDataStatus lsrGetInteger(const LSREngine engine, const LSRFUDataId fu
  * Thus, lsrGetError should always be called in a loop, until it returns LSR_NO_ERROR, if all error flags are to be reset.
  *
  * Initially, all error flags are set to LSR_NO_ERROR.
+ *
+ * @note lsrGetError() will also report errors from the gil.h
  */
 LSR_API LSRError lsrGetError(const LSREngine engine);
 

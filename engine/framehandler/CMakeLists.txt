@@ -30,6 +30,7 @@ include_directories(
     ${LSRROOT}/gil/api
     ${FRAMEHANDLER_BASE}/api
     ${FRAMEHANDLER_BASE}/src
+    ${HMI_PROJECT_PATH}
 )
 
 set(FRAMEHANDLER_HEADERS

@@ -10,15 +10,20 @@ function(GUNITTEST_APP)
     endif()
 
     GUNITTEST(NAME "lsr_${GUNITTEST_APP_NAME}"
-        LIBS ${GUNITTEST_APP_LIBS} ${ENGINE_PROJECT_NAME} pilSample gilSample
+        LIBS ${GUNITTEST_APP_LIBS} ${ENGINE_PROJECT_NAME} pilSample gilMock
         WORKING_DIRECTORY ${GUNITTEST_APP_WORKING_DIRECTORY}
         FILES ${GUNITTEST_APP_FILES}
     )
 endfunction()
 
+include_directories(
+    ${LSRENGINE}/display/test
+)
+
 GUNITTEST_APP(
     NAME EngineAppTest
     FILES EngineAppTest.cpp
+    TestDBInvalidBitmap.cpp
     ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
 )
 

@@ -36,10 +36,6 @@
 namespace lsr
 {
 
-struct DDHType;
-class Database;
-class DataContext;
-
 /**
  * Window implements the widget which is parent for @c Frame widgets.
  *
@@ -51,20 +47,20 @@ public:
 
     /**
      * Method creates a @c Window object and all its children
-     * with given @c widgetPool according to configuration from @c db object.
+     * with given @c WidgetPool according to configuration from @c db object.
      *
-     * @param[in]  widgetPool pool which provides allocation an @c Window object.
+     * @param[in]  factory    pool which provides allocation an @c Window object.
      * @param[in]  db         object provides work with database.
      * @param[in]  dsp        @c DisplayManager instance.
      * @param[in]  winDef     window display configuration.
      * @param[in]  pContext   data context, which shall be used for evaluation.
-     * @param[out] error      error state will be equal to @c LSR_NO_ERROR if
-     *                        operation succeeded, other @c LSRError values otherwise.
+     * @param[out] error      error state will be equal to @c LSR_NO_ENGINE_ERROR if
+     *                        operation succeeded, other @c LSREngineError values otherwise.
      *
      * @return pointer to @c Window object if initialization of object was successful,
      *         @c NULL otherwise.
      */
-    static Window* create(WidgetPool& widgetPool,
+    static Window* create(WidgetPool& factory,
                           const Database& db,
                           DisplayManager& dsp,
                           const WindowDefinition& winDef,
@@ -109,15 +105,15 @@ private:
     /**
      * Method initialize object.
      *
-     * @param[in]  widgetPool pool which provides allocation an @c Frame object.
+     * @param[in]  factory    pool which provides allocation an @c Frame object.
      * @param[in]  db         object provides work with database.
      * @param[in]  pContext   data context, which shall be used for evaluation.
-     * @param[out] error      error state will be equal to @c LSR_NO_ERROR if
-     *                        operation succeeded, other @c LSRError values otherwise.
+     * @param[out] error      error state will be equal to @c LSR_NO_ENGINE_ERROR if
+     *                        operation succeeded, other @c LSREngineError values otherwise.
      *
      * @return @c true if object initialization succeeded, @c false otherwise.
      */
-    bool setup(WidgetPool& widgetPool,
+    bool setup(WidgetPool& factory,
                const Database& db,
                DataContext* const pContext,
                LSRErrorCollector& error);
@@ -130,14 +126,14 @@ private:
     /**
      * Method does nothing. It is a stub method
      */
-    virtual void onDraw(Canvas& canvas, const Area& area) P_OVERRIDE;
+    virtual void onDraw(Canvas& dst, const Area& rect) const P_OVERRIDE;
 
     /**
      * Method does nothing. It is a stub method
      *
      * @return @c true.
      */
-    virtual bool onVerify(Canvas& canvas, const Area& area) P_OVERRIDE;
+    virtual bool onVerify(Canvas& dst, const Area& rect) P_OVERRIDE;
 
     /**
      * Method returns type of the widget.

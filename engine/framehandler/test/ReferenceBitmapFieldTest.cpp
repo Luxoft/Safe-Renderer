@@ -60,21 +60,21 @@ protected:
 
     lsr::ReferenceBitmapField* createField(const ReferenceBitmapFieldType* ddh)
     {
-        lsr::LSRErrorCollector error(LSR_NO_ERROR);
+        lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
         lsr::ReferenceBitmapField* field =
             lsr::ReferenceBitmapField::create(m_widgetPool,
                                               m_db,
                                               ddh,
                                               &m_context,
                                               error);
-        EXPECT_EQ(LSR_NO_ERROR, error.get());
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, error.get());
         return field;
     }
 
     lsr::ReferenceBitmapField* createInconsistentField(
             const ReferenceBitmapFieldType* ddh)
     {
-        lsr::LSRErrorCollector error(LSR_NO_ERROR);
+        lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
         lsr::ReferenceBitmapField* field =
             lsr::ReferenceBitmapField::create(m_widgetPool,
                                               m_db,
@@ -153,7 +153,7 @@ TEST_F(ReferenceBitmapFieldTest, OnUpdateTest)
     field->verify(m_canvas, area);
 
     EXPECT_EQ(expectedId, lsr::DatabaseAccessor::instance().getRequestedBitmapId());
-    EXPECT_EQ(LSR_NO_ERROR, field->getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, OnUpdateWithTheSameValueTest)
@@ -184,7 +184,7 @@ TEST_F(ReferenceBitmapFieldTest, OnUpdateWithTheSameValueTest)
 
     EXPECT_EQ(expectedId, lsr::DatabaseAccessor::instance().getRequestedBitmapId());
 
-    EXPECT_EQ(LSR_NO_ERROR, field->getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, OnUpdateWrongValueTest)
@@ -205,7 +205,7 @@ TEST_F(ReferenceBitmapFieldTest, OnUpdateWrongValueTest)
     field->update(0U);
     field->verify(m_canvas, area);
 
-    EXPECT_EQ(LSR_DATASTATUS_NOT_AVAIABLE, field->getError());
+    EXPECT_EQ(LSR_ERR_DATASTATUS_NOT_AVAILABLE, field->getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, VerifyTest)
@@ -226,7 +226,7 @@ TEST_F(ReferenceBitmapFieldTest, VerifyTest)
     field->update(0U);
     EXPECT_TRUE(field->verify(m_canvas, area));
 
-    EXPECT_EQ(LSR_NO_ERROR, field->getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, VerifyWithInvisibleWidgetTest)
@@ -247,7 +247,7 @@ TEST_F(ReferenceBitmapFieldTest, VerifyWithInvisibleWidgetTest)
     field->update(0U);
     EXPECT_TRUE(field->verify(m_canvas, area));
 
-    EXPECT_EQ(LSR_NO_ERROR, field->getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, VerifyFailsTest)
@@ -278,7 +278,7 @@ TEST_F(ReferenceBitmapFieldTest, VerifyFailsTest)
     field->update(0U);
 
     EXPECT_FALSE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_NO_ERROR, field->getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, VerifyFailsWithVeryLargeCounterValueTest)
@@ -310,7 +310,7 @@ TEST_F(ReferenceBitmapFieldTest, VerifyFailsWithVeryLargeCounterValueTest)
     field->update(0U);
 
     EXPECT_FALSE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_NO_ERROR, field->getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, ResetErrorCounterValueTest)
@@ -341,7 +341,7 @@ TEST_F(ReferenceBitmapFieldTest, ResetErrorCounterValueTest)
     field->update(0U);
 
     EXPECT_FALSE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_NO_ERROR, field->getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
 
     // Now, verify will return true
     lsr::DisplayAccessor::instance().setVerifyFlag(true);
@@ -353,7 +353,7 @@ TEST_F(ReferenceBitmapFieldTest, ResetErrorCounterValueTest)
     field->update(0U);
 
     EXPECT_TRUE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_NO_ERROR, field->getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, VerifyFailsWithWrongErrorCounterValueTest1)
@@ -381,7 +381,7 @@ TEST_F(ReferenceBitmapFieldTest, VerifyFailsWithWrongErrorCounterValueTest1)
 
     field->update(0U);
     EXPECT_FALSE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_DATASTATUS_NOT_AVAIABLE, field->getError());
+    EXPECT_EQ(LSR_ERR_DATASTATUS_NOT_AVAILABLE, field->getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, VerifyFailsWithWrongErrorCounterValueTest2)
@@ -411,7 +411,7 @@ TEST_F(ReferenceBitmapFieldTest, VerifyFailsWithWrongErrorCounterValueTest2)
     // Here should be a magic
     field->update(0U);
     EXPECT_FALSE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_DATASTATUS_INCONSISTENT, field->getError());
+    EXPECT_EQ(LSR_ERR_DATASTATUS_INCONSISTENT, field->getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, VerifyFailsWithSetDataToDHFailedTest)

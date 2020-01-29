@@ -40,7 +40,6 @@ namespace lsr
 {
 
 class IDataHandler;
-class Window;
 
 /**
  * FrameHandler creates and stores all widgets and provide a functionality to work
@@ -53,7 +52,7 @@ class Window;
  *
  * @reqid SW_ENG_068, SW_ENG_069, SW_ENG_070, SW_ENG_071, SW_ENG_073, SW_ENG_074, SW_ENG_075, SW_ENG_076
  */
-class FrameHandler: private NonCopyable<FrameHandler>
+class FrameHandler: private NonCopyable
 {
 public:
     /**
@@ -109,11 +108,11 @@ public:
     bool handleWindowEvents();
 
     /**
-     * Method return the worst error, which can occur inside @c FrameHandler object.
+     * Method returns the most severe error, which occurred inside @c FrameHandler object.
      *
-     * @return the worst error. See @c LSRError.
+     * @return the most severe error. See @c LSREngineError.
      */
-    LSRError getError();
+    LSREngineError getError();
 
 private:
     friend class ::FrameHandlerCorrupter;

@@ -31,11 +31,11 @@ using lsr::LSRErrorCollector;
 
 TEST(LSRErrorCollectorTest, base)
 {
-    LSRErrorCollector err = LSR_NO_ERROR;
-    EXPECT_EQ(LSR_NO_ERROR, err.get());
-    err = LSR_UNKNOWN_ERROR;
-    EXPECT_EQ(LSR_UNKNOWN_ERROR, err.get());
-    err = LSR_NO_ERROR;
-    EXPECT_EQ(LSR_UNKNOWN_ERROR, err.get());
+    LSRErrorCollector err = LSR_NO_ENGINE_ERROR;
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, err.get());
+    err = LSR_ERR_DATASTATUS_INCONSISTENT;
+    EXPECT_EQ(LSR_ERR_DATASTATUS_INCONSISTENT, err.get());
+    err = LSR_NO_ENGINE_ERROR;
+    EXPECT_EQ(LSR_ERR_DATASTATUS_INCONSISTENT, err.get());
 }
 

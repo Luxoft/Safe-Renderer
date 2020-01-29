@@ -27,7 +27,7 @@
 **
 ******************************************************************************/
 
-#include "LSRError.h"
+#include "ComError.h"
 #include "LsrTypes.h"
 
 /*!
@@ -59,9 +59,9 @@ public:
     *   @param[in] pMsgTransmitter The transmitter for this connection
     *   @param[in] messageType Message type for this message
     *   @param[in] stream object with incoming data. See @c lsr::InputStream
-    *   @return LSR_NO_ERROR for success, error code otherwise
+    *   @return COM_NO_ERROR for success, error code otherwise
     */
-    virtual LSRError onMessage(IMsgTransmitter* const pMsgTransmitter,
+    virtual ComError onMessage(IMsgTransmitter* const pMsgTransmitter,
         const U8 messageType,
         InputStream& stream) = 0;
 

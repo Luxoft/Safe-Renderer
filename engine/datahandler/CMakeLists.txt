@@ -28,6 +28,7 @@ include_directories(
     ${LSRROOT}/pil/api
     ${DATAHANDLER_BASE}/api
     ${DATAHANDLER_BASE}/src
+    ${HMI_PROJECT_PATH}
 )
 
 set(DATAHANDLER_HEADERS

@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "crc32.h"
+#include <LSRLimits.h>
 
 typedef struct
 {
@@ -64,10 +65,9 @@ typedef struct gil_texture_t
 
 #define MAX_CONTEXTS 1
 #define MAX_WINDOWS 1
-#define MAX_TEXTURES 10
 static gil_context_t g_contexts[MAX_CONTEXTS];
 static gil_surface_t g_windows[MAX_WINDOWS];
-static gil_texture_t g_textures[MAX_TEXTURES];
+static gil_texture_t g_textures[lsr::MAX_TEXTURES];
 static size_t g_usedContexts;
 static size_t g_usedWindows;
 static size_t g_usedTextures;
@@ -172,7 +172,7 @@ GILBoolean gilSetColor(GILContext context, uint8_t red, uint8_t green, uint8_t b
 GILTexture gilCreateTexture(GILContext context)
 {
     GILTexture tx = NULL;
-    if (g_usedTextures < MAX_TEXTURES)
+    if (g_usedTextures < lsr::MAX_TEXTURES)
     {
         tx = &g_textures[g_usedTextures++];
         tx->id = g_usedTextures;
@@ -188,7 +188,7 @@ GILBoolean gilTexPixels(GILTexture t, uint32_t width, uint32_t height, GILFormat
 {
     GILBoolean ret = GIL_TRUE;
     uint32_t bufSize = getBufferSize(width, height, format);
-    const uint32_t crc = calcCrc32Complete(data, bufSize);
+    const uint32_t crc = calcCrc32Complete(static_cast<const U8*>(data), bufSize);
     fprintf(stdout, "gilTexPixels(%d, %u, %u, %d, %u) ret :%d\n",
             t ? t->id : 0, width, height, format, crc, ret);
     t->crc = crc;

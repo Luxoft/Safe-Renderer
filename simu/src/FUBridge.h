@@ -62,18 +62,18 @@ public:
      * The method waits for timeout milliseconds if no new data is available.
      * @param timeout timeout in milliseconds
      */
-    LSRError handleIncomingData(uint32_t timeout);
+    ComError handleIncomingData(uint32_t timeout);
 
 private:
     // IMsgReceiver
-    virtual LSRError onMessage(IMsgTransmitter* const pMsgTransmitter, const U8 messageType, InputStream& stream) P_OVERRIDE;
+    virtual ComError onMessage(IMsgTransmitter* const pMsgTransmitter, const U8 messageType, InputStream& stream) P_OVERRIDE;
     virtual void onConnect(IMsgTransmitter* const pMsgTransmitter) P_OVERRIDE;
     virtual void onDisconnect(IMsgTransmitter* const pMsgTransmitter) P_OVERRIDE;
 
-    LSRError onRegistration(IMsgTransmitter*, InputStream& stream);
-    LSRError onODI(IMsgTransmitter*, InputStream& stream);
-    LSRError onODIDynamicData(InputStream& stream);
-    LSRError subscribeAll();
+    ComError onRegistration(IMsgTransmitter*, InputStream& stream);
+    ComError onODI(IMsgTransmitter*, InputStream& stream);
+    ComError onODIDynamicData(InputStream& stream);
+    ComError subscribeAll();
     void refresh();
 
     ODIComSession m_session;

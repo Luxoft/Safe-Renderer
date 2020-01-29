@@ -73,7 +73,7 @@ TEST_F(AliveMessageTest, TestConstrFromStream)
     InputStream stream(buffer, sizeof(buffer));
     AliveMessage msg = AliveMessage::fromStream(stream);
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     EXPECT_EQ(m_id, msg.getId());
 }
@@ -106,7 +106,7 @@ TEST_F(AliveMessageTest, TestSerialize)
 
     U16 expectedMsgSize = m_msg->getSize();
     stream << *m_msg;
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     EXPECT_EQ(expectedMsgSize, stream.bytesWritten());
 
@@ -128,7 +128,7 @@ TEST_F(AliveMessageTest, TestSerializeWithZeroBuffer1)
     U8 buffer[1024] = {0};
     OutputStream stream(buffer, 0);
     stream << (*m_msg);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
     EXPECT_EQ(0u, stream.bytesWritten());
 }
 
@@ -137,7 +137,7 @@ TEST_F(AliveMessageTest, TestSerializeWithZeroBuffer2)
     U8* buffer = NULL;
     OutputStream stream(buffer, 1024);
     stream << *m_msg;
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
     EXPECT_EQ(0u, stream.bytesWritten());
 }
 
@@ -151,7 +151,7 @@ TEST_F(AliveMessageTest, TestSerializeWithNotEnoughBuffer)
     stream << someVariable << someVariable;
 
     stream << *m_msg;
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(AliveMessageTest, TestDeserialize)
@@ -162,7 +162,7 @@ TEST_F(AliveMessageTest, TestDeserialize)
     InputStream stream(buffer, sizeof(buffer));
     stream >> *m_msg;
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     EXPECT_EQ(m_id, m_msg->getId());
 }
@@ -172,13 +172,13 @@ TEST_F(AliveMessageTest, TestSerializeDeserialize)
     U8 buffer[1024] = {0};
     OutputStream inStream(buffer, sizeof(buffer));
     inStream << *m_msg;
-    EXPECT_EQ(LSRError(LSR_NO_ERROR),  inStream.getError());
+    EXPECT_EQ(COM_NO_ERROR,  inStream.getError());
 
     InputStream outStream(buffer, sizeof(buffer));
     AliveMessage msg(m_id + 56);
     outStream >> msg;
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), outStream.getError());
+    EXPECT_EQ(COM_NO_ERROR, outStream.getError());
 
     EXPECT_EQ(m_id, m_msg->getId());
 }
@@ -191,7 +191,7 @@ TEST_F(AliveMessageTest, TestDeserializeWIthZeroMessage1)
     InputStream stream(buffer, 0);
     stream >> *m_msg;
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(AliveMessageTest, TestDeserializeWIthZeroMessage2)
@@ -202,7 +202,7 @@ TEST_F(AliveMessageTest, TestDeserializeWIthZeroMessage2)
     InputStream stream(buffer, bufferSize);
     stream >> *m_msg;
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(AliveMessageTest, TestDeserializeWithNotEnoughBuffer)
@@ -218,6 +218,6 @@ TEST_F(AliveMessageTest, TestDeserializeWithNotEnoughBuffer)
 
     stream >> *m_msg;
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 

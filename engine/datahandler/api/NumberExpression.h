@@ -47,6 +47,8 @@ class NumberExpression: public Expression
 public:
     NumberExpression();
     virtual ~NumberExpression() P_OVERRIDE;
+    //NumberExpression(const NumberExpression&);  Base class NonCopyable hides copy constructor
+    //NumberExpression& operator=(const NumberExpression&);  Base class NonCopyable hides assignment operator
 
     /**
      * Initializes the object and registers data subscriptions if needed.
@@ -71,9 +73,6 @@ public:
     void dispose();
 
 private:
-    NumberExpression(const NumberExpression&);
-    NumberExpression& operator=(const NumberExpression&);
-
     const ExpressionTermType* m_pTerm;
     DataContext* m_pContext;
     mutable Number m_value;

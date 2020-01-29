@@ -77,7 +77,7 @@ void ODIComSession::Reset()
     m_debugSocket = static_cast<Socket>(-1);
 }
 
-LSRError ODIComSession::handleIncomingData(U32 msTimeout)
+ComError ODIComSession::handleIncomingData(U32 msTimeout)
 {
     if (m_connectionsList.size() > 0)
     {
@@ -152,7 +152,7 @@ LSRError ODIComSession::handleIncomingData(U32 msTimeout)
         usleep(msTimeout * 1000);
 #endif
     }
-    return LSR_NO_ERROR;
+    return COM_NO_ERROR;
 }
 
 void ODIComSession::OnMessage(MsgTransceiverTCP* pMsgTransceiverTCP, U8 messageType, const U8* data, U32 dataLen)
@@ -286,33 +286,33 @@ void ODIComSession::CheckDisconnected()
     m_connectionsDisconnectedList.clear();
 }
 
-LSRError ODIComSession::registerMsgReceiver(IMsgReceiver* pMsgReceiver, const U8 messageType, U32 minPayload, U32 maxPayload)
+ComError ODIComSession::registerMsgReceiver(IMsgReceiver* pMsgReceiver, const U8 messageType, U32 minPayload, U32 maxPayload)
 {
     m_registeredTypes.push_back( MsgTransceiverTCP::ExpectedType(messageType, minPayload, maxPayload) );
     m_messageListenerMap.insert( std::pair<U8, IMsgReceiver*>(messageType, pMsgReceiver) );
     m_messageListeners.push_back(pMsgReceiver);
-    return LSR_NO_ERROR;
+    return COM_NO_ERROR;
 }
 
-LSRError ODIComSession::unregisterMsgReceiver(IMsgReceiver* pMsgReceiver, U8 messageType)
+ComError ODIComSession::unregisterMsgReceiver(IMsgReceiver* pMsgReceiver, U8 messageType)
 {
     std::map<U8,IMsgReceiver*>::iterator it = m_messageListenerMap.find(messageType);
 
     if ( it == m_messageListenerMap.end() )
     {
         LOG_ERR(("ODIComSession::UnregisterMsgReceiver, listener not found"));
-        return LSR_UNKNOWN_ERROR;
+        return COM_UNKNOWN_ERROR;
     }
 
     if( it->second != pMsgReceiver )
     {
         LOG_ERR(("ODIComSession::UnregisterMsgReceiver, attempted to unregister wrong listener"));
-        return LSR_UNKNOWN_ERROR;
+        return COM_UNKNOWN_ERROR;
     }
 
     m_messageListenerMap.erase(it);
     m_messageListeners.remove(pMsgReceiver);
-    return LSR_NO_ERROR;
+    return COM_NO_ERROR;
 }
 
 void ODIComSession::unregisterAllMsgReceivers()

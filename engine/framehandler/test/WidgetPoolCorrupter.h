@@ -74,11 +74,11 @@ public:
     }
 
 private:
-    typedef PoolCorrupter<lsr::Frame, MAX_FRAMES_COUNT, sizeof(P_MAX_ALIGN)> FramePoolCorrupter;
-    typedef PoolCorrupter<lsr::Panel, MAX_PANELS_COUNT, sizeof(P_MAX_ALIGN)> PanelPoolCorrupter;
-    typedef PoolCorrupter<lsr::BitmapField, MAX_BITMAPS_COUNT, sizeof(P_MAX_ALIGN)> BitmapFieldPoolCorrupter;
-    typedef PoolCorrupter<lsr::ReferenceBitmapField, MAX_REFERENCE_BITMAPS_COUNT, sizeof(P_MAX_ALIGN)> ReferenceBitmapFieldPoolCorrupter;
-    typedef PoolCorrupter<lsr::Window, MAX_WINDOWS_COUNT, sizeof(P_MAX_ALIGN)> WindowPoolCorrupter;
+    typedef PoolCorrupter<lsr::Frame, lsr::MAX_FRAMES_COUNT, sizeof(P_MAX_ALIGN)> FramePoolCorrupter;
+    typedef PoolCorrupter<lsr::Panel, lsr::MAX_PANELS_COUNT, sizeof(P_MAX_ALIGN)> PanelPoolCorrupter;
+    typedef PoolCorrupter<lsr::BitmapField, lsr::MAX_BITMAPS_COUNT, sizeof(P_MAX_ALIGN)> BitmapFieldPoolCorrupter;
+    typedef PoolCorrupter<lsr::ReferenceBitmapField, lsr::MAX_REFERENCE_BITMAPS_COUNT, sizeof(P_MAX_ALIGN)> ReferenceBitmapFieldPoolCorrupter;
+    typedef PoolCorrupter<lsr::Window, lsr::MAX_WINDOWS_COUNT, sizeof(P_MAX_ALIGN)> WindowPoolCorrupter;
 
     FramePoolCorrupter& m_frameCorrupter;
     PanelPoolCorrupter& m_panelCorrupter;

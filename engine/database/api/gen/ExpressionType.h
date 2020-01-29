@@ -5,6 +5,7 @@
 **
 **   File:        ExpressionType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,29 +32,34 @@
 
 namespace lsr
 {
-struct ExpressionTermType;
 
+/**
+ * ExpressionType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct ExpressionType
 {
-    const ExpressionOperatorEnumeration _operator;
-    const ExpressionTermType* const *term;
-    const U16 termCount;
+    const ExpressionOperatorEnumeration m_operator;
+    const ExpressionTermType* const* const m_term;
+    const U16 m_termCount;
 
 
     /**
      * Returns the value of the operator attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     ExpressionOperatorEnumeration GetOperator() const
     {
-        return _operator;
+        return m_operator;
     }
 
     /**
      * Returns the number of term elements.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetTermCount() const
     {
-        return termCount;
+        return m_termCount;
     }
 
     /**
@@ -61,9 +67,11 @@ struct ExpressionType
      * This method checks the index and returns NULL if the item index exceeds the element count.
      *
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const ExpressionTermType* GetTerm(const U16 i) const
     {
-        return (i < termCount) ? term[i] : NULL;
+        // coverity[misra_cpp_2008_rule_5_0_15_violation]
+        return (i < m_termCount) ? m_term[i] : NULL;
     }
 
 };

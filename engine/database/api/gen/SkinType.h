@@ -5,6 +5,7 @@
 **
 **   File:        SkinType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,23 +32,26 @@
 
 namespace lsr
 {
-struct ColorMapType;
-struct BitmapDefinitionType;
 
+/**
+ * SkinType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct SkinType
 {
-    const ColorMapType* const *colorMap;
-    const U16 colorMapCount;
-    const BitmapDefinitionType* const *bitmap;
-    const U16 bitmapCount;
+    const ColorMapType* const* const m_colorMap;
+    const U16 m_colorMapCount;
+    const BitmapDefinitionType* const* const m_bitmap;
+    const U16 m_bitmapCount;
 
 
     /**
      * Returns the number of colorMap elements.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetColorMapCount() const
     {
-        return colorMapCount;
+        return m_colorMapCount;
     }
 
     /**
@@ -55,17 +59,20 @@ struct SkinType
      * This method checks the index and returns NULL if the item index exceeds the element count.
      *
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const ColorMapType* GetColorMap(const U16 i) const
     {
-        return (i < colorMapCount) ? colorMap[i] : NULL;
+        // coverity[misra_cpp_2008_rule_5_0_15_violation]
+        return (i < m_colorMapCount) ? m_colorMap[i] : NULL;
     }
 
     /**
      * Returns the number of bitmap elements.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetBitmapCount() const
     {
-        return bitmapCount;
+        return m_bitmapCount;
     }
 
     /**
@@ -73,9 +80,11 @@ struct SkinType
      * This method checks the index and returns NULL if the item index exceeds the element count.
      *
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const BitmapDefinitionType* GetBitmap(const U16 i) const
     {
-        return (i < bitmapCount) ? bitmap[i] : NULL;
+        // coverity[misra_cpp_2008_rule_5_0_15_violation]
+        return (i < m_bitmapCount) ? m_bitmap[i] : NULL;
     }
 
 };

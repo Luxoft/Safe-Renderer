@@ -37,9 +37,9 @@ using lsr::PanelDatabaseType;
 
 TEST(DDHType, versionCheck)
 {
-    std::string serializerVersionError = "Data has been serialized with another version of the serializer than what the HMI Engine expects (Expecting Serializer version: 5.4.0)";
-    std::string schemaVersionError = "Data has been generated from another schema version than the HMI Engine expects (Expecting Schema Version: 5.4.x)";
-    std::string schemaChecksumError = "Data has been generated from a schema version with another checksum than the HMI Engine expects (Expecting Schema checksum: 0x49d84938)";
+    std::string serializerVersionError = "Data has been serialized with another version of the serializer than what the HMI Engine expects (Expecting Serializer version: 5.5.0)";
+    std::string schemaVersionError = "Data has been generated from another schema version than the HMI Engine expects (Expecting Schema Version: 5.5.x)";
+    std::string schemaChecksumError = "Data has been generated from a schema version with another checksum than the HMI Engine expects (Expecting Schema checksum: 0x9fa75f84)";
     const U32 arbitraryValue = 42;
     {
         DDHType ddh = { 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, 0U };

@@ -32,59 +32,68 @@
 
 #include <LsrTypes.h>
 #include <DynamicDataType.h>
+#include <NonCopyable.h>
 
 namespace lsr
 {
-    /**
-    * Helper class to store dynamic data identifiers (FU + DataId)
-    */
-    class DynamicData
+
+/**
+ * Helper class to store dynamic data identifiers (FUClassId + DataId)
+ */
+class DynamicData
+{
+public:
+    explicit DynamicData(const U32 fudataid) : m_fu(static_cast<FUClassId>(fudataid >> 16U)), m_data(static_cast<DataId>(fudataid)) {}
+    DynamicData() : m_fu(0U), m_data(0U) {}
+    DynamicData(const FUClassId idFu, const DataId idData) : m_fu(idFu), m_data(idData) {}
+    explicit DynamicData(const DynamicDataType* const pDataId) : m_fu(static_cast<FUClassId>(pDataId->GetFUDataId() >> 16U)), m_data(static_cast<DataId>(pDataId->GetFUDataId())) {}
+    DataId getDataId() const { return m_data; }
+    FUClassId getFUClassId() const { return m_fu; }
+
+    U32 getCombined() const
     {
-    public:
-        explicit DynamicData(U32 fudataid) : m_fu(static_cast<FUClassId>(fudataid >> 16U)), m_data(static_cast<DataId>(fudataid)) {}
-        DynamicData() : m_fu(0U), m_data(0U) {}
-        DynamicData(FUClassId fuId, DataId dataId) : m_fu(fuId), m_data(dataId) {}
-        DynamicData(const DynamicDataType* pDataId) : m_fu(static_cast<FUClassId>(pDataId->GetFUDataId() >> 16U)), m_data(static_cast<DataId>(pDataId->GetFUDataId())) {}
-        DataId getDataId() const { return m_data; }
-        FUClassId getFUClassId() const { return m_fu; }
+        const U32 msb = m_fu;
+        const U32 lsb = m_data;
+        return static_cast<U32>(msb << 16U) | lsb;
+    }
 
-        U32 getCombined() const
-        {
-            const U32 msb = m_fu;
-            const U32 lsb = m_data;
-            return static_cast<U32>(msb << 16U) | lsb;
-        }
+    bool operator==(const DynamicData& rhs) const { return (m_fu == rhs.m_fu) && (m_data == rhs.m_data); }
+    bool operator!=(const DynamicData& rhs) const { return !operator==(rhs); }
+    bool operator<(const DynamicData& rhs) const { return getCombined() < rhs.getCombined(); }
+private:
+    FUClassId m_fu;
+    DataId m_data;
+};
 
-        bool operator==(const DynamicData& rhs) const { return (m_fu == rhs.m_fu) && (m_data == rhs.m_data); }
-        bool operator!=(const DynamicData& rhs) const { return !operator==(rhs); }
-        bool operator<(const DynamicData& rhs) const { return getCombined() < rhs.getCombined(); }
-    private:
-        FUClassId m_fu;
-        DataId m_data;
-    };
-
-class IDataHandler
+// coverity[misra_cpp_2008_rule_12_8_2_violation] Base class NonCopyable hides copy assignment operator
+class IDataHandler : private NonCopyable
 {
 public:
     /**
      * Returns the data, identified by @c fuClassId and @c dataId.
      * Value is calculated in accordance with the data type.
      *
-     * @param[in]  dataId    the identifier of the data
+     * @param[in]  id        the identifier of the data
      * @param[out] value     the output value.
      *
      * @return status of @c value, see @c DataStatus.
      */
-    virtual DataStatus getNumber(const DynamicData& dataId, Number &value) const = 0;
+    virtual DataStatus getNumber(const DynamicData& id, Number &value) const = 0;
 
     /**
      * Sets a data entry in the data handler
-     * @param[in]  dataId    the identifier of the data
+     * @param[in]  id        the identifier of the data
      * @param[in]  value     the value which shall be set
      * @param[in]  status    the status which shall be applied to the data
      * @return true if the data was set, false on error
      */
-    virtual bool setData(const DynamicData& dataId, const Number& value, const DataStatus status) = 0;
+    virtual bool setData(const DynamicData& id, const Number& value, const DataStatus status) = 0;
+
+protected:
+    IDataHandler()
+    : NonCopyable()
+    {
+    }
 
     virtual ~IDataHandler() {}
 };

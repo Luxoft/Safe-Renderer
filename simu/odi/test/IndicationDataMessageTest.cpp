@@ -109,7 +109,7 @@ TEST_F(IndicationDataMessageTest, TestConstrFromStream)
     InputStream stream(buffer, sizeof(buffer));
     IndicationDataMessage msg = IndicationDataMessage::fromStream(stream);
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     EXPECT_EQ(m_fuId, msg.getFuId());
     bool expectedValue = false;
@@ -204,7 +204,7 @@ TEST_F(IndicationDataMessageTest, TestSerialize)
 
     const U16 expectedMsgSize = m_msg->getSize();
     stream << *m_msg;
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(expectedMsgSize, stream.bytesWritten());
 
     U8* expectedBuffer = new U8[expectedMsgSize];
@@ -240,7 +240,7 @@ TEST_F(IndicationDataMessageTest, TestSerializeNotInitedObject)
 
     const U16 expectedMsgSize = m_msg->getSize();
     stream << *m_msg;
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(expectedMsgSize, stream.bytesWritten());
 
     U8* expectedBuffer = new U8[expectedMsgSize];
@@ -262,7 +262,7 @@ TEST_F(IndicationDataMessageTest, TestSerializeWithNotEnoughBuffer)
     OutputStream stream(buffer, sizeof(buffer));
 
     stream << *m_msg;
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(IndicationDataMessageTest, TestSerializeWithWrongBuffer)
@@ -274,13 +274,13 @@ TEST_F(IndicationDataMessageTest, TestSerializeWithWrongBuffer)
     stream1 << *m_msg;
 
     EXPECT_EQ(0u, stream1.bytesWritten());
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream1.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream1.getError());
 
     OutputStream stream2(buffer, 0u);
     stream2 << *m_msg;
 
     EXPECT_EQ(0u, stream2.bytesWritten());
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream2.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream2.getError());
 }
 
 
@@ -307,7 +307,7 @@ TEST_F(IndicationDataMessageTest, TestDeserialize)
     InputStream stream(buffer, sizeof(buffer));
     stream >> *m_msg;
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     EXPECT_EQ(m_fuId, m_msg->getFuId());
     bool expectedValue = false;
@@ -326,14 +326,14 @@ TEST_F(IndicationDataMessageTest, TestSerializeDeserialize)
     OutputStream outStream(buffer, sizeof(buffer));
 
     outStream << *m_msg;
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), outStream.getError());
+    EXPECT_EQ(COM_NO_ERROR, outStream.getError());
 
     IndicationDataMessage msg;
 
     InputStream stream(buffer, sizeof(buffer));
     stream >> msg;
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     EXPECT_EQ(m_msg->getFuId(), msg.getFuId());
     for (U8 indicationId = 1; indicationId <= m_countIndications; ++indicationId)
@@ -363,7 +363,7 @@ TEST_F(IndicationDataMessageTest, TestDeserializeWithNotFullSize)
     InputStream stream(buffer, sizeof(buffer));
     stream >> *m_msg;
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(IndicationDataMessageTest, TestDeserializeWithWrongBuffer)
@@ -402,7 +402,7 @@ TEST_F(IndicationDataMessageTest, TestDeserializeWithWrongBuffer)
         EXPECT_EQ(expectedIndicator, m_msg->getIndication(static_cast<IndicationId>(i)));
     }
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream1.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream1.getError());
 
     InputStream stream2(buffer, 0u);
     IndicationDataMessage msg2;
@@ -416,6 +416,6 @@ TEST_F(IndicationDataMessageTest, TestDeserializeWithWrongBuffer)
         EXPECT_EQ(expectedIndicator, m_msg->getIndication(static_cast<IndicationId>(i)));
     }
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream2.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream2.getError());
 }
 

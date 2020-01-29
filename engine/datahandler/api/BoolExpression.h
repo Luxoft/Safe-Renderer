@@ -48,6 +48,9 @@ class BoolExpression P_FINAL : public Expression
 {
 public:
     BoolExpression();
+    virtual ~BoolExpression() P_OVERRIDE;
+    //BoolExpression(const BoolExpression&);  Base class NonCopyable hides copy constructor
+    //BoolExpression& operator=(const BoolExpression&);  Base class NonCopyable hides assignment operator
 
     /**
      * Initializes the object and registers data subscriptions in the @c lsr::DataHandler
@@ -72,12 +75,7 @@ public:
      */
     void dispose();
 
-    virtual ~BoolExpression() P_OVERRIDE;
-
 private:
-    BoolExpression(const BoolExpression&);
-    BoolExpression& operator=(const BoolExpression&);
-
     const lsr::ExpressionTermType* m_pTerm;
     DataContext* m_pContext;
     mutable bool m_value;

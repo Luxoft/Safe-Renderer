@@ -33,45 +33,45 @@
     <ActionId>1</ActionId>
     <ActionType>ValueAction</ActionType>
     <ActionValueType>EnumerationValue</ActionValueType>
-    <EnumerationSetId>1</EnumerationSetId>
+    <EnumerationSet>#enumSet:Display Units</EnumerationSet>
   </Action>
   <Action fuclass:Name="SetDisplayLanguage">
     <ActionId>2</ActionId>
     <ActionType>ValueAction</ActionType>
     <ActionValueType>EnumerationValue</ActionValueType>
-    <EnumerationSetId>2</EnumerationSetId>
+    <EnumerationSet>#enumSet:Display Language</EnumerationSet>
   </Action>
   <Action fuclass:Name="SetDisplayTimeNotation">
     <ActionId>3</ActionId>
     <ActionType>ValueAction</ActionType>
     <ActionValueType>EnumerationValue</ActionValueType>
-    <EnumerationSetId>3</EnumerationSetId>
+    <EnumerationSet>#enumSet:Display Time Unit Notation</EnumerationSet>
   </Action>
   <Action fuclass:Name="SetSkinValue">
     <ActionId>4</ActionId>
     <ActionType>ValueAction</ActionType>
     <ActionValueType>EnumerationValue</ActionValueType>
-    <EnumerationSetId>4</EnumerationSetId>
+    <EnumerationSet>#enumSet:Display Skin</EnumerationSet>
   </Action>
   <DynamicDataEntry fuclass:Documentation="The current DisplayUnits setting for the HMIEngine. The DisplayUnits setting is either received externally from another FU or set internally by a particular display." fuclass:Name="DisplayUnits">
     <DataId>1</DataId>
     <DataType>EnumerationValue</DataType>
-    <EnumerationSetId>1</EnumerationSetId>
+    <EnumerationSet>#enumSet:Display Units</EnumerationSet>
   </DynamicDataEntry>
   <DynamicDataEntry fuclass:Documentation="This is the currently active language." fuclass:Name="DisplayLanguage">
     <DataId>2</DataId>
     <DataType>EnumerationValue</DataType>
-    <EnumerationSetId>2</EnumerationSetId>
+    <EnumerationSet>#enumSet:Display Language</EnumerationSet>
   </DynamicDataEntry>
   <DynamicDataEntry fuclass:Documentation="This shows the current setting of how time of day is displayed." fuclass:Name="DisplayTimeNotation">
     <DataId>3</DataId>
     <DataType>EnumerationValue</DataType>
-    <EnumerationSetId>3</EnumerationSetId>
+    <EnumerationSet>#enumSet:Display Time Unit Notation</EnumerationSet>
   </DynamicDataEntry>
   <DynamicDataEntry fuclass:Documentation="The current skin value for the display. The value of this data affects which colors, bitmaps and fonts shall be used by the display." fuclass:Name="SkinValue">
     <DataId>4</DataId>
     <DataType>EnumerationValue</DataType>
-    <EnumerationSetId>4</EnumerationSetId>
+    <EnumerationSet>#enumSet:Display Skin</EnumerationSet>
   </DynamicDataEntry>
   <DynamicDataEntry fuclass:Documentation="The current time value containing hours, minutes, seconds and hundredths of seconds." fuclass:Name="TimeOfDay">
     <DataId>5</DataId>

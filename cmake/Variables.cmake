@@ -13,6 +13,14 @@ if(NOT DEFINED UNIT_TESTS)
 endif()
 message(STATUS "--> UNIT_TESTS: ${UNIT_TESTS}")
 
+if(NOT DEFINED HMI_PROJECT_PATH)
+    message(FATAL_ERROR "Please specify HMI_PROJECT_PATH, which contains the project specific LSRLimits.h. For running the demo you can use the test hmi 'test/database/Telltales'")
+endif()
+if(NOT IS_ABSOLUTE ${HMI_PROJECT_PATH})
+    set(HMI_PROJECT_PATH "${CMAKE_CURRENT_BINARY_DIR}/${HMI_PROJECT_PATH}")
+endif()
+message(STATUS "--> HMI_PROJECT_PATH: ${HMI_PROJECT_PATH}")
+
 #
 # Compiler configuration
 #

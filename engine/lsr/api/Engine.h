@@ -32,6 +32,7 @@
 #include "FrameHandler.h"
 #include "DisplayManager.h"
 #include "DataHandler.h"
+#include "lsr.h"
 
 
 namespace lsr
@@ -40,26 +41,49 @@ namespace lsr
 class Engine
 {
 public:
-    Engine(const DDHType* ddhbin);
+    Engine(const DDHType* const ddh);
 
     bool render();
     bool verify();
 
-    bool setData(const DynamicData& dataId,
+    bool setData(const DynamicData& id,
                  const Number& value,
                  const DataStatus status);
-    DataStatus getData(const DynamicData& dataId, Number &value) const;
+    DataStatus getData(const DynamicData& id, Number &value) const;
 
     bool handleWindowEvents();
 
-    LSRError getError();
+    /**
+     * Typed error class (to avoid accidential assignments)
+     */
+    class Error
+    {
+    public:
+        explicit Error(const U32 errorCode)
+            : m_errorCode(errorCode)
+        {}
+
+        bool isError() const
+        {
+            return (m_errorCode != LSR_NO_ERROR);
+        }
+
+        U32 getValue() const
+        {
+            return m_errorCode;
+        }
+    private:
+        U32 m_errorCode;
+    };
+
+    Error getError();
 
 private:
     Database m_db;
     DisplayManager m_display;
     DataHandler m_dataHandler;
     FrameHandler m_frameHandler;
-    LSRError m_error;
+    LSREngineError m_error;
 };
 
 } // namespace lsr

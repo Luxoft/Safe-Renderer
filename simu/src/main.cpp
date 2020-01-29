@@ -24,7 +24,7 @@
 **
 ******************************************************************************/
 
-#include "Telltales.hpp"
+#include "HMIProject.h"
 #include "Engine.h"
 #include "FUBridge.h"
 #include "OdiTypes.h"
@@ -258,14 +258,14 @@ namespace
         return true;
     }
 
-    bool isErrorCritical(const LSRError& error)
+    bool isErrorCritical(const lsr::Engine::Error& error)
     {
         bool res = false;
-        switch (error)
+        switch (error.getValue())
         {
-        case LSR_NO_ERROR:
-        case LSR_DATASTATUS_NOT_AVAIABLE:
-        case LSR_DATASTATUS_INCONSISTENT:
+        case LSR_NO_ENGINE_ERROR:
+        case LSR_ERR_DATASTATUS_NOT_AVAILABLE:
+        case LSR_ERR_DATASTATUS_INCONSISTENT:
         {
             res = false;
             break;
@@ -308,18 +308,18 @@ int main(int argc, char* argv[])
 
         gilInit(&config);
         lsr::Engine engine(Telltales::getDDH());
-        lsr::LSRErrorCollector err = engine.getError();
+        lsr::Engine::Error err = engine.getError();
         // Database errors are fatal (may yield undefined behaviour)
-        if (err.get() == LSR_NO_ERROR)
+        if (!err.isError())
         {
             lsr::FUBridge bridge(Telltales::getDDH(),
                 configuration.tcpConfig.port,
                 configuration.tcpConfig.hostname,
                 engine);
 
-            while (!isErrorCritical(err.get()) && engine.handleWindowEvents() == false)
+            while (!isErrorCritical(err) && engine.handleWindowEvents() == false)
             {
-                err = bridge.handleIncomingData(30); //receive from Editor
+                static_cast<void>(bridge.handleIncomingData(30)); //receive from Editor
                 engine.render();
                 err = engine.getError();
                 if (!engine.verify())
@@ -329,8 +329,8 @@ int main(int argc, char* argv[])
             }
         }
         gilUninit();
-        std::cerr << "Engine terminated with error code: " << err.get() << std::endl;
-        return err.get();
+        std::cerr << "Engine terminated with error code: " << err.getValue() << std::endl;
+        return err.getValue();
     }
     return 0;
 }

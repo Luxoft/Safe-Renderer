@@ -26,7 +26,7 @@
 
 #include "WidgetPoolHelper.h"
 
-#include <LsrLimits.h>
+#include <LSRLimits.h>
 
 #include <AreaType.h>
 #include <ResourceBuffer.h>
@@ -57,7 +57,7 @@ lsr::BitmapField* WidgetPoolHelper::fillUpWithBitmaps(const lsr::StaticBitmapFie
                                                                lsr::DataContext* context)
 {
     lsr::BitmapField* field = NULL;
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     for (U8 i = 0U; i < MAX_BITMAPS_COUNT; ++i)
     {
         field = lsr::BitmapField::create(m_widgetPool,
@@ -76,7 +76,7 @@ lsr::ReferenceBitmapField* WidgetPoolHelper::fillUpWithReferenceBitmaps(
                                                                lsr::DataContext* context)
 {
     lsr::ReferenceBitmapField* field = NULL;
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     for (U8 i = 0U; i < MAX_REFERENCE_BITMAPS_COUNT; ++i)
     {
         field = lsr::ReferenceBitmapField::create(m_widgetPool,
@@ -94,7 +94,7 @@ lsr::Panel* WidgetPoolHelper::fillUpWithPanels(const lsr::PanelType* type,
                                                         lsr::DataContext* context)
 {
     lsr::Panel* panel = NULL;
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     for (U8 i = 0U; i < MAX_PANELS_COUNT; ++i)
     {
         panel = lsr::Panel::create(m_widgetPool,
@@ -112,7 +112,7 @@ lsr::Frame* WidgetPoolHelper::fillUpWithFrames(const lsr::Database& db,
                                                         lsr::Window* parent,
                                                         lsr::DataContext* context)
 {
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     lsr::Frame* frame = NULL;
     for (U8 i = 0U; i < MAX_FRAMES_COUNT; ++i)
     {
@@ -132,7 +132,7 @@ lsr::Window* WidgetPoolHelper::fillUpWithWindows(const lsr::Database& db,
                                                           const lsr::WindowDefinition& winDef,
                                                           lsr::DataContext* context)
 {
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     lsr::Window* window = NULL;
     for (U8 i = 0U; i < MAX_WINDOWS_COUNT; ++i)
     {
@@ -160,7 +160,7 @@ bool WidgetPoolHelper::isBitMapPoolFilled() const
     lsr::ResourceBuffer imgBuffer;
     lsr::Database db(Telltales::getDDH());
 
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     lsr::BitmapField* field =
         lsr::BitmapField::create(m_widgetPool,
                                  db,
@@ -184,7 +184,7 @@ bool WidgetPoolHelper::isReferenceBitMapPoolFilled() const
     lsr::ResourceBuffer imgBuffer;
     lsr::Database db(Telltales::getDDH());
 
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     lsr::ReferenceBitmapField* field =
         lsr::ReferenceBitmapField::create(m_widgetPool,
                                           db,
@@ -207,7 +207,7 @@ bool WidgetPoolHelper::isPanelPoolFilled() const
     lsr::ResourceBuffer imgBuffer;
     lsr::Database db(Telltales::getDDH());
 
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     lsr::Panel* panel =
         lsr::Panel::create(m_widgetPool,
                            db,
@@ -226,7 +226,7 @@ bool WidgetPoolHelper::isFramePoolFilled() const
     MockDataHandler dataHandler;
     DataContext context(dataHandler);
 
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     lsr::Frame* frame =
         lsr::Frame::create(m_widgetPool,
                            db,
@@ -248,7 +248,7 @@ bool WidgetPoolHelper::isWindowPoolFilled() const
     MockDataHandler dataHandler;
     DataContext context(dataHandler);
 
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     lsr::Window* window =
         lsr::Window::create(m_widgetPool,
                             db,

@@ -5,6 +5,7 @@
 **
 **   File:        PageDatabaseType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,20 +32,24 @@
 
 namespace lsr
 {
-struct PageType;
 
+/**
+ * PageDatabaseType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct PageDatabaseType
 {
-    const PageType* const *page;
-    const U16 pageCount;
+    const PageType* const* const m_page;
+    const U16 m_pageCount;
 
 
     /**
      * Returns the number of page elements.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetPageCount() const
     {
-        return pageCount;
+        return m_pageCount;
     }
 
     /**
@@ -52,9 +57,11 @@ struct PageDatabaseType
      * This method checks the index and returns NULL if the item index exceeds the element count.
      * Each page in the database collects a number of panels and may also specify an overriding Control Map to change control behavior
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const PageType* GetPage(const U16 i) const
     {
-        return (i < pageCount) ? page[i] : NULL;
+        // coverity[misra_cpp_2008_rule_5_0_15_violation]
+        return (i < m_pageCount) ? m_page[i] : NULL;
     }
 
 };

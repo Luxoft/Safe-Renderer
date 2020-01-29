@@ -45,34 +45,40 @@ void Texture::load(const GILContext ctx, const LsrImage* const img)
     ASSERT(img != NULL);
     m_height = static_cast<U16>(img->getHeight());
     m_width = static_cast<U16>(img->getWidth());
+
     const void* const pixelData = img->getPixelData();
-    const GILFormat format = convertFormat(img);
-    const U8 colorSize = getPaletteColorSize(img);
-    if ((NULL != pixelData) && (format != GIL_FORMAT_INVALID))
+    if (NULL != pixelData)
     {
-        m_format = format;
-        m_texture = gilCreateTexture(ctx);
-        static_cast<void>(gilTexPixels(m_texture, static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height), m_format, pixelData)); // ignore return value
-        switch (colorSize)
+        const GILFormat format = convertFormat(img);
+        if (format != GIL_FORMAT_INVALID)
         {
-        case 4U:
-            static_cast<void>(gilTexPalette4(m_texture, img->palette, img->header.clutSize)); // ignore return value
-            break;
-        case 3U:
-            static_cast<void>(gilTexPalette3(m_texture, img->palette, img->header.clutSize)); // ignore return value
-            break;
-        case 2U:
-            static_cast<void>(gilTexPalette2(m_texture, img->palette, img->header.clutSize)); // ignore return value
-            break;
-        default:
-            break;
+            m_format = format;
+            m_texture = gilCreateTexture(ctx);
+            // return values for gilTex* are informational (gilError will be raised in case of error)
+            static_cast<void>(gilTexPixels(m_texture, static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height), m_format, pixelData)); // ignore return value
+
+            const U8 colorSize = getPaletteColorSize(img);
+            switch (colorSize)
+            {
+            case 4U:
+                static_cast<void>(gilTexPalette4(m_texture, img->palette, img->header.clutSize)); // ignore return value
+                break;
+            case 3U:
+                static_cast<void>(gilTexPalette3(m_texture, img->palette, img->header.clutSize)); // ignore return value
+                break;
+            case 2U:
+                static_cast<void>(gilTexPalette2(m_texture, img->palette, img->header.clutSize)); // ignore return value
+                break;
+            default:
+                break;
+            }
         }
     }
 }
 
-void Texture::bind(GILContext ctx)
+void Texture::bind(const GILContext ctx)
 {
-    ASSERT(isLoaded());
+    // binding a NULL texture will raise a gilError
     gilBindTexture(ctx, m_texture);
 }
 
@@ -84,14 +90,17 @@ U8 Texture::getPaletteColorSize(const LsrImage* const img)
         switch (img->getPixelFormat())
         {
         case LsrImageTypes::PIXEL_FORMAT_RGB565:
+            static_cast<void>(retval);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             retval = 2U;
             break;
         case LsrImageTypes::PIXEL_FORMAT_RGB888:
         case LsrImageTypes::PIXEL_FORMAT_BGR888:
+            static_cast<void>(retval);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             retval = 3U;
             break;
         case LsrImageTypes::PIXEL_FORMAT_RGBA8888:
         case LsrImageTypes::PIXEL_FORMAT_BGRA8888:
+            static_cast<void>(retval);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             retval = 4U;
             break;
         default:
@@ -112,15 +121,19 @@ GILFormat Texture::convertFormat(const LsrImage* const img)
             switch (img->getPixelFormat())
             {
             case LsrImageTypes::PIXEL_FORMAT_RGB565:
+                static_cast<void>(format);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
                 format = GIL_FORMAT_P_2_RGB_565;
                 break;
             case LsrImageTypes::PIXEL_FORMAT_RGB888:
+                static_cast<void>(format);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
                 format = GIL_FORMAT_P_2_RGB_888;
                 break;
             case LsrImageTypes::PIXEL_FORMAT_RGBA8888:
+                static_cast<void>(format);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
                 format = GIL_FORMAT_P_2_RGBA_8888;
                 break;
             case LsrImageTypes::PIXEL_FORMAT_BGRA8888:
+                static_cast<void>(format);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
                 format = GIL_FORMAT_P_2_BGRA_8888;
                 break;
             default:
@@ -133,18 +146,23 @@ GILFormat Texture::convertFormat(const LsrImage* const img)
         switch (img->getPixelFormat())
         {
         case LsrImageTypes::PIXEL_FORMAT_RGB565:
+            static_cast<void>(format);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             format = GIL_FORMAT_RGB_565;
             break;
         case LsrImageTypes::PIXEL_FORMAT_RGB888:
+            static_cast<void>(format);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             format = GIL_FORMAT_RGB_888;
             break;
         case LsrImageTypes::PIXEL_FORMAT_BGR888:
+            static_cast<void>(format);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             format = GIL_FORMAT_BGR_888;
             break;
         case LsrImageTypes::PIXEL_FORMAT_RGBA8888:
+            static_cast<void>(format);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             format = GIL_FORMAT_RGBA_8888;
             break;
         case LsrImageTypes::PIXEL_FORMAT_BGRA8888:
+            static_cast<void>(format);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             format = GIL_FORMAT_BGRA_8888;
             break;
         default:

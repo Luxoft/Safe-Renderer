@@ -5,6 +5,7 @@
 **
 **   File:        EnumerationBitmapMapType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -32,26 +33,32 @@
 namespace lsr
 {
 
+/**
+ * EnumerationBitmapMapType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct EnumerationBitmapMapType
 {
-    const U16 key;
-    const U16 bitmapId;
+    const U16 m_key;
+    const U16 m_bitmapId;
 
 
     /**
      * Returns the value of the key attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetKey() const
     {
-        return key;
+        return m_key;
     }
 
     /**
      * Returns the value of the bitmapId attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetBitmapId() const
     {
-        return bitmapId;
+        return m_bitmapId;
     }
 
 };

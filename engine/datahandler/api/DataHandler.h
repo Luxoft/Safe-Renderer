@@ -28,34 +28,31 @@
 ******************************************************************************/
 
 #include "IDataHandler.h"
-#include "LsrLimits.h"
+#include <LSRLimits.h>
+#include "Timer.h"
 
 namespace lsr
 {
-
-class Database;
-struct DynamicDataEntryType;
-struct FUClassType;
 
 struct DynamicDataEntry
 {
     const FUClassType* fu; ///< FU DB information
     const DynamicDataEntryType* data; ///< Dynamic Data DB information
     U32 value; ///< Raw data value
-    U32 timestamp; ///< Timestamp of last data update
+    Timer refreshTimer; ///< Timestamp of last data update
     DataStatus status; ///< Validity information
 };
 
 struct DynamicDataEntry_Comparer
 {
-    static U32 key(const FUClassId fuId, const DataId dataId);
+    static U32 key(const FUClassId idFu, const DataId idData);
     bool operator()(struct DynamicDataEntry const& entry, U32 const value) const;
 };
 
-inline U32 DynamicDataEntry_Comparer::key(const FUClassId fuId, const DataId dataId)
+inline U32 DynamicDataEntry_Comparer::key(const FUClassId idFu, const DataId idData)
 {
-    const U32 msb = fuId;
-    const U32 lsb = dataId;
+    const U32 msb = idFu;
+    const U32 lsb = idData;
     return (msb << 16U) | lsb;
 }
 
@@ -76,21 +73,21 @@ class DataHandler : public IDataHandler
 public:
     explicit DataHandler(const Database& db);
 
-    virtual DataStatus getNumber(const DynamicData& dataId,
+    virtual DataStatus getNumber(const DynamicData& id,
         Number &value) const P_OVERRIDE;
 
-    virtual bool setData(const DynamicData& dataId,
+    virtual bool setData(const DynamicData& id,
         const Number& value,
         const DataStatus status) P_OVERRIDE;
 
 private:
-    DynamicDataEntry* find(const DynamicData& data);
-    const DynamicDataEntry* find(const DynamicData& data) const;
+    DynamicDataEntry* find(const DynamicData& id);
+    const DynamicDataEntry* find(const DynamicData& id) const;
 
     DynamicDataEntry m_dataEntries[MAX_DYNAMIC_DATA];
     size_t m_numDataEntries;
 
-    LSRError m_error;
+    LSREngineError m_error;
 };
 
 } // namespace datahandler

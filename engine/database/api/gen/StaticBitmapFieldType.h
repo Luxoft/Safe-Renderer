@@ -5,6 +5,7 @@
 **
 **   File:        StaticBitmapFieldType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,41 +32,46 @@
 
 namespace lsr
 {
-struct AreaType;
-struct ExpressionTermType;
 
+/**
+ * StaticBitmapFieldType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct StaticBitmapFieldType
 {
-    const AreaType* const area;
-    const ExpressionTermType* const visible;
-    const ExpressionTermType* const bitmap;
+    const AreaType* const m_area;
+    const ExpressionTermType* const m_visible;
+    const ExpressionTermType* const m_bitmap;
 
 
     /**
      * Returns a pointer to the area child reference.
      * Defines the area of the element relative to the upper left corner of its parent
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const AreaType* GetArea() const
     {
-        return area;
+        return m_area;
     }
 
     /**
      * Returns a pointer to the visible child reference.
      * Controls the visibility of the element. It can make sense to have a field invisible if it is also enabled because when it receives focus, it becomes visible and when it loses focus, it becomes invisible again
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const ExpressionTermType* GetVisible() const
     {
-        return visible;
+        return m_visible;
     }
 
     /**
      * Returns a pointer to the bitmap child reference.
      * The locally unique ID of a bitmap in the Bitmaps Database or a more complex expression
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const ExpressionTermType* GetBitmap() const
     {
-        return bitmap;
+        return m_bitmap;
     }
 
 };

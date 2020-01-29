@@ -5,6 +5,7 @@
 **
 **   File:        DynamicDataEntryType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -32,53 +33,62 @@
 namespace lsr
 {
 
+/**
+ * DynamicDataEntryType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct DynamicDataEntryType
 {
-    const U16 dataId;
-    const DynamicDataTypeEnumeration dataType;
-    const I32 minimum;
-    const I32 maximum;
-    const U16 repeatTimeout;
+    const U16 m_dataId;
+    const DynamicDataTypeEnumeration m_dataType;
+    const I32 m_minimum;
+    const I32 m_maximum;
+    const U16 m_repeatTimeout;
 
 
     /**
      * Returns the value of the dataId attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetDataId() const
     {
-        return dataId;
+        return m_dataId;
     }
 
     /**
      * Returns the value of the dataType attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     DynamicDataTypeEnumeration GetDataType() const
     {
-        return dataType;
+        return m_dataType;
     }
 
     /**
      * Returns the value of the minimum attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     I32 GetMinimum() const
     {
-        return minimum;
+        return m_minimum;
     }
 
     /**
      * Returns the value of the maximum attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     I32 GetMaximum() const
     {
-        return maximum;
+        return m_maximum;
     }
 
     /**
      * Returns the value of the repeatTimeout attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetRepeatTimeout() const
     {
-        return repeatTimeout;
+        return m_repeatTimeout;
     }
 
 };

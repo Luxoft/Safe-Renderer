@@ -27,31 +27,32 @@
 **
 ******************************************************************************/
 
-#include "LSRError.h"
+#include "LSREngineError.h"
 
 namespace lsr
 {
 
 /**
- * Wrapper for LSRError values.
+ * Wrapper for LSREngineError values.
  *
- * Keeps the worst error value if multiple error values are assigned.
+ * Keeps the highest error value if multiple error values are assigned.
  * This helps to avoid accidental no-error cases if a function has
  * different sources of error:
  *
  * Example:
  *
- * LSRErrorCollector err = LSR_NO_ERROR;
+ * TErrorCollector<LSREngineError> err = LSR_NO_ERROR;
  * err = LSR_UNKNOWN_ERROR; // value is assigned
  * err = LSR_NO_ERROR;      // value is NOT assigned
  */
-class LSRErrorCollector
+template <class T>
+class TErrorCollector
 {
 public:
     /**
      * Creates an error collector with an initial error value
      */
-    LSRErrorCollector(const LSRError err) : m_error(err)
+    TErrorCollector(const T err) : m_error(err)
     {}
 
     /**
@@ -60,7 +61,7 @@ public:
      * @param err new error value
      * @return reference to this
      */
-    LSRErrorCollector& operator=(const LSRError err)
+    TErrorCollector& operator=(const T err)
     {
         if (err > m_error)
         {
@@ -73,13 +74,15 @@ public:
      * Returns the stored error value
      * @return resulting error
      */
-    LSRError get() const
+    T get() const
     {
         return m_error;
     }
 private:
-    LSRError m_error;
+    T m_error;
 };
+
+typedef TErrorCollector<LSREngineError> LSRErrorCollector;
 
 } // namespace lsr
 

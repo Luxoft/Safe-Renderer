@@ -56,6 +56,7 @@ void NumberExpression::setup(const ExpressionTermType* const pTerm,
 void NumberExpression::dispose()
 {
     m_pTerm = NULL;
+    m_pContext = NULL;
 }
 
 DataStatus NumberExpression::getValue(Number& value) const

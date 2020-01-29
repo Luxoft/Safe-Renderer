@@ -26,7 +26,7 @@
 
 #include "PoolTestTypes.h"
 
-#include <LSRError.h>
+#include <LSREngineError.h>
 
 #include <gtest/gtest.h>
 #include <cstddef>
@@ -52,7 +52,7 @@ TYPED_TEST(PoolFaultInjectionTest, AllocateWithBadPool)
 
     this->m_corrupter->corruptStorage();
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 }
 
 TYPED_TEST(PoolFaultInjectionTest, AllocateWithOverWrittenStandardFreeMarker)
@@ -61,7 +61,7 @@ TYPED_TEST(PoolFaultInjectionTest, AllocateWithOverWrittenStandardFreeMarker)
 
     this->m_corrupter->corruptFreeMarker();
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 }
 
 TYPED_TEST(PoolFaultInjectionTest, AllocateWithOverWrittenStandardBusyMarker)
@@ -70,7 +70,7 @@ TYPED_TEST(PoolFaultInjectionTest, AllocateWithOverWrittenStandardBusyMarker)
 
     this->m_corrupter->corruptBusyMarker();
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 }
 
 TYPED_TEST(PoolFaultInjectionTest, AllocateWithOverWrittenFreeNode)
@@ -80,7 +80,7 @@ TYPED_TEST(PoolFaultInjectionTest, AllocateWithOverWrittenFreeNode)
 
     this->m_corrupter->corruptFreeNode();
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 }
 
 TYPED_TEST(PoolFaultInjectionTest, AllocateWithCorruptedFreeListPtrOutSideStorage)
@@ -88,13 +88,13 @@ TYPED_TEST(PoolFaultInjectionTest, AllocateWithCorruptedFreeListPtrOutSideStorag
     this->allocate();
 
     this->m_corrupter->corruptFreeListPtrBeforeStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 
     this->m_corrupter->corruptFreeListPtrAtTheEndOfStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 
     this->m_corrupter->corruptFreeListPtrAfterStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 }
 
 TYPED_TEST(PoolFaultInjectionTest, AllocateWithCorruptedFreeListPtrInSideStorage)
@@ -102,10 +102,10 @@ TYPED_TEST(PoolFaultInjectionTest, AllocateWithCorruptedFreeListPtrInSideStorage
     this->allocate();
 
     this->m_corrupter->corruptFreeListPtrLessThanCell();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 
     this->m_corrupter->corruptFreeListPtrMoreThanCell();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 }
 
 TYPED_TEST(PoolFaultInjectionTest, AllocateWithCorruptedNextPtrOutSideStorage)
@@ -113,13 +113,13 @@ TYPED_TEST(PoolFaultInjectionTest, AllocateWithCorruptedNextPtrOutSideStorage)
     this->allocate();
 
     this->m_corrupter->corruptNextPtrBeforeStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 
     this->m_corrupter->corrupNextPtrAtTheEndOfStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 
     this->m_corrupter->corruptNextListPtrAfterStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 }
 
 TYPED_TEST(PoolFaultInjectionTest, AllocateWithCorruptedNextPtrInSideStorage)
@@ -127,10 +127,10 @@ TYPED_TEST(PoolFaultInjectionTest, AllocateWithCorruptedNextPtrInSideStorage)
     this->allocate();
 
     this->m_corrupter->corruptNextListPtrLessThanCell();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 
     this->m_corrupter->corruptNextListPtrMoreThanCell();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 }
 
 TYPED_TEST(PoolFaultInjectionTest, AllocateWithLoopInFreeList1)
@@ -138,7 +138,7 @@ TYPED_TEST(PoolFaultInjectionTest, AllocateWithLoopInFreeList1)
     // make loop with m_pFreeList value
     this->m_corrupter->createInfLoopFromPos(1U);
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 }
 
 TYPED_TEST(PoolFaultInjectionTest, AllocateWithLoopInFreeList2)
@@ -146,7 +146,7 @@ TYPED_TEST(PoolFaultInjectionTest, AllocateWithLoopInFreeList2)
     // Make loop with some value inside free list.
     this->m_corrupter->createInfLoopFromPos(2U);
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->allocateFailed());
 }
 
 // Testing Deallocation method
@@ -157,7 +157,7 @@ TYPED_TEST(PoolFaultInjectionTest, DeallocateWithBadPool)
 
     this->m_corrupter->corruptStorage();
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 }
 
 TYPED_TEST(PoolFaultInjectionTest, DeallocateWithOverWrittenStandardFreeMarker)
@@ -166,7 +166,7 @@ TYPED_TEST(PoolFaultInjectionTest, DeallocateWithOverWrittenStandardFreeMarker)
 
     this->m_corrupter->corruptFreeMarker();
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 }
 
 TYPED_TEST(PoolFaultInjectionTest, DeallocateWithOverWrittenStandardBusyMarker)
@@ -175,7 +175,7 @@ TYPED_TEST(PoolFaultInjectionTest, DeallocateWithOverWrittenStandardBusyMarker)
 
     this->m_corrupter->corruptBusyMarker();
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 }
 
 TYPED_TEST(PoolFaultInjectionTest, DeallocateWithOverWrittenFreeNode)
@@ -185,7 +185,7 @@ TYPED_TEST(PoolFaultInjectionTest, DeallocateWithOverWrittenFreeNode)
 
     this->m_corrupter->corruptFreeNode();
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 }
 
 TYPED_TEST(PoolFaultInjectionTest, DeallocateWithCorruptedFreeListPtrOutSideStorage)
@@ -193,13 +193,13 @@ TYPED_TEST(PoolFaultInjectionTest, DeallocateWithCorruptedFreeListPtrOutSideStor
     void* ptr = this->allocate();
 
     this->m_corrupter->corruptFreeListPtrBeforeStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 
     this->m_corrupter->corruptFreeListPtrAtTheEndOfStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 
     this->m_corrupter->corruptFreeListPtrAfterStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 }
 
 TYPED_TEST(PoolFaultInjectionTest, DeallocateWithCorruptedFreeListPtrInSideStorage)
@@ -207,10 +207,10 @@ TYPED_TEST(PoolFaultInjectionTest, DeallocateWithCorruptedFreeListPtrInSideStora
     void* ptr = this->allocate();
 
     this->m_corrupter->corruptFreeListPtrLessThanCell();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 
     this->m_corrupter->corruptFreeListPtrMoreThanCell();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 }
 
 TYPED_TEST(PoolFaultInjectionTest, DeallocateWithCorruptedNextPtrOutSideStorage)
@@ -218,13 +218,13 @@ TYPED_TEST(PoolFaultInjectionTest, DeallocateWithCorruptedNextPtrOutSideStorage)
     void* ptr = this->allocate();
 
     this->m_corrupter->corruptNextPtrBeforeStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 
     this->m_corrupter->corrupNextPtrAtTheEndOfStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 
     this->m_corrupter->corrupNextPtrAtTheEndOfStorage();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 }
 
 TYPED_TEST(PoolFaultInjectionTest, DeallocateWithCorruptedNextPtrInSideStorage)
@@ -232,10 +232,10 @@ TYPED_TEST(PoolFaultInjectionTest, DeallocateWithCorruptedNextPtrInSideStorage)
     void* ptr = this->allocate();
 
     this->m_corrupter->corruptNextListPtrLessThanCell();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 
     this->m_corrupter->corruptNextListPtrMoreThanCell();
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 }
 
 TYPED_TEST(PoolFaultInjectionTest, DeallocateWithLoopInFreeList1)
@@ -245,7 +245,7 @@ TYPED_TEST(PoolFaultInjectionTest, DeallocateWithLoopInFreeList1)
     // make loop with m_pFreeList value
     this->m_corrupter->createInfLoopFromPos(1U);
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 }
 
 TYPED_TEST(PoolFaultInjectionTest, DeallocateWithLoopInFreeList2)
@@ -255,7 +255,7 @@ TYPED_TEST(PoolFaultInjectionTest, DeallocateWithLoopInFreeList2)
     // Make loop with some value inside free list.
     this->m_corrupter->createInfLoopFromPos(2U);
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_CORRUPTED), this->m_pool->deallocate(ptr));
 }
 
 // Testing CheckPool method

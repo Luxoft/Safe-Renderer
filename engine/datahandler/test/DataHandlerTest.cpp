@@ -46,7 +46,7 @@ public:
     DataHandlerTest()
         : m_db(Telltales::getDDH())
     {
-        EXPECT_EQ(LSR_NO_ERROR, m_db.getError());
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, m_db.getError());
     }
 
     void SetUp() P_OVERRIDE

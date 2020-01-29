@@ -53,7 +53,7 @@ TEST_F(FieldTest, CreateBitmapFieldTest)
     const StaticBitmapFieldType bmpField = { &area, &visible, &bmp };
     const BaseFieldChoiceType fieldChoice = { BaseFieldChoiceType::STATICBITMAPFIELD_CHOICE, &bmpField };
 
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     for (U8 i = 0U; i < MAX_BITMAPS_COUNT; ++i)
     {
         lsr:: Field* field = lsr::Field::create(m_widgetPool,
@@ -61,7 +61,7 @@ TEST_F(FieldTest, CreateBitmapFieldTest)
                                                 &fieldChoice,
                                                 &m_context,
                                                 error);
-        EXPECT_EQ(LSR_NO_ERROR, error.get());
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, error.get());
         EXPECT_TRUE(NULL != field);
     }
 
@@ -77,7 +77,7 @@ TEST_F(FieldTest, CreateRefsBitmapFieldTest)
     const ReferenceBitmapFieldType bmpField = { errorCounter, &area, &visible, &bmp };
     const BaseFieldChoiceType fieldChoice = { BaseFieldChoiceType::REFERENCEBITMAPFIELD_CHOICE, &bmpField };
 
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     for (U8 i = 0U; i < MAX_REFERENCE_BITMAPS_COUNT; ++i)
     {
         lsr:: Field* field = lsr::Field::create(m_widgetPool,
@@ -85,7 +85,7 @@ TEST_F(FieldTest, CreateRefsBitmapFieldTest)
                                                 &fieldChoice,
                                                 &m_context,
                                                 error);
-        EXPECT_EQ(LSR_NO_ERROR, error.get());
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, error.get());
         EXPECT_TRUE(NULL != field);
     }
 
@@ -100,7 +100,7 @@ TEST_F(FieldTest, CreateWrongFieldTest)
     const StaticBitmapFieldType bmpField = { &area, &visible, &bmp };
     const BaseFieldChoiceType fieldChoice = { BaseFieldChoiceType::NONE, &bmpField };
 
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     lsr:: Field* field = lsr::Field::create(m_widgetPool,
                                             m_db,
                                             &fieldChoice,

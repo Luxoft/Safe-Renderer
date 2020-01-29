@@ -33,18 +33,19 @@
 namespace lsr
 {
 
-Field* Field::create(WidgetPool& widgetPool,
+Field* Field::create(WidgetPool& factory,
                      const Database& db,
                      const BaseFieldChoiceType* const pDdh,
                      DataContext* const pContext,
                      LSRErrorCollector& error)
 {
-    Field* field = NULL;
+    Field* pField = NULL;
     switch (pDdh->GetBaseFieldChoiceTypeChoice())
     {
     case BaseFieldChoiceType::STATICBITMAPFIELD_CHOICE:
     {
-        field = BitmapField::create(widgetPool,
+        static_cast<void>(pField);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+        pField = BitmapField::create(factory,
                                     db,
                                     pDdh->GetStaticBitmapField(),
                                     pContext,
@@ -53,7 +54,8 @@ Field* Field::create(WidgetPool& widgetPool,
     }
     case BaseFieldChoiceType::REFERENCEBITMAPFIELD_CHOICE:
     {
-        field = ReferenceBitmapField::create(widgetPool,
+        static_cast<void>(pField);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+        pField = ReferenceBitmapField::create(factory,
                                              db,
                                              pDdh->GetReferenceBitmapField(),
                                              pContext,
@@ -66,7 +68,7 @@ Field* Field::create(WidgetPool& widgetPool,
         break;
     }
     }
-    return field;
+    return pField;
 }
 
 Field::Field()

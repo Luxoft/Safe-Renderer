@@ -52,7 +52,7 @@ TEST(OdiMsgHeaderTest, TestConstrFromStream)
     InputStream stream(buffer, sizeof(buffer));
     OdiMsgHeader header = OdiMsgHeader::fromStream(stream);
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     EXPECT_EQ(expectedOdiType, header.getOdiType());
 }
@@ -78,7 +78,7 @@ TEST(OdiMsgHeaderTest, TestSerialize)
 
     const U16 expectedMsgSize = header.getSize();
     stream << header;
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(expectedMsgSize, stream.bytesWritten());
 
     U8* expectedBuffer = new U8[expectedMsgSize];
@@ -106,13 +106,13 @@ TEST(OdiMsgHeaderTest, TestSerializeWithWrongBuffer)
     stream1 << header;
 
     EXPECT_EQ(0u, stream1.bytesWritten());
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream1.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream1.getError());
 
     OutputStream stream2(buffer, 0u);
     stream2 << header;
 
     EXPECT_EQ(0u, stream2.bytesWritten());
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream2.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream2.getError());
 }
 
 TEST(OdiMsgHeaderTest, TestDeserializeWith)
@@ -127,7 +127,7 @@ TEST(OdiMsgHeaderTest, TestDeserializeWith)
     OdiMsgHeader header(DataMessageTypes::UNKNOWN);
     stream >> header;
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     EXPECT_EQ(expectedOdiType, header.getOdiType());
 }
@@ -142,14 +142,14 @@ TEST(OdiMsgHeaderTest, TestSerializeDeserialize)
     OdiMsgHeader outHeader(expectedOdiType);
 
     outStream << outHeader;
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), outStream.getError());
+    EXPECT_EQ(COM_NO_ERROR, outStream.getError());
 
     OdiMsgHeader inHeader(DataMessageTypes::UNKNOWN);
 
     InputStream inStream(buffer, sizeof(buffer));
     inStream >> inHeader;
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), inStream.getError());
+    EXPECT_EQ(COM_NO_ERROR, inStream.getError());
 
     EXPECT_EQ(expectedOdiType, inHeader.getOdiType());
 }
@@ -165,7 +165,7 @@ TEST(OdiMsgHeaderTest, TestDeserializeWithWrongDataMsgType)
     InputStream stream(buffer, sizeof(buffer));
     stream >> header;
 
-    EXPECT_EQ(LSRError(LSR_COMM_INVALID_FIELD_IN_MSG), stream.getError());
+    EXPECT_EQ(COM_INVALID_FIELD_IN_MSG, stream.getError());
 }
 
 TEST(OdiMsgHeaderTest, TestDeserializeWithWrongBuffer)
@@ -178,11 +178,11 @@ TEST(OdiMsgHeaderTest, TestDeserializeWithWrongBuffer)
     OdiMsgHeader header1(DataMessageTypes::UNKNOWN);
     stream1 >> header1;
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream1.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream1.getError());
 
     InputStream stream2(buffer, 0U);
     OdiMsgHeader header2(DataMessageTypes::UNKNOWN);
     stream2 >> header2;
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream2.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream2.getError());
 }

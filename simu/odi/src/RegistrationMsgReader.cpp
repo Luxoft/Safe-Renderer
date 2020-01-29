@@ -46,7 +46,7 @@ RegistrationMsgReader::RegistrationMsgReader(InputStream& stream)
     m_stream >> tmpMode;
     if (!messageutils::checkRegistrationMode(tmpMode))
     {
-        m_stream.setError(LSR_ODI_INVALID_FIELD_IN_MSG);
+        m_stream.setError(COM_INVALID_FIELD_IN_MSG);
     }
     else
     {

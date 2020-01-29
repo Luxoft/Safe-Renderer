@@ -5,6 +5,7 @@
 **
 **   File:        ColorDatabaseType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -32,6 +33,10 @@
 namespace lsr
 {
 
+/**
+ * ColorDatabaseType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct ColorDatabaseType
 {
 

@@ -56,7 +56,7 @@ FUBridge::~FUBridge()
 {
 }
 
-LSRError FUBridge::handleIncomingData(uint32_t timeout)
+ComError FUBridge::handleIncomingData(uint32_t timeout)
 {
     // Check for data upstream (Editor -> Engine)
     if (NULL != m_transmitter)
@@ -67,7 +67,7 @@ LSRError FUBridge::handleIncomingData(uint32_t timeout)
 }
 
 
-LSRError FUBridge::onMessage(IMsgTransmitter* pTransmitter, const U8 messageType, InputStream& stream)
+ComError FUBridge::onMessage(IMsgTransmitter* pTransmitter, const U8 messageType, InputStream& stream)
 {
     switch (messageType)
     {
@@ -81,10 +81,10 @@ LSRError FUBridge::onMessage(IMsgTransmitter* pTransmitter, const U8 messageType
         LOG_WARN(("FUBridge ignored message type :%d", messageType));
         break;
     }
-    return LSR_NO_ERROR;
+    return COM_NO_ERROR;
 }
 
-LSRError FUBridge::onRegistration(IMsgTransmitter* pTransmitter, InputStream& stream)
+ComError FUBridge::onRegistration(IMsgTransmitter* pTransmitter, InputStream& stream)
 {
     // Editor/FUApp sends registration message for each FU
     // Engine ignores registration messages, but we need to simulate data subscriptions to make the Editor send data responses
@@ -107,7 +107,7 @@ LSRError FUBridge::onRegistration(IMsgTransmitter* pTransmitter, InputStream& st
  * (Sending data subscriptions is the expected behaviour for the non-asil Engine.
  * ASIL-FUs won't expect subscription messages.)
  */
-LSRError FUBridge::subscribeAll()
+ComError FUBridge::subscribeAll()
 {
     U8 buf[256];
     for (U16 i = 0; i < m_ddh->GetFUCount(); ++i)
@@ -137,7 +137,7 @@ LSRError FUBridge::subscribeAll()
             }
         }
     }
-    return LSR_NO_ERROR;
+    return COM_NO_ERROR;
 }
 
 /**
@@ -166,10 +166,10 @@ void FUBridge::refresh()
     }
 }
 
-LSRError FUBridge::onODI(IMsgTransmitter* pTransmitter, InputStream& stream)
+ComError FUBridge::onODI(IMsgTransmitter* pTransmitter, InputStream& stream)
 {
     const OdiMsgHeader odiMsgHeader = OdiMsgHeader::fromStream(stream);
-    LSRErrorCollector err = LSR_NO_ERROR;
+    TErrorCollector<ComError> err = COM_NO_ERROR;
     if (odiMsgHeader.getOdiType() == DataMessageTypes::DYN_DATA_RESP)
     {
         err = onODIDynamicData(stream);
@@ -183,7 +183,7 @@ LSRError FUBridge::onODI(IMsgTransmitter* pTransmitter, InputStream& stream)
     return err.get();
 }
 
-LSRError FUBridge::onODIDynamicData(InputStream& stream)
+ComError FUBridge::onODIDynamicData(InputStream& stream)
 {
     const DataResponseMessage dataResponse = DataResponseMessage::fromStream(stream);
     const DynamicData dynData(dataResponse.getFuId(), dataResponse.getDataId());
@@ -191,7 +191,7 @@ LSRError FUBridge::onODIDynamicData(InputStream& stream)
     const Number value(dataResponse.getDataValue(), dataResponse.getDataType());
     const DataStatus status = dataResponse.getInvalidFlag() ? DataStatus::INVALID : DataStatus::VALID;
     const bool success = m_dataHandler.setData(dynData, value, status);
-    return success ? LSR_NO_ERROR : LSR_DH_INVALID_MESSAGE_TYPE;
+    return success ? COM_NO_ERROR : COM_INVALID_MESSAGE_TYPE;
 }
 
 void FUBridge::onConnect(IMsgTransmitter* pMsgTransmitter)

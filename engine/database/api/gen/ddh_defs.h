@@ -28,23 +28,17 @@
 ******************************************************************************/
 
 #include "LsrTypes.h"  // Common types
-
-// By defining _USE_PACK_PRAGMA, the pre-processor directive
-// #pragma pack(1) will be used before the structures (thus
-// removing the byte padding of the structures).
-#define _USE_PACK_PRAGMA 1
+#include <DatabaseTypes.h>  // Database forward declarations
 
 namespace lsr
 {
 
 // Type definitions of the Id types used in the XML Schema
 // The Id types used in the ODI protocol are defined in odi_types.h instead
-typedef U16 ColorId;
 typedef U16 BitmapId;
 typedef U8 FrameId;
-typedef U16 PageId;
+// coverity[misra_cpp_2008_rule_3_4_1_violation] used by unit tests
 typedef U16 PanelId;
-typedef U8 FieldId;
 
 /** DynamicDataTypeEnumeration */
 enum DynamicDataTypeEnumeration

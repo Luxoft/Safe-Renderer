@@ -43,23 +43,23 @@ Panel::Panel(const PanelType* const pDdh)
 {
 }
 
-bool Panel::setup(WidgetPool& widgetPool,
+bool Panel::setup(WidgetPool& factory,
                   const Database& db,
                   DataContext* const pContext,
                   LSRErrorCollector& error)
 {
-    bool success = setArea(m_pDdh->GetArea()) && setupVisibilityExpr(pContext);
+    bool successful = setArea(m_pDdh->GetArea()) && setupVisibilityExpr(pContext);
 
-    if (success)
+    if (successful)
     {
         const U16 numFields = m_pDdh->GetFieldCount();
         for (U16 i = 0U; i < numFields; ++i)
         {
             const BaseFieldChoiceType* pFieldType = m_pDdh->GetField(i);
-            Field* const pField = Field::create(widgetPool, db, pFieldType, pContext, error);
+            Field* const pField = Field::create(factory, db, pFieldType, pContext, error);
             if ((NULL == pField) || (!addChild(pField)))
             {
-                success = false;
+                successful = false;
                 break;
             }
         }
@@ -69,10 +69,10 @@ bool Panel::setup(WidgetPool& widgetPool,
         error = LSR_DB_INCONSISTENT;
     }
 
-    return success;
+    return successful;
 }
 
-Panel* Panel::create(WidgetPool& widgetPool,
+Panel* Panel::create(WidgetPool& factory,
                      const Database& db,
                      const PanelType* const pDdhPanel,
                      DataContext* const pContext,
@@ -81,17 +81,17 @@ Panel* Panel::create(WidgetPool& widgetPool,
 
     ASSERT(NULL != pDdhPanel);
 
-    LSRError tmpError = LSR_NO_ERROR;
-    void* const pRawMemory = widgetPool.panelPool().allocate(tmpError);
+    LSREngineError tmpError = LSR_NO_ENGINE_ERROR;
+    void* const pRawMemory = factory.panelPool().allocate(tmpError);
     error = tmpError;
 
     Panel* pPanel = new(pRawMemory)Panel(pDdhPanel);
     if (NULL != pPanel)
     {
-        if (!pPanel->setup(widgetPool, db, pContext, error))
+        if (!pPanel->setup(factory, db, pContext, error))
         {
             pPanel->~Panel();
-            error = widgetPool.panelPool().deallocate(pRawMemory);
+            error = factory.panelPool().deallocate(pRawMemory);
             pPanel = NULL;
         }
     }
@@ -101,15 +101,14 @@ Panel* Panel::create(WidgetPool& widgetPool,
 
 bool Panel::setupVisibilityExpr(DataContext* const pContext)
 {
-    bool res = false;
     const ExpressionTermType* const pType = m_pDdh->GetVisible();
-    if (NULL != pType)
+    const bool typeIsVisibility = (NULL != pType);
+    if (typeIsVisibility)
     {
         m_visibilityExpr.setup(pType, pContext);
         setVisibilityExpression(&m_visibilityExpr);
-        res = true;
     }
-    return res;
+    return typeIsVisibility;
 }
 
 void Panel::onUpdate(const U32 monotonicTimeMs)
@@ -117,7 +116,7 @@ void Panel::onUpdate(const U32 monotonicTimeMs)
     static_cast<void>(monotonicTimeMs);  // ignore unused variable
 }
 
-void Panel::onDraw(Canvas& /* canvas */, const Area& /* area */)
+void Panel::onDraw(Canvas& /* dst */, const Area& /* rect */) const
 {}
 
 bool Panel::onVerify(Canvas&, const Area&)

@@ -58,7 +58,7 @@ TEST_F(FrameHandlerTest, CreateTest)
     lsr::Database db(Telltales::getDDH());
     lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
     EXPECT_TRUE(fh.start());
-    EXPECT_EQ(LSR_NO_ERROR, fh.getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, fh.getError());
 }
 
 TEST_F(FrameHandlerTest, CreateTwiceTest)
@@ -67,7 +67,7 @@ TEST_F(FrameHandlerTest, CreateTwiceTest)
     lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
     EXPECT_TRUE(fh.start());
     EXPECT_TRUE(fh.start());
-    EXPECT_EQ(LSR_NO_ERROR, fh.getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, fh.getError());
 }
 
 TEST_F(FrameHandlerTest, GetErrorTest)
@@ -75,7 +75,7 @@ TEST_F(FrameHandlerTest, GetErrorTest)
     lsr::Database db(Telltales::getDDH());
     lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
     EXPECT_TRUE(fh.start());
-    EXPECT_EQ(LSR_NO_ERROR, fh.getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, fh.getError());
 }
 
 namespace testdb
@@ -138,13 +138,13 @@ TEST_F(FrameHandlerTest, GetErrorWithErrorInWidgetTest)
 
     fh.update(0U);
 
-    EXPECT_EQ(LSR_DATASTATUS_NOT_AVAIABLE, fh.getError());
+    EXPECT_EQ(LSR_ERR_DATASTATUS_NOT_AVAILABLE, fh.getError());
 }
 
 
 TEST_F(FrameHandlerTest, GetErrorWithErrorInWidgetSetupTest)
 {
-    EXPECT_EQ(2, MAX_PANELS_COUNT); // assumption for the test
+    EXPECT_EQ(2U, MAX_PANELS_COUNT); // assumption for the test
     const U32 panelCount = MAX_PANELS_COUNT + 1U;
     // Create too many panels for the page
 
@@ -209,7 +209,7 @@ TEST_F(FrameHandlerTest, VerifyTest)
     lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
 
     EXPECT_TRUE(fh.start());
-    EXPECT_EQ(LSR_NO_ERROR, fh.getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, fh.getError());
 
     fh.update(0U);
     EXPECT_TRUE(fh.verify());
@@ -225,7 +225,7 @@ TEST_F(FrameHandlerTest, DrawTest)
     lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
 
     EXPECT_TRUE(fh.start());
-    EXPECT_EQ(LSR_NO_ERROR, fh.getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, fh.getError());
 
     fh.update(0U);
     EXPECT_TRUE(fh.render());
@@ -241,7 +241,7 @@ TEST_F(FrameHandlerTest, RenderWithNotInvalidatedStateTest)
     lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
 
     EXPECT_TRUE(fh.start());
-    EXPECT_EQ(LSR_NO_ERROR, fh.getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, fh.getError());
 
     fh.update(0U);
     EXPECT_TRUE(fh.render());
@@ -262,7 +262,7 @@ TEST_F(FrameHandlerTest, HandleWindowEventsTest)
     lsr::FrameHandler fh(db, m_dataHandler, m_dsp);
 
     EXPECT_TRUE(fh.start());
-    EXPECT_EQ(LSR_NO_ERROR, fh.getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, fh.getError());
 
     fh.handleWindowEvents();
 

@@ -27,7 +27,7 @@
 #include "SelfCheckerClass.h"
 
 #include <PooledObjectFactory.h>
-#include <LSRError.h>
+#include <LSREngineError.h>
 
 #include <gtest/gtest.h>
 #include <cstddef>
@@ -83,12 +83,12 @@ public:
         delete m_factory;
     }
 
-    typename T::ObjectType* createObject(LSRError& error)
+    typename T::ObjectType* createObject(LSREngineError& error)
     {
         return m_factory->createObject(error);
     }
 
-    LSRError deleteObject(typename T::ObjectType* object)
+    LSREngineError deleteObject(typename T::ObjectType* object)
     {
         return m_factory->deleteObject(object);
     }
@@ -145,15 +145,15 @@ TYPED_TEST_CASE(PooledObjectFactoryTestBaseTypes, ImplForBaseTypes);
 template <class T>
 void Defragmentation(PooledObjectFactoryTest<T>* factory)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename T::ObjectType* objectFirst = factory->createObject(error);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), factory->deleteObject(objectFirst));
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), factory->deleteObject(objectFirst));
 
     // After deleting, another creating method should return the same address.
     typename T::ObjectType* objectSecond = factory->createObject(error);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
 
     EXPECT_EQ(objectFirst, objectSecond);
 }
@@ -161,73 +161,73 @@ void Defragmentation(PooledObjectFactoryTest<T>* factory)
 template <class T>
 void DeleteObject(PooledObjectFactoryTest<T>* factory)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename T::ObjectType* object = factory->createObject(error);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), factory->deleteObject(object));
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), factory->deleteObject(object));
 }
 
 template <class T>
 void DeleteObjectTwice(PooledObjectFactoryTest<T>* factory)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename T::ObjectType* object = factory->createObject(error);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), factory->deleteObject(object));
-    EXPECT_EQ(LSRError(LSR_POOL_DOUBLE_DELETE), factory->deleteObject(object));
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), factory->deleteObject(object));
+    EXPECT_EQ(LSREngineError(LSR_POOL_DOUBLE_DELETE), factory->deleteObject(object));
 }
 
 template <class T>
 void DeleteObjectWithNullPointer(PooledObjectFactoryTest<T>* factory)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     factory->createObject(error);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
 
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT), factory->deleteObject(NULL));
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT), factory->deleteObject(NULL));
 }
 
 template <class T>
 void DeleteObjectWithPointerFromAnotherBuffer(PooledObjectFactoryTest<T>* factory)
 {
     // Pointer to memory before storage
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename T::ObjectType* object = factory->createObject(error);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
 
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT), factory->deleteObject(object - 0x50U));
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT), factory->deleteObject(object - 0x50U));
 
     // Pointer to memory after storage
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT), factory->deleteObject(object + 0x7FFFU));
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT), factory->deleteObject(object + 0x7FFFU));
 }
 
 template <class T>
 void DeleteObjectWithShiftedPointer(PooledObjectFactoryTest<T>* factory)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     U8* ptr = reinterpret_cast<U8*>(factory->createObject(error));
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
 
     // check at the position < getCellSize
     typename T::ObjectType* object =
         reinterpret_cast<typename T::ObjectType*>(ptr + 1U);
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT), factory->deleteObject(object));
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT), factory->deleteObject(object));
 
     // check at the position > getCellSize
     object = reinterpret_cast<typename T::ObjectType*>(ptr - 1U);
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT), factory->deleteObject(object));
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT), factory->deleteObject(object));
 }
 
 template <class T>
 void CheckFactory(PooledObjectFactoryTest<T>* factory)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename T::ObjectType* object = factory->createObject(error);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), factory->deleteObject(object));
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), factory->deleteObject(object));
 
     EXPECT_TRUE(factory->checkFactory());
 }
@@ -239,195 +239,195 @@ TYPED_TEST(PooledObjectFactoryTest, CreateObject)
 {
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
-        LSRError error = LSR_NO_ERROR;
+        LSREngineError error = LSR_NO_ENGINE_ERROR;
         typename TypeParam::ObjectType* object = this->m_factory->createObject(error);
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
         EXPECT_TRUE(object->wasConstructed());
     }
 }
 
 TYPED_TEST(PooledObjectFactoryTest, CreateTooManyObjects)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
         typename TypeParam::ObjectType* object = this->m_factory->createObject(error);
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
         EXPECT_TRUE(object->wasConstructed());
     }
     typename TypeParam::ObjectType* object = this->m_factory->createObject(error);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
     EXPECT_EQ(NULL, object);
 }
 
 
 TYPED_TEST(PooledObjectFactoryTest, CreateObjectWithArg1)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename TypeParam::ObjectType* object = NULL;
     std::size_t i = 0U;
     for (; i < TypeParam::PoolSize::value; ++i)
     {
         object = this->m_factory->createObject(error, i);
         EXPECT_TRUE(object->wasConstructed());
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
 
     object = this->m_factory->createObject(error, i);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
     EXPECT_EQ(NULL, object);
 }
 
 TYPED_TEST(PooledObjectFactoryTest, CreateObjectWithArg2)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename TypeParam::ObjectType* object = NULL;
     std::size_t i = 0U;
     for (; i < TypeParam::PoolSize::value; ++i)
     {
         object = this->m_factory->createObject(error, i, i * 2);
         EXPECT_TRUE(object->wasConstructed());
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
 
     object = this->m_factory->createObject(error, i, i * 2);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
     EXPECT_EQ(NULL, object);
 }
 
 TYPED_TEST(PooledObjectFactoryTest, CreateObjectWithArg3)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename TypeParam::ObjectType* object = NULL;
     std::size_t i = 0U;
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
         object = this->m_factory->createObject(error, i, i * 2, i * 3);
         EXPECT_TRUE(object->wasConstructed());
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
 
     object = this->m_factory->createObject(error, i, i * 2, i * 3);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
     EXPECT_EQ(NULL, object);
 }
 
 TYPED_TEST(PooledObjectFactoryTest, CreateObjectWithArg4)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename TypeParam::ObjectType* object = NULL;
     std::size_t i = 0U;
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
         object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4);
         EXPECT_TRUE(object->wasConstructed());
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
 
     object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
     EXPECT_EQ(NULL, object);
 }
 
 TYPED_TEST(PooledObjectFactoryTest, CreateObjectWithArg5)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename TypeParam::ObjectType* object = NULL;
     std::size_t i = 0U;
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
         object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5);
         EXPECT_TRUE(object->wasConstructed());
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
 
     object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
     EXPECT_EQ(NULL, object);
 }
 
 TYPED_TEST(PooledObjectFactoryTest, CreateObjectWithArg6)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename TypeParam::ObjectType* object = NULL;
     std::size_t i = 0U;
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
         object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5, i * 6);
         EXPECT_TRUE(object->wasConstructed());
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
 
     object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5, i * 6);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
     EXPECT_EQ(NULL, object);
 }
 
 TYPED_TEST(PooledObjectFactoryTest, CreateObjectWithArg7)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename TypeParam::ObjectType* object = NULL;
     std::size_t i = 0U;
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
         object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5, i * 6, i * 7);
         EXPECT_TRUE(object->wasConstructed());
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
 
     object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5, i * 6, i * 7);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
     EXPECT_EQ(NULL, object);
 }
 
 TYPED_TEST(PooledObjectFactoryTest, CreateObjectWithArg8)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename TypeParam::ObjectType* object = NULL;
     std::size_t i = 0U;
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
         object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5, i * 6, i * 7, i * 8);
         EXPECT_TRUE(object->wasConstructed());
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
 
     object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5, i * 6, i * 7, i * 8);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
     EXPECT_EQ(NULL, object);
 }
 
 TYPED_TEST(PooledObjectFactoryTest, CreateObjectWithArg9)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename TypeParam::ObjectType* object = NULL;
     std::size_t i = 0U;
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
         object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5, i * 6, i * 7, i * 8, i * 9);
         EXPECT_TRUE(object->wasConstructed());
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
 
     object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5, i * 6, i * 7, i * 8, i * 9);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
     EXPECT_EQ(NULL, object);
 }
 
 TYPED_TEST(PooledObjectFactoryTest, CreateObjectWithArg10)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     typename TypeParam::ObjectType* object = NULL;
     std::size_t i = 0U;
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
         object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5, i * 6, i * 7, i * 8, i * 9, i * 10);
         EXPECT_TRUE(object->wasConstructed());
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
 
     object = this->m_factory->createObject(error, i, i * 2, i * 3, i * 4, i * 5, i * 6, i * 7, i * 8, i * 9, i * 10);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
     EXPECT_EQ(NULL, object);
 }
 
@@ -468,7 +468,7 @@ TYPED_TEST(PooledObjectFactoryTest, CheckFactory)
 
 TYPED_TEST(PooledObjectFactoryTest, CheckFactoryWithCorruptedMemory)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     U8* objectFirst = reinterpret_cast<U8*>(this->m_factory->createObject(error));
     U8* objectSecond = reinterpret_cast<U8*>(this->m_factory->createObject(error));
     const std::size_t cellSize = objectSecond - objectFirst;
@@ -483,25 +483,25 @@ TYPED_TEST(PooledObjectFactoryTest, CheckFactoryWithCorruptedMemory)
  */
 TYPED_TEST(PooledObjectFactoryTestBaseTypes, CreateObject)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
         this->m_factory->createObject(error);
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
 }
 
 TYPED_TEST(PooledObjectFactoryTestBaseTypes, CreateTooManyObjects)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
         this->m_factory->createObject(error);
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
     }
     typename TypeParam::ObjectType* object = this->m_factory->createObject(error);
     EXPECT_EQ(NULL, object);
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), error);
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), error);
 }
 
 TYPED_TEST(PooledObjectFactoryTestBaseTypes, Defragmentation)
@@ -541,7 +541,7 @@ TYPED_TEST(PooledObjectFactoryTestBaseTypes, CheckFactory)
 
 TYPED_TEST(PooledObjectFactoryTestBaseTypes, CheckFactoryWithCorruptedMemory)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     U8* objectFirst = reinterpret_cast<U8*>(this->m_factory->createObject(error));
     U8* objectSecond = reinterpret_cast<U8*>(this->m_factory->createObject(error));
     const std::size_t cellSize = objectSecond - objectFirst;

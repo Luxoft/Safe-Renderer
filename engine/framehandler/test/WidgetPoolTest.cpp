@@ -42,7 +42,7 @@
 #include <MockDataHandler.h>
 
 #include <Telltales.hpp>
-#include <LsrLimits.h>
+#include <LSRLimits.h>
 
 #include <gtest/gtest.h>
 
@@ -148,7 +148,7 @@ TEST(WidgetPoolTest, GetErrorTest)
 {
     lsr::WidgetPool widgetPool;
 
-    EXPECT_EQ(LSR_NO_ERROR, widgetPool.getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, widgetPool.getError());
 }
 
 TEST(WidgetPoolTest, GetErrorWithCorruptedBitmapPoolTest)

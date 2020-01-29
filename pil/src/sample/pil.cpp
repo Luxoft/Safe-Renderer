@@ -30,17 +30,6 @@
 
 extern "C"
 {
-
-    void pilError(uint32_t errorCode, const char* msg)
-    {
-        printf("pilError: %d %s\n", static_cast<int>(errorCode), msg);
-    }
-
-    void pilTrace(const char* msg)
-    {
-        printf("%s\n", msg);
-    }
-
     void pilAssert(const char* msg, const char* file, int32_t lineNo)
     {
         printf("Assertion failed in %s (%d): %s\n", file, lineNo, msg);

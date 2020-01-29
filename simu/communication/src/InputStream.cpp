@@ -36,11 +36,11 @@ InputStream::InputStream(const void* const pBuffer, const uint32_t bufferSize)
     : m_pBuffer(static_cast<const uint8_t*>(pBuffer))
     , m_bufferSize(bufferSize)
     , m_pos(0U)
-    , m_error(LSR_NO_ERROR)
+    , m_error(COM_NO_ERROR)
 {
     if ((NULL == m_pBuffer) || (0U == m_bufferSize))
     {
-        m_error = LSR_COMM_NOT_ENOUGH_BUFFER_SIZE;
+        m_error = COM_NOT_ENOUGH_BUFFER_SIZE;
         m_pBuffer = NULL;
         m_bufferSize = 0U;
     }
@@ -54,17 +54,17 @@ uint32_t InputStream::bytesToRead() const
 uint32_t InputStream::read(void* const pData, const uint32_t dataSize)
 {
     uint32_t sizeOfReadData = 0U;
-    if (m_error == LSR_NO_ERROR)
+    if (m_error == COM_NO_ERROR)
     {
         if ((NULL == pData) || (0U == dataSize))
         {
-            m_error = LSR_COMM_NOT_ENOUGH_INPUT_DATA;
+            m_error = COM_NOT_ENOUGH_INPUT_DATA;
         }
         else
         {
             if (dataSize > bytesToRead())
             {
-                m_error = LSR_COMM_NOT_ENOUGH_BUFFER_SIZE;
+                m_error = COM_NOT_ENOUGH_BUFFER_SIZE;
             }
             else
             {

@@ -29,7 +29,7 @@
 
 #include <stdint.h>
 
-#include "LSRError.h"
+#include "ComError.h"
 
 
 /**
@@ -50,13 +50,13 @@ public:
 
     void setBufferSize(uint32_t size);
     void setPos(uint32_t pos);
-    void setError(LSRError error);
+    void setError(lsr::ComError error);
 
 private:
     const uint8_t* m_buffer;
     uint32_t m_bufferSize;
     uint32_t m_pos;
-    LSRError m_error;
+    lsr::ComError m_error;
 };
 
 inline void InputStreamCorrupter::setBufferSize(uint32_t size)
@@ -69,7 +69,7 @@ inline void InputStreamCorrupter::setPos(uint32_t pos)
     m_pos = pos;
 }
 
-inline void InputStreamCorrupter::setError(LSRError error)
+inline void InputStreamCorrupter::setError(lsr::ComError error)
 {
     m_error = error;
 }

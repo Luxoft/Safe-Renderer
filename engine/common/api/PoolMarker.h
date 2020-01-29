@@ -82,7 +82,7 @@ inline PoolMarker<MarkerSize>::PoolMarker(const U8 data)
 template <std::size_t MarkerSize>
 inline PoolMarker<MarkerSize>::PoolMarker(const PoolMarker<MarkerSize>& rhs)
 {
-    memcpy(m_marker, rhs.m_marker, MarkerSize);
+    static_cast<void>(std::memcpy(m_marker, rhs.m_marker, MarkerSize));  // ignore return value
 }
 
 template <std::size_t MarkerSize>

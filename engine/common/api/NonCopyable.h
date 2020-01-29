@@ -27,7 +27,9 @@
 **
 ******************************************************************************/
 
-template<class T>
+namespace lsr
+{
+
 class NonCopyable
 {
 protected:
@@ -41,5 +43,7 @@ private:
     NonCopyable(const NonCopyable&);
     NonCopyable& operator=(const NonCopyable&);
 };
+
+} // namespace lsr
 
 #endif // POPULUSSC_NONCOPYABLE_H

@@ -48,7 +48,7 @@ public:
 
     MOCK_METHOD1(onUpdate, void (const U32));
 
-    MOCK_METHOD2(onDraw, void (lsr::Canvas&, const lsr::Area&));
+    MOCK_CONST_METHOD2(onDraw, void (lsr::Canvas&, const lsr::Area&));
 
     MOCK_METHOD2(onVerify, bool (lsr::Canvas&, const lsr::Area&));
 
@@ -77,7 +77,7 @@ public:
         Widget::setArea(area);
     }
 
-    void setError(LSRError error)
+    void setError(LSREngineError error)
     {
         Widget::setError(error);
     }

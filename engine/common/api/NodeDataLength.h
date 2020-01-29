@@ -67,6 +67,7 @@ struct DivRemainder
  *                         @c false otherwise. This parameter typically shouldn't be set by
  *                         user. It is a technical parameter.
  */
+// coverity[misra_cpp_2008_rule_14_7_1_violation] Used for calculations during preprocessing
 template <std::size_t ObjectSize, std::size_t AlignValue, bool RemainderIsZero>
 struct LengthWithRemainder
 {
@@ -101,6 +102,7 @@ struct LengthWithRemainder<ObjectSize, AlignValue, false>
  *                        @c false otherwise. This parameter typically shouldn't be set by
  *                        user. It is a technical parameter.
  */
+// coverity[misra_cpp_2008_rule_14_7_1_violation] Used for calculations during preprocessing
 template <std::size_t ObjectSize, std::size_t AlignValue, bool ObjectIsBigger>
 struct Length
 {
@@ -117,6 +119,7 @@ struct Length<ObjectSize, AlignValue, true>
     };
 };
 
+// coverity[misra_cpp_2008_rule_14_7_1_violation] Used for calculations during preprocessing
 template <std::size_t ObjectSize, std::size_t AlignValue>
 struct Length<ObjectSize, AlignValue, false>
 {

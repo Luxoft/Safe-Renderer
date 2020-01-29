@@ -29,10 +29,10 @@
 
 #include "gil.h"
 #include "LsrTypes.h"
+#include <DatabaseTypes.h>
 
 namespace lsr
 {
-struct LsrImage;
 
 class Texture
 {
@@ -49,7 +49,7 @@ public:
     /**
      * Bind the texture to the context
      */
-    void bind(GILContext ctx);
+    void bind(const GILContext ctx);
 
     U16 getWidth() const;
     U16 getHeight() const;

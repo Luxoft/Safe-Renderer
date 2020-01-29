@@ -38,7 +38,7 @@ TEST(OutputStreamTest, TestNormalInitialization)
     uint8_t buffer[1024] = {0u};
     OutputStream stream(buffer, sizeof(buffer));
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(0u, stream.bytesWritten());
     EXPECT_EQ(sizeof(buffer), stream.bytesAvailable());
     EXPECT_EQ(buffer, stream.getBuffer());
@@ -67,7 +67,7 @@ TEST(OutputStreamTest, TestInitializationWithZeroBuffer)
 {
     OutputStream stream(NULL, 0u);
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
     EXPECT_EQ(0u, stream.bytesWritten());
     EXPECT_EQ(0u, stream.bytesAvailable());
     EXPECT_EQ(NULL, stream.getBuffer());
@@ -78,14 +78,14 @@ TEST(OutputStreamTest, TestInitializationWithWrongBuffer)
     uint8_t buffer[1024] = {0u};
     OutputStream stream1(NULL, sizeof(buffer));
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream1.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream1.getError());
     EXPECT_EQ(0u, stream1.bytesWritten());
     EXPECT_EQ(0u, stream1.bytesAvailable());
     EXPECT_EQ(NULL, stream1.getBuffer());
 
     OutputStream stream2(buffer, 0u);
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream2.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream2.getError());
     EXPECT_EQ(0u, stream2.bytesWritten());
     EXPECT_EQ(0u, stream2.bytesAvailable());
     EXPECT_EQ(NULL, stream2.getBuffer());
@@ -126,10 +126,10 @@ TEST(InputStreamTest, TestBytesWrittenWithCorruptedData)
 
     uint16_t data16 = 50u;
     stream << data16;
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
     EXPECT_EQ(expected, stream.bytesWritten());
 
-    corrupter->setError(LSR_NO_ERROR);
+    corrupter->setError(COM_NO_ERROR);
 
     uint8_t data8 = 34u;
     stream << data8;
@@ -180,10 +180,10 @@ TEST(InputStreamTest, TestBytesAvailableWithCorruptedData)
 
     uint16_t data16 = 0;
     stream << data16;
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
     EXPECT_EQ(expected, stream.bytesAvailable());
 
-    corrupter->setError(LSR_NO_ERROR);
+    corrupter->setError(COM_NO_ERROR);
 
     corrupter->setPos(32);
     expected = 0;
@@ -206,7 +206,7 @@ TEST(OutputStreamTest, TestWrite)
     OutputStream stream(buffer, sizeof(buffer));
     uint32_t writtenDataSize = stream.write(expectedBuffer, sizeof(expectedBuffer));
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(sizeof(expectedBuffer), writtenDataSize);
 
     const uint8_t* actualBuffer = static_cast<const uint8_t*>(stream.getBuffer());
@@ -230,7 +230,7 @@ TEST(OutputStreamTest, TestWriteZeroData1)
     OutputStream stream(buffer, sizeof(buffer));
     uint32_t writtenDataSize = stream.write(NULL, sizeof(expectedBuffer));
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_INPUT_DATA), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_INPUT_DATA, stream.getError());
     EXPECT_EQ(0u, writtenDataSize);
 }
 
@@ -247,7 +247,7 @@ TEST(OutputStreamTest, TestWriteZeroData2)
     OutputStream stream(buffer, sizeof(buffer));
     uint32_t writtenDataSize = stream.write(expectedBuffer, 0);
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_INPUT_DATA), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_INPUT_DATA, stream.getError());
     EXPECT_EQ(0u, writtenDataSize);
 }
 
@@ -264,7 +264,7 @@ TEST(OutputStreamTest, TestWriteWithBigDataBySteps)
     const uint8_t* data = expectedBuffer;
     OutputStream stream(buffer, sizeof(buffer));
     uint32_t writtenDataSize = stream.write(data, sizeOfDataToWrite);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(sizeOfDataToWrite, writtenDataSize);
 
     const uint8_t* actualBuffer = static_cast<const uint8_t*>(stream.getBuffer());
@@ -276,7 +276,7 @@ TEST(OutputStreamTest, TestWriteWithBigDataBySteps)
 
     data += sizeOfDataToWrite;
     writtenDataSize = stream.write(data, sizeOfDataToWrite);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(sizeOfDataToWrite, writtenDataSize);
 
     for (uint8_t index = 0; index < stream.bytesWritten(); ++index)
@@ -286,7 +286,7 @@ TEST(OutputStreamTest, TestWriteWithBigDataBySteps)
 
     data += sizeOfDataToWrite;
     writtenDataSize = stream.write(data, sizeOfDataToWrite);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
     EXPECT_EQ(0u, writtenDataSize);
     for (uint8_t index = 0; index < stream.bytesWritten(); ++index)
     {
@@ -310,7 +310,7 @@ TEST(OutputStreamTest, TestWriteWithBigDataByOneStep)
 
     OutputStream stream(buffer, sizeof(buffer));
     stream.write(expectedBuffer, sizeof(expectedBuffer));
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 
     const uint8_t* actualBuffer = static_cast<const uint8_t*>(stream.getBuffer());
 
@@ -332,13 +332,13 @@ TEST(OutputStreamTest, TestWriteToFullBuffer)
 
     OutputStream stream(buffer, sizeof(buffer));
     stream.write(expectedBuffer, sizeof(expectedBuffer));
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     stream.write(expectedBuffer, sizeof(expectedBuffer));
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 
     stream.write(expectedBuffer, sizeof(expectedBuffer));
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(OutputStreamTest, TestOperatorWithBool)

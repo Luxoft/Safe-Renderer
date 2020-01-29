@@ -5,6 +5,7 @@
 **
 **   File:        PanelDatabaseType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,20 +32,24 @@
 
 namespace lsr
 {
-struct PanelType;
 
+/**
+ * PanelDatabaseType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct PanelDatabaseType
 {
-    const PanelType* const *panel;
-    const U16 panelCount;
+    const PanelType* const* const m_panel;
+    const U16 m_panelCount;
 
 
     /**
      * Returns the number of panel elements.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetPanelCount() const
     {
-        return panelCount;
+        return m_panelCount;
     }
 
     /**
@@ -52,9 +57,11 @@ struct PanelDatabaseType
      * This method checks the index and returns NULL if the item index exceeds the element count.
      *
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const PanelType* GetPanel(const U16 i) const
     {
-        return (i < panelCount) ? panel[i] : NULL;
+        // coverity[misra_cpp_2008_rule_5_0_15_violation]
+        return (i < m_panelCount) ? m_panel[i] : NULL;
     }
 
 };

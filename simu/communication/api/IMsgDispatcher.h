@@ -27,7 +27,7 @@
 **
 ******************************************************************************/
 
-#include "LSRError.h"
+#include "ComError.h"
 #include "LsrTypes.h"
 
 /*!
@@ -66,10 +66,10 @@ public:
     * @param messageType The type of message to receive.
     * @param minPayload The minimum accepted payload. Set to NO_PAYLOAD_LIMIT for no limit.
     * @param maxPayload The maximum accepted payload. Set to NO_PAYLOAD_LIMIT for no limit.
-    * @return LSR_NO_ERROR for success, error code otherwise. See @LSRError.
+    * @return COM_NO_ERROR for success, error code otherwise. See @ComError.
     *
     **/
-    virtual LSRError registerMsgReceiver(IMsgReceiver* const pMsgReceiver, const U8 messageType,
+    virtual ComError registerMsgReceiver(IMsgReceiver* const pMsgReceiver, const U8 messageType,
                                          const U32 minPayload = NO_PAYLOAD_LIMIT, const U32 maxPayload = NO_PAYLOAD_LIMIT) = 0;
 
     /**
@@ -77,10 +77,10 @@ public:
     *
     * @param pMsgReceiver The receiver that wants to unregister.
     * @param messageType The type of message to unregister from.
-    * @return LSR_NO_ERROR for success, error code otherwise.
+    * @return COM_NO_ERROR for success, error code otherwise.
     *
     **/
-    virtual LSRError unregisterMsgReceiver(IMsgReceiver* const pMsgReceiver, const U8 messageType) = 0;
+    virtual ComError unregisterMsgReceiver(IMsgReceiver* const pMsgReceiver, const U8 messageType) = 0;
 
     /**
     * Unregister all message receivers.
@@ -91,10 +91,10 @@ public:
      * Handles incoming data.
      *
      * @param msTimeout Maximum time to wait for new data.
-     * @return LSR_NO_ERROR for success, error code otherwise.
+     * @return COM_NO_ERROR for success, error code otherwise.
      *
      */
-    virtual LSRError handleIncomingData(const U32 msTimeout) = 0;
+    virtual ComError handleIncomingData(const U32 msTimeout) = 0;
 };
 
 } // namespace lsr

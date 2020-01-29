@@ -25,10 +25,10 @@ include_directories(
 )
 
 set(COMMUNICATION_HEADERS
+    ${COMMUNICATION_BASE}/api/ComError.h
     ${COMMUNICATION_BASE}/api/IMsgDispatcher.h
     ${COMMUNICATION_BASE}/api/IMsgReceiver.h
     ${COMMUNICATION_BASE}/api/IMsgTransmitter.h
-    ${COMMUNICATION_BASE}/api/IFuConnection.h
     ${COMMUNICATION_BASE}/api/InputStream.h
     ${COMMUNICATION_BASE}/api/MessageHeader.h
     ${COMMUNICATION_BASE}/api/OutputStream.h

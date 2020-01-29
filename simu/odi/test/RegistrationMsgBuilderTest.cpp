@@ -64,7 +64,7 @@ protected:
 
         stream << msg;
 
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+        EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
         const U16 expectedMsgSize = msg.getSize();
         EXPECT_EQ(expectedMsgSize, stream.bytesWritten());
@@ -84,7 +84,7 @@ protected:
 
         stream << msg;
 
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+        EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
         const U16 expectedMsgSize = msg.getSize();
         EXPECT_EQ(expectedMsgSize, stream.bytesWritten());
@@ -216,7 +216,7 @@ TEST_F(RegistrationMsgBuilderTest, TestSerializeWithNotEnoughBuffer)
     OutputStream stream(buffer, sizeof(buffer));
 
     stream << msg;
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(RegistrationMsgBuilderTest, TestSerializeWithWrongBuffer)
@@ -234,12 +234,12 @@ TEST_F(RegistrationMsgBuilderTest, TestSerializeWithWrongBuffer)
     stream1 << msg;
 
     EXPECT_EQ(0u, stream1.bytesWritten());
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream1.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream1.getError());
 
     OutputStream stream2(buffer, 0u);
     stream2 << msg;
 
     EXPECT_EQ(0u, stream2.bytesWritten());
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream2.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream2.getError());
 }
 

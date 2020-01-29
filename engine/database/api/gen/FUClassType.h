@@ -5,6 +5,7 @@
 **
 **   File:        FUClassType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,38 +32,44 @@
 
 namespace lsr
 {
-struct DynamicDataEntryType;
 
+/**
+ * FUClassType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct FUClassType
 {
-    const U16 fUClassId;
-    const bool internal;
-    const DynamicDataEntryType* const *dynamicDataEntry;
-    const U16 dynamicDataEntryCount;
+    const U16 m_fUClassId;
+    const bool m_internal;
+    const DynamicDataEntryType* const* const m_dynamicDataEntry;
+    const U16 m_dynamicDataEntryCount;
 
 
     /**
      * Returns the value of the fUClassId attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetFUClassId() const
     {
-        return fUClassId;
+        return m_fUClassId;
     }
 
     /**
      * Returns the value of the internal attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     bool GetInternal() const
     {
-        return internal;
+        return m_internal;
     }
 
     /**
      * Returns the number of dynamicDataEntry elements.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetDynamicDataEntryCount() const
     {
-        return dynamicDataEntryCount;
+        return m_dynamicDataEntryCount;
     }
 
     /**
@@ -70,9 +77,11 @@ struct FUClassType
      * This method checks the index and returns NULL if the item index exceeds the element count.
      *
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const DynamicDataEntryType* GetDynamicDataEntry(const U16 i) const
     {
-        return (i < dynamicDataEntryCount) ? dynamicDataEntry[i] : NULL;
+        // coverity[misra_cpp_2008_rule_5_0_15_violation]
+        return (i < m_dynamicDataEntryCount) ? m_dynamicDataEntry[i] : NULL;
     }
 
 };

@@ -84,7 +84,7 @@ TEST_F(MessageHeaderTest, TestConstrFromStream)
     InputStream stream(buffer, sizeof(buffer));
     MessageHeader msg = MessageHeader::fromStream(stream);
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     EXPECT_EQ(expectedType, msg.getType());
     EXPECT_EQ(expectedDataSize, msg.getDataSize());
@@ -107,7 +107,7 @@ TEST_F(MessageHeaderTest, TestSerialize)
 
     const U16 expectedMsgSize = m_header->getSize();
     stream << *m_header;
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(expectedMsgSize, stream.bytesWritten());
 
     U8* expectedBuffer = new U8[expectedMsgSize];
@@ -134,7 +134,7 @@ TEST_F(MessageHeaderTest, TestSerializeWithNotEnoughBuffer)
     OutputStream stream(buffer, sizeof(buffer));
 
     stream << *m_header;
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(MessageHeaderTest, TestSerializeWithWrongBuffer)
@@ -144,13 +144,13 @@ TEST_F(MessageHeaderTest, TestSerializeWithWrongBuffer)
     stream1 << *m_header;
 
     EXPECT_EQ(0u, stream1.bytesWritten());
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream1.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream1.getError());
 
     OutputStream stream2(buffer, 0u);
     stream2 << *m_header;
 
     EXPECT_EQ(0u, stream2.bytesWritten());
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream2.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream2.getError());
 }
 
 TEST_F(MessageHeaderTest, TestDeserialize)
@@ -166,7 +166,7 @@ TEST_F(MessageHeaderTest, TestDeserialize)
     InputStream stream(buffer, sizeof(buffer));
     stream >> *m_header;
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     EXPECT_EQ(m_type, m_header->getType());
     EXPECT_EQ(m_dataSize, m_header->getDataSize());
@@ -178,14 +178,14 @@ TEST_F(MessageHeaderTest, TestSerializeDeserialize)
     OutputStream outStream(buffer, sizeof(buffer));
 
     outStream << *m_header;
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), outStream.getError());
+    EXPECT_EQ(COM_NO_ERROR, outStream.getError());
 
     MessageHeader msg(MessageTypes::UNKNOWN, 0u);
 
     InputStream inStream(buffer, sizeof(buffer));
     inStream >> msg;
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), inStream.getError());
+    EXPECT_EQ(COM_NO_ERROR, inStream.getError());
 
     EXPECT_EQ(m_type, msg.getType());
     EXPECT_EQ(m_dataSize, msg.getDataSize());
@@ -203,7 +203,7 @@ TEST_F(MessageHeaderTest, TestDeserializeWithNotFullSize)
     InputStream stream(buffer, sizeof(buffer));
     stream >> *m_header;
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(MessageHeaderTest, TestDeserializeWithWrongMsgType)
@@ -219,7 +219,7 @@ TEST_F(MessageHeaderTest, TestDeserializeWithWrongMsgType)
     InputStream stream(buffer, sizeof(buffer));
     stream >> *m_header;
 
-    EXPECT_EQ(LSRError(LSR_COMM_INVALID_FIELD_IN_MSG), stream.getError());
+    EXPECT_EQ(COM_INVALID_FIELD_IN_MSG, stream.getError());
 }
 
 TEST_F(MessageHeaderTest, TestDeserializeWithWrongBuffer)
@@ -239,11 +239,11 @@ TEST_F(MessageHeaderTest, TestDeserializeWithWrongBuffer)
     MessageHeader msg1(expectedType, expectedDataSize);
     stream1 >> msg1;
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream1.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream1.getError());
 
     InputStream stream2(buffer, 0u);
     MessageHeader msg2(expectedType, expectedDataSize);
     stream2 >> msg2;
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream2.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream2.getError());
 }

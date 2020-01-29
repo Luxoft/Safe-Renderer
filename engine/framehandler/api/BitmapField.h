@@ -35,8 +35,6 @@
 namespace lsr
 {
 
-struct StaticBitmapFieldType;
-
 /**
  * Class provides functionality to draw Bitmap on some canvas.
  *
@@ -46,10 +44,10 @@ class BitmapField P_FINAL : public Field
 {
 public:
     /**
-     * Method creates a @c BitmapField object with given @c widgetPool according
+     * Method creates a @c BitmapField object with given @c WidgetPool according
      * to configuration @c ddh.
      *
-     * @param[in]  widgetPool pool which provides allocation an @c BitmapField object.
+     * @param[in]  factory    pool which provides allocation an @c BitmapField object.
      * @param[in]  db         object provides work with database.
      * @param[in]  pDdh       @c lsr::StaticBitmapFieldType ddh configuration.
      * @param[in]  pContext   data context, which shall be used for evaluation.
@@ -58,7 +56,7 @@ public:
      * @return pointer to @c BitmapField object if initialization of object was successful,
      *         @c NULL otherwise.
      */
-    static BitmapField* create(WidgetPool& widgetPool,
+    static BitmapField* create(WidgetPool& factory,
                                const Database& db,
                                const StaticBitmapFieldType* const pDdh,
                                DataContext* const pContext,
@@ -77,8 +75,8 @@ private:
      * Method initialize object.
      *
      * @param[in]  pContext data context, which shall be used for evaluation.
-     * @param[out] error    error state will be equal to @c LSR_NO_ERROR if
-     *                      operation succeeded, other @c LSRError values otherwise.
+     * @param[out] error    error state will be equal to @c LSR_NO_ENGINE_ERROR if
+     *                      operation succeeded, other @c LSREngineError values otherwise.
      *
      * @return @c true if object initialization succeeded, @c false otherwise.
      */
@@ -97,10 +95,10 @@ private:
      * Method draws itself on @c canvas if visible flag (see @c lsr::Widget::isVisible)
      * was risen up.
      *
-     * @param[in] canvas canvas to draw widget.
-     * @param[in] area area in absolute coordinates.
+     * @param[in] dst  destination canvas to draw widget.
+     * @param[in] rect area in absolute coordinates.
      */
-    virtual void onDraw(Canvas& canvas, const Area& area) P_OVERRIDE;
+    virtual void onDraw(Canvas& dst, const Area& rect) const P_OVERRIDE;
 
     /**
      * Method does nothing. It is a stub method

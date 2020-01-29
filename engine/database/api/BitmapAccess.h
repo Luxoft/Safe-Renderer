@@ -29,30 +29,27 @@
 
 #include "ResourceBuffer.h"
 #include "ddh_defs.h"
-#include "LSRError.h"
+#include "LSREngineError.h"
 #include "StaticBitmap.h"
 
 namespace lsr
 {
-
-struct DDHType;
-struct BitmapDefinitionType;
 
 class BitmapAccess
 {
 public:
     BitmapAccess(const DDHType* const ddh);
 
-    LSRError getError() const;
+    LSREngineError getError() const;
 
-    StaticBitmap getBitmap(const BitmapId bitmapId, const U16 skin) const;
+    StaticBitmap getBitmap(const BitmapId id, const U16 skin) const;
 
     const LsrImage* getBitmapBuffer(const StaticBitmap& bitmap) const;
 
 private:
-    const BitmapDefinitionType* getBitmapDefinition(const BitmapId bitmapId, const U16 skinIx) const;
+    const BitmapDefinitionType* getBitmapDefinition(const BitmapId id, const U16 skinIx) const;
     const DDHType* m_ddh;
-    LSRError m_error;
+    LSREngineError m_error;
 };
 
 } // namespace lsr

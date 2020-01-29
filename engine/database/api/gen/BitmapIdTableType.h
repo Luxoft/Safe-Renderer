@@ -5,6 +5,7 @@
 **
 **   File:        BitmapIdTableType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,20 +32,24 @@
 
 namespace lsr
 {
-struct EnumerationBitmapMapType;
 
+/**
+ * BitmapIdTableType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct BitmapIdTableType
 {
-    const EnumerationBitmapMapType* const *item;
-    const U16 itemCount;
+    const EnumerationBitmapMapType* const* const m_item;
+    const U16 m_itemCount;
 
 
     /**
      * Returns the number of item elements.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetItemCount() const
     {
-        return itemCount;
+        return m_itemCount;
     }
 
     /**
@@ -52,9 +57,11 @@ struct BitmapIdTableType
      * This method checks the index and returns NULL if the item index exceeds the element count.
      *
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const EnumerationBitmapMapType* GetItem(const U16 i) const
     {
-        return (i < itemCount) ? item[i] : NULL;
+        // coverity[misra_cpp_2008_rule_5_0_15_violation]
+        return (i < m_itemCount) ? m_item[i] : NULL;
     }
 
 };

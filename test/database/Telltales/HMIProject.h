@@ -1,10 +1,10 @@
-#ifndef LUXOFTSAFERENDERER_LSRLIMITS_H
-#define LUXOFTSAFERENDERER_LSRLIMITS_H
+#ifndef LUXOFTSAFERENDERER_HMIPROJECT_H
+#define LUXOFTSAFERENDERER_HMIPROJECT_H
 
 /******************************************************************************
 **
-**   File:        LsrLimits.h
-**   Description:
+**   File:        HMIProject.h
+**   Description: Redirection to generated database header
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -26,23 +26,6 @@
 **   SPDX-License-Identifier: LGPL-3.0
 **
 ******************************************************************************/
+#include "Output/Telltales.hpp"
 
-#include "LsrTypes.h"
-
-/**
- * Value describes maximum nesting level which @c lsr::Expression can have.
- */
-static const U32 MAX_EXPRESSION_NESTING = 8U;
-
-// FrameHandler constants
-static const U8 MAX_FRAMES_COUNT = 1U;
-static const U8 MAX_PANELS_COUNT = 2U;
-static const U8 MAX_BITMAPS_COUNT = 20U;
-static const U8 MAX_REFERENCE_BITMAPS_COUNT = 20U;
-static const U8 MAX_WINDOWS_COUNT = 1U;
-static const U8 MAX_WIDGET_CHILDREN_COUNT = 20U;
-
-// DataHandler constants
-static const U32 MAX_DYNAMIC_DATA = 40U;
-
-#endif // LUXOFTSAFERENDERER_LSRLIMITS_H
+#endif // LUXOFTSAFERENDERER_HMIPROJECT_H

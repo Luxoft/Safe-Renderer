@@ -5,6 +5,7 @@
 **
 **   File:        DynamicDataType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -32,26 +33,32 @@
 namespace lsr
 {
 
+/**
+ * DynamicDataType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct DynamicDataType
 {
-    const U32 fUDataId;
-    const DynamicDataTypeEnumeration type;
+    const U32 m_fUDataId;
+    const DynamicDataTypeEnumeration m_type;
 
 
     /**
      * Returns the value of the fUDataId attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U32 GetFUDataId() const
     {
-        return fUDataId;
+        return m_fUDataId;
     }
 
     /**
      * Returns the value of the type attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     DynamicDataTypeEnumeration GetType() const
     {
-        return type;
+        return m_type;
     }
 
 };

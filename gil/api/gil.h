@@ -43,7 +43,8 @@
 #ifndef GIL_H
 #define GIL_H
 
-#include <stdint.h>  // <cstdint> cannot be used (C++11)
+// coverity[misra_cpp_2008_rule_18_0_1_violation] <cstdint> cannot be used (C++11)
+#include <stdint.h>
 
 #ifdef WIN32
 #define GIL_API extern __declspec(dllexport)
@@ -57,14 +58,19 @@ extern "C"
 #endif
 
 typedef int32_t GILBoolean;
+// coverity[misra_cpp_2008_rule_7_3_1_violation] C interface
 typedef struct gil_config_t* GILConfig;
+// coverity[misra_cpp_2008_rule_7_3_1_violation] C interface
 typedef struct gil_surface_t* GILSurface;
+// coverity[misra_cpp_2008_rule_7_3_1_violation] C interface
 typedef struct gil_context_t* GILContext;
+// coverity[misra_cpp_2008_rule_7_3_1_violation] C interface
 typedef struct gil_texture_t* GILTexture;
 
 #define GIL_FALSE 0
 #define GIL_TRUE 1
 
+// coverity[misra_cpp_2008_rule_7_3_1_violation] C interface
 typedef enum
 {
     GIL_FORMAT_INVALID,
@@ -95,11 +101,11 @@ typedef enum
 
 typedef uint32_t GILError;
 
-#define GIL_NO_ERROR            0
-#define GIL_INVALID_CONTEXT     0x200
-#define GIL_INVALID_OPERATION   0x201
-#define GIL_INVALID_SURFACE     0x202
-#define GIL_INVALID_VALUE       0x203
+#define GIL_NO_ERROR            0U
+#define GIL_INVALID_CONTEXT     0x200U
+#define GIL_INVALID_OPERATION   0x201U
+#define GIL_INVALID_SURFACE     0x202U
+#define GIL_INVALID_VALUE       0x203U
 
 /**
  * Initializes the library.

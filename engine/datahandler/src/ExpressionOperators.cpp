@@ -145,6 +145,7 @@ DataStatus getTerms(const ExpressionType* const pExpression,
  *                              @c DataStatus::NOT_AVAILABLE status
  * @param[out] inconsistentList list with @c DataStatus::INCONSISTENT status
  */
+// coverity[misra_cpp_2008_rule_2_10_5_violation : FALSE] Template function instantiation
 template <std::size_t ExpressionsCount>
 void sortExpressionsResults(const ExpressionType* const pExpression,
                             DataContext* const pContext,
@@ -154,7 +155,6 @@ void sortExpressionsResults(const ExpressionType* const pExpression,
 {
     ASSERT(pExpression->GetTermCount() == ExpressionsCount);
 
-    DynamicDataTypeEnumeration type = DATATYPE_ENUM_SIZE;
     const U16 termCount = static_cast<U16>(ExpressionsCount);
     for (U16 i = 0U; i < termCount; ++i)
     {
@@ -165,13 +165,6 @@ void sortExpressionsResults(const ExpressionType* const pExpression,
         status = Expression::getNumber(pExpression->GetTerm(i),
                                        pContext,
                                        value);
-
-        if (type == DATATYPE_ENUM_SIZE)
-        {
-            type = value.getType();
-        }
-
-        ASSERT(type == value.getType());
 
         switch (status.getValue())
         {
@@ -207,6 +200,7 @@ void sortExpressionsResults(const ExpressionType* const pExpression,
  *
  * @return index of the majority element in the @c list.
  */
+// coverity[misra_cpp_2008_rule_2_10_5_violation : FALSE] Template function instantiation
 template <std::size_t ListSize>
 std::size_t getMajorValue(const NumberList<ListSize>& list, std::size_t& repeated)
 {
@@ -214,10 +208,14 @@ std::size_t getMajorValue(const NumberList<ListSize>& list, std::size_t& repeate
     std::size_t resIndex = 0U;
     for (std::size_t i = 0U; i < list.itemsCount(); ++i)
     {
+        const lsr::Number outerItem = list.item(i);
+
         std::size_t count = 1U;
-        for (std::size_t j = i + 1U; j <  list.itemsCount(); ++j)
+        for (std::size_t j = i + 1U; j < list.itemsCount(); ++j)
         {
-            if (list.item(i) == list.item(j))
+            const lsr::Number innerItem = list.item(j);
+
+            if (outerItem == innerItem)
             {
                 ++count;
             }
@@ -225,8 +223,11 @@ std::size_t getMajorValue(const NumberList<ListSize>& list, std::size_t& repeate
         if (repeated < count)
         {
             repeated = count;
+            static_cast<void>(resIndex);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             resIndex = i;
         }
+
+        static_cast<void>(outerItem);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
     }
 
     return resIndex;
@@ -244,7 +245,7 @@ std::size_t getMajorValue(const NumberList<ListSize>& list, std::size_t& repeate
  */
 BitmapId searchInTable(const BitmapIdTableType* const pTable, const Number& key, DataStatus& status)
 {
-    BitmapId ret = 0U;
+    BitmapId value = 0U;
     status = DataStatus::INVALID;
     ASSERT(NULL != pTable);
 
@@ -256,17 +257,19 @@ BitmapId searchInTable(const BitmapIdTableType* const pTable, const Number& key,
 
         if (pItem->GetKey() == key.getU32())
         {
-            ret = pItem->GetBitmapId();
+            static_cast<void>(value);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+            value = pItem->GetBitmapId();
             status = DataStatus::VALID;
             break;
         }
     }
 
-    return ret;
+    return value;
 }
 
 } // anonymous namespace
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus minMax(const ExpressionType* const pExpression,
                   DataContext* const pContext,
                   Number& value)
@@ -311,6 +314,7 @@ DataStatus minMax(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus equals(const ExpressionType* const pExpression,
                   DataContext* const pContext,
                   Number& value)
@@ -330,6 +334,7 @@ DataStatus equals(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus notEquals(const ExpressionType* const pExpression,
                      DataContext* const pContext,
                      Number& value)
@@ -341,6 +346,7 @@ DataStatus notEquals(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus lessThan(const ExpressionType* const pExpression,
                     DataContext* const pContext,
                     Number& value)
@@ -360,6 +366,7 @@ DataStatus lessThan(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus lessThanOrEquals(const ExpressionType* const pExpression,
                             DataContext* const pContext,
                             Number& value)
@@ -371,6 +378,7 @@ DataStatus lessThanOrEquals(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus greaterThan(const ExpressionType* const pExpression,
                        DataContext* const pContext,
                        Number& value)
@@ -390,6 +398,7 @@ DataStatus greaterThan(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus greaterThanOrEquals(const ExpressionType* const pExpression,
                                DataContext* const pContext,
                                Number& value)
@@ -401,6 +410,7 @@ DataStatus greaterThanOrEquals(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus itemAt(const ExpressionType* const pExpression,
                         DataContext* const pContext,
                         Number& value)
@@ -443,11 +453,13 @@ DataStatus itemAt(const ExpressionType* const pExpression,
                     value = defaultValue;
                 }
             }
+            static_cast<void>(id);  // suppress MISRA 0-1-6: Value is not used on this path
             break;
         }
         default:
         {
             status = DataStatus::INCONSISTENT;
+            static_cast<void>(id);  // suppress MISRA 0-1-6: Value is not used on this path
             break;
         }
         }
@@ -455,6 +467,7 @@ DataStatus itemAt(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus booleanAnd(const ExpressionType* const pExpression,
                       DataContext* const pContext,
                       Number& value)
@@ -482,6 +495,7 @@ DataStatus booleanAnd(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus booleanOr(const ExpressionType* const pExpression,
                      DataContext* const pContext,
                      Number& value)
@@ -543,6 +557,7 @@ DataStatus booleanNot(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus fallback(const ExpressionType* const pExpression,
                     DataContext* const pContext,
                     Number& value)
@@ -567,6 +582,7 @@ DataStatus fallback(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus fallback2(const ExpressionType* const pExpression,
                      DataContext* const pContext,
                      Number& value)
@@ -602,6 +618,7 @@ DataStatus fallback2(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus fallback3(const ExpressionType* const pExpression,
                      DataContext* const pContext,
                      Number& value)
@@ -644,6 +661,7 @@ DataStatus fallback3(const ExpressionType* const pExpression,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus redundancy(const ExpressionType* const pExpression,
                       DataContext* const pContext,
                       Number& value)
@@ -654,6 +672,7 @@ DataStatus redundancy(const ExpressionType* const pExpression,
 
     ASSERT(pExpression->GetTermCount() == expressionsCount);
 
+    static_cast<void>(expressionsCount);  // Coverity: MISRA 3-4-1 fix (Variable cannot be used in an inner scope. Coverity bug?)
     NumberList<expressionsCount> validList;
     NumberList<expressionsCount> invalidList;
     NumberList<expressionsCount> inconsistentList;

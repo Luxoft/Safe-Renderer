@@ -9,26 +9,22 @@
 ******************************************************************************/
 
 #include "LsrTypes.h"
-
-namespace lsr
-{
-    struct DDHType;
-} // namespace lsr
+#include <DatabaseTypes.h>
 
 namespace Telltales
 {
 
-static const U32 FUSETTINGS_DISPLAYUNITS = ((1U << 16U) + 1U);
-static const U32 FUSETTINGS_DISPLAYLANGUAGE = ((1U << 16U) + 2U);
-static const U32 FUSETTINGS_DISPLAYTIMENOTATION = ((1U << 16U) + 3U);
-static const U32 FUSETTINGS_SKINVALUE = ((1U << 16U) + 4U);
-static const U32 FUSETTINGS_TIMEOFDAY = ((1U << 16U) + 5U);
-static const U32 FUSETTINGS_CURRENTDATE = ((1U << 16U) + 6U);
-static const U32 FUTELLTALES_BREAKON = ((42U << 16U) + 1U);
-static const U32 FUTELLTALES_BREAKOFF = ((42U << 16U) + 2U);
-static const U32 FUTELLTALES_AIRBAG = ((42U << 16U) + 3U);
-static const U32 INTERNALFU_BREAKERRORCOUNT = ((255U << 16U) + 1U);
-static const U32 INTERNALFU_AIRBAGERRORCOUNT = ((255U << 16U) + 2U);
+static const U32 FUSETTINGS_DISPLAYUNITS = 0x00010001U;  // FU:1 DataId:1
+static const U32 FUSETTINGS_DISPLAYLANGUAGE = 0x00010002U;  // FU:1 DataId:2
+static const U32 FUSETTINGS_DISPLAYTIMENOTATION = 0x00010003U;  // FU:1 DataId:3
+static const U32 FUSETTINGS_SKINVALUE = 0x00010004U;  // FU:1 DataId:4
+static const U32 FUSETTINGS_TIMEOFDAY = 0x00010005U;  // FU:1 DataId:5
+static const U32 FUSETTINGS_CURRENTDATE = 0x00010006U;  // FU:1 DataId:6
+static const U32 FUTELLTALES_BREAKON = 0x002a0001U;  // FU:42 DataId:1
+static const U32 FUTELLTALES_BREAKOFF = 0x002a0002U;  // FU:42 DataId:2
+static const U32 FUTELLTALES_AIRBAG = 0x002a0003U;  // FU:42 DataId:3
+static const U32 INTERNALFU_BREAKERRORCOUNT = 0x00ff0001U;  // FU:255 DataId:1
+static const U32 INTERNALFU_AIRBAGERRORCOUNT = 0x00ff0002U;  // FU:255 DataId:2
 
 static const U32 FRAME_COUNT = 1U;
 static const U32 PANEL_COUNT = 2U;

@@ -28,7 +28,7 @@
 #include "ExpressionOperators.h"
 
 #include <Assertion.h>
-#include <LsrLimits.h>
+#include <LSRLimits.h>
 
 #include <ExpressionType.h>
 
@@ -78,7 +78,7 @@ DataStatus Expression::getNumber(const ExpressionTermType* const pTerm,
 {
     DataStatus status = DataStatus::INCONSISTENT;
 
-    if ((NULL != pContext) && (MAX_EXPRESSION_NESTING > pContext->getNestingCounter()))
+    if ((NULL != pContext) && (MAX_EXPRESSION_NESTING >= pContext->getNestingCounter()))
     {
         NestingCounterHelper nestingCounter(*pContext);
 
@@ -91,7 +91,7 @@ DataStatus Expression::getNumber(const ExpressionTermType* const pTerm,
             const DynamicDataType* const pData = pTerm->GetDynamicData();
 
             ASSERT(NULL != pData);
-            status = dh.getNumber(pData, value);
+            status = dh.getNumber(DynamicData(pData), value);
             break;
         }
         case ExpressionTermType::EXPRESSION_CHOICE:
@@ -141,6 +141,7 @@ DataStatus Expression::getBool(const ExpressionTermType* const pTerm,
     return status;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and mitigated by MAX_EXPRESSION_NESTING
 DataStatus Expression::calcNumber(const ExpressionType* const pExpression,
                                   DataContext* const pContext,
                                   Number& value)

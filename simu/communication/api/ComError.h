@@ -1,10 +1,10 @@
-#ifndef LUXOFTSAFERENDERER_IFUCONNECTION_H
-#define LUXOFTSAFERENDERER_IFUCONNECTION_H
+#ifndef LUXOFTSAFERENDERER_COM_ERROR_H
+#define LUXOFTSAFERENDERER_COM_ERROR_H
 
 /******************************************************************************
 **
-**   File:        IFuConnection.h
-**   Description:
+**   File:        ComError.h
+**   Description: Error codes for communication and odi
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -27,34 +27,17 @@
 **
 ******************************************************************************/
 
-#include "PilMsgTransmitter.h"
-
-/*!
-* @addtogroup lsr
-* @{
-*/
-
 namespace lsr
 {
-
-/**
- * Interface for FU activation.
- */
-class IFuConnection
-{
-public:
-    /**
-    * Send registration message to given transmitter.
-    *
-    * @param[in] The pointer to PilMsgTransmitter transmitter object.
-    * @return LSR_NO_ERROR for success, error code otherwise.
-    *
-    */
-    virtual LSRError registerFu(PilMsgTransmitter*) = 0;
-};
-
+    enum ComError
+    {
+        COM_NO_ERROR,
+        COM_UNKNOWN_ERROR,
+        COM_INVALID_MESSAGE_TYPE,
+        COM_NOT_ENOUGH_BUFFER_SIZE,
+        COM_INVALID_FIELD_IN_MSG,
+        COM_NOT_ENOUGH_INPUT_DATA,
+    };
 } // namespace lsr
 
-/*! @} */
-
-#endif // LUXOFTSAFERENDERER_IFUCONNECTION_H
+#endif // LUXOFTSAFERENDERER_COM_ERROR_H

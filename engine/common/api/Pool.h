@@ -28,7 +28,7 @@
 ******************************************************************************/
 
 #include "LsrTypes.h"
-#include "LSRError.h"
+#include "LSREngineError.h"
 #include "NodeDataLength.h"
 #include "PoolMarker.h"
 
@@ -72,16 +72,16 @@ public:
 
     /**
      * Methods searches the first free block in the internal storage and returns pointer to it.
-     * If some errors occur, the @c error flag will be set. See @c LSRError.
+     * If some errors occur, the @c error flag will be set. See @c LSREngineError.
      *
      * @param[out] error the error value which should be set during operation execution.
-     *                   If this value is equal to @c LSR_NO_ERROR, allocation
+     *                   If this value is equal to @c LSR_NO_ENGINE_ERROR, allocation
      *                   finished successfully, and failed in other cases.
      *
      * @return pointer to the first free memory block if it exists, @c NULL otherwise.
-     *         Returned pointer is not equal to NULL only if @c error == @c LSR_NO_ERROR.
+     *         Returned pointer is not equal to NULL only if @c error == @c LSR_NO_ENGINE_ERROR.
      */
-    void* allocate(LSRError& error);
+    void* allocate(LSREngineError& error);
 
     /**
      * Method sets to zero the memory block to which @c ptr points
@@ -92,10 +92,10 @@ public:
      *
      * @param[in] ptr pointer to the block which should be deallocated.
      *
-     * @return @c LSR_NO_ERROR if deallocation was successful, and other values of
-     *         @c LSRError in other cases.
+     * @return @c LSR_NO_ENGINE_ERROR if deallocation was successful, and other values of
+     *         @c LSREngineError in other cases.
      */
-    LSRError deallocate(void* const ptr);
+    LSREngineError deallocate(void* const ptr);
 
     /**
      * Method checks if @c ptr is a pointer to a valid object inside internal storage.
@@ -130,6 +130,7 @@ private:
      */
     struct Node
     {
+        // coverity[misra_cpp_2008_rule_9_5_1_violation]
         union NodeBody
         {
             /**
@@ -173,30 +174,42 @@ inline Pool<T, PoolSize, AlignValue>::Pool()
     , m_markerFree(MARKER_FREE_CHAR)
     , m_markerBusy(MARKER_BUSY_CHAR)
 {
+    // coverity[misra_cpp_2008_rule_0_1_2_violation] Template parameter
     static const std::size_t lastIndex = (PoolSize - 1U);
 
+    // coverity[misra_cpp_2008_rule_5_2_7_violation]
     m_pFreeList = reinterpret_cast<Node*>(m_storage);
-    for (std::size_t i = 0U; i < lastIndex; ++i)
+    if (lastIndex > 0U)
     {
-        m_pFreeList[i].body.next = &m_pFreeList[i+1U];
-        m_pFreeList[i].marker = m_markerFree;
+        for (std::size_t i = 0U; i < lastIndex; ++i)
+        {
+            // coverity[misra_cpp_2008_rule_5_0_15_violation]
+            Node& currentNode = m_pFreeList[i];
+            // coverity[misra_cpp_2008_rule_5_0_15_violation]
+            currentNode.body.next = &m_pFreeList[i + 1U];
+            currentNode.marker = m_markerFree;
+        }
     }
-    m_pFreeList[lastIndex].body.next = NULL;
-    m_pFreeList[lastIndex].marker = m_markerFree;
+
+    // coverity[misra_cpp_2008_rule_5_0_15_violation]
+    Node& lastNode = m_pFreeList[lastIndex];
+    lastNode.body.next = NULL;
+    lastNode.marker = m_markerFree;
 }
 
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
-inline void* Pool<T, PoolSize, AlignValue>::allocate(LSRError& error)
+inline void* Pool<T, PoolSize, AlignValue>::allocate(LSREngineError& error)
 {
     void* pData = NULL;
     if (checkPool())
     {
         if (m_pFreeList != NULL)
         {
+            static_cast<void>(pData);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             pData = m_pFreeList->body.data;
             m_pFreeList->marker = m_markerBusy;
             m_pFreeList = m_pFreeList->body.next;
-            error = LSR_NO_ERROR;
+            error = LSR_NO_ENGINE_ERROR;
         }
         else
         {
@@ -207,13 +220,14 @@ inline void* Pool<T, PoolSize, AlignValue>::allocate(LSRError& error)
     {
         error = LSR_POOL_IS_CORRUPTED;
     }
+    // coverity[misra_cpp_2008_rule_9_3_2_violation]
     return pData;
 }
 
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
-inline LSRError Pool<T, PoolSize, AlignValue>::deallocate(void* const ptr)
+inline LSREngineError Pool<T, PoolSize, AlignValue>::deallocate(void* const ptr)
 {
-    LSRError res = LSR_NO_ERROR;
+    LSREngineError res = LSR_NO_ENGINE_ERROR;
     if (checkPool())
     {
         // Check if ptr points inside the storage and to the beginning of the Node.
@@ -222,24 +236,29 @@ inline LSRError Pool<T, PoolSize, AlignValue>::deallocate(void* const ptr)
             // Check if this is not double deallocation
             if (!checkObjectIsFree(ptr))
             {
+                // coverity[misra_cpp_2008_rule_5_2_8_violation]
                 Node* const pNode = static_cast<Node*>(ptr);
                 static_cast<void>(std::memset(pNode->body.data, 0, sizeof(T)));  // ignore return value
                 pNode->body.next = m_pFreeList;
                 pNode->marker = m_markerFree;
                 m_pFreeList = pNode;
+                static_cast<void>(res);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             }
             else
             {
+                static_cast<void>(res);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
                 res = LSR_POOL_DOUBLE_DELETE;
             }
         }
         else
         {
+            static_cast<void>(res);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             res = LSR_POOL_INVALID_OBJECT;
         }
     }
     else
     {
+        static_cast<void>(res);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
         res = LSR_POOL_IS_CORRUPTED;
     }
     return res;
@@ -266,22 +285,27 @@ inline bool Pool<T, PoolSize, AlignValue>::isAllocated(const void* const ptr) co
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
 inline bool Pool<T, PoolSize, AlignValue>::checkObjectIsInsideStorage(const void* const ptr) const
 {
+    // coverity[misra_cpp_2008_rule_5_2_8_violation]
     const U8* const tmpPtr = reinterpret_cast<const U8* const>(ptr);
+    // coverity[misra_cpp_2008_rule_5_0_15_violation]
     return (tmpPtr >= m_storage) && (tmpPtr < (m_storage + sizeof(m_storage)));
 }
 
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
 inline bool Pool<T, PoolSize, AlignValue>::checkBeginningOfObject(const void* const ptr) const
 {
+    // coverity[misra_cpp_2008_rule_5_2_8_violation]
     const U8* const tmpPtr = reinterpret_cast<const U8* const>(ptr);
-    const std::size_t length = tmpPtr - m_storage;
+    // coverity[misra_cpp_2008_rule_5_0_15_violation]
+    const std::ptrdiff_t length = (tmpPtr - m_storage);
 
-    return ((length == 0U) || ((length >= sizeof(Node)) && ((length % sizeof(Node)) == 0U)));
+    return ((length == 0) || ((length >= static_cast<ptrdiff_t>(sizeof(Node))) && ((length % static_cast<ptrdiff_t>(sizeof(Node))) == 0)));
 }
 
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
 inline bool Pool<T, PoolSize, AlignValue>::checkMarker(const void* const ptr) const
 {
+    // coverity[misra_cpp_2008_rule_5_2_8_violation]
     const Node* const pNode = reinterpret_cast<const Node* const>(ptr);
     return (pNode->marker == m_markerBusy) || (pNode->marker == m_markerFree);
 }
@@ -290,13 +314,9 @@ template<class T, std::size_t PoolSize, std::size_t AlignValue>
 inline bool Pool<T, PoolSize, AlignValue>::checkStorage() const
 {
     bool res = true;
-    for (std::size_t idx = 0U; idx < sizeof(m_storage); idx += sizeof(Node))
+    for (std::size_t idx = 0U; res && (idx < sizeof(m_storage)); idx += sizeof(Node))
     {
-        if (!checkMarker(&m_storage[idx]))
-        {
-            res = false;
-            break;
-        }
+        res = checkMarker(&m_storage[idx]);
     }
     return res;
 }
@@ -311,6 +331,7 @@ inline bool Pool<T, PoolSize, AlignValue>::checkStandardMarkers() const
 template<class T, std::size_t PoolSize, std::size_t AlignValue>
 inline bool Pool<T, PoolSize, AlignValue>::checkObjectIsFree(const void* const ptr) const
 {
+    // coverity[misra_cpp_2008_rule_5_2_8_violation]
     const Node* const pNode = static_cast<const Node* const>(ptr);
     return pNode->marker == m_markerFree;
 }
@@ -334,10 +355,13 @@ inline bool Pool<T, PoolSize, AlignValue>::checkFreeList() const
         res = checkObjectIsInsideStorage(ptr)
            && checkBeginningOfObject(ptr)
            && checkObjectIsFree(ptr);
-
-        const Node* pNode = static_cast<const Node*>(ptr);
-        ptr = pNode->body.next;
-        ++nodeCounter;
+        if (res)
+        {
+            // coverity[misra_cpp_2008_rule_5_2_8_violation]
+            const Node* const pNode = static_cast<const Node*>(ptr);
+            ptr = pNode->body.next;
+            ++nodeCounter;
+        }
     }
 
     /**

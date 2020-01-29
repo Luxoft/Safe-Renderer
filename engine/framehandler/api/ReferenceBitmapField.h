@@ -35,9 +35,6 @@
 namespace lsr
 {
 
-struct ReferenceBitmapFieldType;
-
-
 /**
  * A non-drawing widget which checks video output.
  *
@@ -51,20 +48,20 @@ class ReferenceBitmapField P_FINAL : public Field
 {
 public:
     /**
-     * Method creates a @c ReferenceBitmapField object with given @c widgetPool according
+     * Method creates a @c ReferenceBitmapField object with given @c WidgetPool according
      * to configuration @c pDdh.
      *
-     * @param[in]  widgetPool pool which provides allocation an @c BitmapField object.
+     * @param[in]  factory    pool which provides allocation an @c BitmapField object.
      * @param[in]  db         object provides work with database.
      * @param[in]  pDdh       @c lsr::StaticBitmapFieldType ddh configuration.
      * @param[in]  pContext   data context, which shall be used for evaluation.
-     * @param[out] error      error state will be equal to @c LSR_NO_ERROR if
-     *                        operation succeeded, other @c LSRError values otherwise.
+     * @param[out] error      error state will be equal to @c LSR_NO_ENGINE_ERROR if
+     *                        operation succeeded, other @c LSREngineError values otherwise.
      *
      * @return pointer to @c ReferenceBitmapField object if initialization of object
      *         was successful, @c NULL otherwise.
      */
-    static ReferenceBitmapField* create(WidgetPool& widgetPool,
+    static ReferenceBitmapField* create(WidgetPool& factory,
                                         const Database& db,
                                         const ReferenceBitmapFieldType* const pDdh,
                                         DataContext* const pContext,
@@ -83,8 +80,8 @@ private:
      * Method initialize object.
      *
      * @param[in]  pContext data context, which shall be used for evaluation.
-     * @param[out] error    error state will be equal to @c LSR_NO_ERROR if
-     *                      operation succeeded, other @c LSRError values otherwise.
+     * @param[out] error    error state will be equal to @c LSR_NO_ENGINE_ERROR if
+     *                      operation succeeded, other @c LSREngineError values otherwise.
      *
      * @return @c true if object initialization succeeded, @c false otherwise.
      */
@@ -102,20 +99,20 @@ private:
     /**
      * Method does nothing. This widget can't be drawn.
      */
-    virtual void onDraw(Canvas&, const Area&) P_OVERRIDE;
+    virtual void onDraw(Canvas&, const Area&) const P_OVERRIDE;
 
     /**
-     * If visible flag is enabled, method performs video checking with @c canvas object.
+     * If visible flag is enabled, method performs video checking with @c Canvas object.
      *
      * If check fails, the error counter inside @c DataHandler will be incremented.
      * See @c IncrementErrorCounter.
      *
-     * @param[in] canvas canvas object which provides checking functionality.
-     * @param[in] area area in absolute coordinates.
+     * @param[in] dst  destination canvas object which provides checking functionality.
+     * @param[in] rect area in absolute coordinates.
      *
      * @return @true if check successes or visible flag is @c false, @c false otherwise.
      */
-    virtual bool onVerify(Canvas& canvas, const Area& area) P_OVERRIDE;
+    virtual bool onVerify(Canvas& dst, const Area& rect) P_OVERRIDE;
 
     /**
      * Method returns type of the widget.

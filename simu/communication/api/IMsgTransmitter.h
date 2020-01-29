@@ -27,7 +27,7 @@
 **
 ******************************************************************************/
 
-#include "LSRError.h"
+#include "ComError.h"
 #include "LsrTypes.h"
 
 /*!
@@ -56,10 +56,10 @@ public:
     * @param[in] data pointer to the data to send. This data should have
     *                 message header (see @c lsr::MessageHeader) and data.
     * @param[in] dataLen the length of the data in bytes
-    * @return LSR_NO_ERROR for success, error code otherwise
+    * @return COM_NO_ERROR for success, error code otherwise
     *
     */
-    virtual LSRError transmitMessage(const U8* const data, const U32 dataLen) = 0;
+    virtual ComError transmitMessage(const U8* const data, const U32 dataLen) = 0;
 
 };
 

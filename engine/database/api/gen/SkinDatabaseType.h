@@ -5,6 +5,7 @@
 **
 **   File:        SkinDatabaseType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,20 +32,24 @@
 
 namespace lsr
 {
-struct SkinType;
 
+/**
+ * SkinDatabaseType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct SkinDatabaseType
 {
-    const SkinType* const *skin;
-    const U16 skinCount;
+    const SkinType* const* const m_skin;
+    const U16 m_skinCount;
 
 
     /**
      * Returns the number of skin elements.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetSkinCount() const
     {
-        return skinCount;
+        return m_skinCount;
     }
 
     /**
@@ -52,9 +57,11 @@ struct SkinDatabaseType
      * This method checks the index and returns NULL if the item index exceeds the element count.
      *
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const SkinType* GetSkin(const U16 i) const
     {
-        return (i < skinCount) ? skin[i] : NULL;
+        // coverity[misra_cpp_2008_rule_5_0_15_violation]
+        return (i < m_skinCount) ? m_skin[i] : NULL;
     }
 
 };

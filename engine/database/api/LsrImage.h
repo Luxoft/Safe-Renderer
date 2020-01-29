@@ -79,7 +79,7 @@ namespace LsrImageTypes
         const U32 clutSize; ///< The number of colors in the clut
         const U32 imageDataSize; ///< The size of the frame image data in bytes
         const U32 pitch; ///< The number of pixels (not bytes) in a row. Could be more than width
-        const PixelFormat pixelFormat; ///< The format of the pixels
+        const PixelFormat format; ///< The format of the pixels
         const U8 bitDepth; ///< Bits per pixel (if palette is used)
     };
 }
@@ -103,7 +103,7 @@ struct LsrImage
 
     LsrImageTypes::PixelFormat getPixelFormat() const
     {
-        return header.pixelFormat;
+        return header.format;
     }
 
     const void* getPixelData() const

@@ -103,9 +103,9 @@ public:
     void SetTimeout(U32 timeout);
 
     // IMsgDispatcher
-    LSRError registerMsgReceiver(IMsgReceiver* const pMsgReceiver, const U8 messageType,
+    ComError registerMsgReceiver(IMsgReceiver* const pMsgReceiver, const U8 messageType,
         const U32 minPayload = IMsgDispatcher::NO_PAYLOAD_LIMIT, const U32 maxPayload = IMsgDispatcher::NO_PAYLOAD_LIMIT) P_OVERRIDE;
-    LSRError unregisterMsgReceiver(IMsgReceiver* const pMsgReceiver, const U8 messageType) P_OVERRIDE;
+    ComError unregisterMsgReceiver(IMsgReceiver* const pMsgReceiver, const U8 messageType) P_OVERRIDE;
     void unregisterAllMsgReceivers() P_OVERRIDE;
 
     /**
@@ -117,7 +117,7 @@ public:
      *                  take longer time depending on callback functions.
      */
 
-    LSRError handleIncomingData(const U32 msTimeout) P_OVERRIDE;
+    ComError handleIncomingData(const U32 msTimeout) P_OVERRIDE;
 
     /**
      * Create a connection over TCP/IP. Note: The Function uses a non blocking socket

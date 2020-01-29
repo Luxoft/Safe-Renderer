@@ -27,7 +27,8 @@
 **
 ******************************************************************************/
 
-#include <stdint.h>  // <cstdint> cannot be used (C++11)
+// coverity[misra_cpp_2008_rule_18_0_1_violation] <cstdint> cannot be used (C++11)
+#include <stdint.h>
 #include <cstring>
 
 #if(_MSC_VER >= 1800 || __cplusplus >= 201103L)
@@ -82,6 +83,7 @@
 * @{
 */
 
+typedef char char_t;
 typedef int8_t I8;
 typedef uint8_t U8;
 typedef uint16_t C16;
@@ -91,9 +93,6 @@ typedef int32_t I32;
 typedef uint32_t U32;
 typedef uint64_t U64;
 typedef int64_t I64;
-
-typedef float F32;
-typedef double F64;
 
 typedef U16 DataId; ///< The numerical ID for a dynamic data type in a FU
 typedef U16 FUClassId; ///< The numerical ID for a FU Class.
@@ -129,6 +128,21 @@ typedef double P_MAX_ALIGN;
 /** An unsigned 32-bit integer with a range from 0 to 0xFFFFFFFF. */
 #define U32_MIN (0) ///< The smallest possible value for a ::U32.
 #define U32_MAX (0xFFFFFFFF) ///< The largest possible value for a ::U32.
+
+
+// forward declarations (to avoid MISRA 3-2-3)
+namespace lsr
+{
+
+class Area;
+class DataContext;
+class Database;
+class DisplayManager;
+class StaticBitmap;
+class Window;
+
+} // namespace lsr
+
 
 /*! @} */
 

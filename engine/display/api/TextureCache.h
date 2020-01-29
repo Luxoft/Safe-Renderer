@@ -29,12 +29,10 @@
 
 #include "gil.h"
 #include "Texture.h"
+#include <LSRLimits.h>
 
 namespace lsr
 {
-
-class StaticBitmap;
-class DisplayManager;
 
 class TextureCache
 {
@@ -49,10 +47,6 @@ public:
     Texture* load(const StaticBitmap& bmp);
 
 private:
-    enum
-    {
-        MAX_TEXTURES = 40 // TODO: limits.h
-    };
     const DisplayManager& m_displayManager;
     Texture m_textures[MAX_TEXTURES];
 };

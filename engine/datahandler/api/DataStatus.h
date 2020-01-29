@@ -27,7 +27,7 @@
 **
 ******************************************************************************/
 
-#include <LSRError.h>
+#include <LSREngineError.h>
 
 namespace lsr
 {
@@ -60,7 +60,7 @@ public:
 
     DataStatus::Enum getValue() const;
 
-    LSRError convertToLSRError() const;
+    LSREngineError convertToLSRError() const;
 
 private:
     friend bool operator==(const DataStatus& lhs, const DataStatus& rhs);
@@ -81,23 +81,27 @@ inline DataStatus::Enum DataStatus::getValue() const
     return m_status;
 }
 
-inline LSRError DataStatus::convertToLSRError() const
+inline LSREngineError DataStatus::convertToLSRError() const
 {
-    LSRError res = LSR_UNKNOWN_ERROR;
+    LSREngineError res = LSR_NO_ENGINE_ERROR;
 
     switch (m_status)
     {
     case VALID:
-        res = LSR_NO_ERROR;
+        static_cast<void>(res);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+        res = LSR_NO_ENGINE_ERROR;
         break;
     case INVALID:
-        res = LSR_DATASTATUS_INVALID;
+        static_cast<void>(res);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+        res = LSR_ERR_DATASTATUS_INVALID;
         break;
     case NOT_AVAILABLE:
-        res = LSR_DATASTATUS_NOT_AVAIABLE;
+        static_cast<void>(res);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+        res = LSR_ERR_DATASTATUS_NOT_AVAILABLE;
         break;
     default:
-        res = LSR_DATASTATUS_INCONSISTENT;
+        static_cast<void>(res);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+        res = LSR_ERR_DATASTATUS_INCONSISTENT;
         break;
     }
 

@@ -5,6 +5,7 @@
 **
 **   File:        BaseFieldChoiceType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,9 +32,11 @@
 
 namespace lsr
 {
-struct ReferenceBitmapFieldType;
-struct StaticBitmapFieldType;
 
+/**
+ * BaseFieldChoiceType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct BaseFieldChoiceType
 {
     /** Choice constants enumeration */
@@ -48,6 +51,7 @@ struct BaseFieldChoiceType
     const void* const ptr;
 
 
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     BaseFieldChoiceTypeChoice GetBaseFieldChoiceTypeChoice() const
     {
         return choiceTag;
@@ -56,9 +60,11 @@ struct BaseFieldChoiceType
      * Returns a pointer to the ReferenceBitmapField choice option. Return NULL
      * if this choice is not the selected option.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const ReferenceBitmapFieldType* GetReferenceBitmapField() const
     {
         return (choiceTag == REFERENCEBITMAPFIELD_CHOICE) ?
+            // coverity[misra_cpp_2008_rule_5_2_8_violation]
             static_cast<const ReferenceBitmapFieldType*>(ptr) : NULL;
     }
 
@@ -66,9 +72,11 @@ struct BaseFieldChoiceType
      * Returns a pointer to the StaticBitmapField choice option. Return NULL
      * if this choice is not the selected option.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const StaticBitmapFieldType* GetStaticBitmapField() const
     {
         return (choiceTag == STATICBITMAPFIELD_CHOICE) ?
+            // coverity[misra_cpp_2008_rule_5_2_8_violation]
             static_cast<const StaticBitmapFieldType*>(ptr) : NULL;
     }
 

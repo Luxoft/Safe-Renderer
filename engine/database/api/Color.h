@@ -65,9 +65,9 @@ public:
      */
     static Color fromColorValue(const U32 value)
     {
-        Color ret;
-        ret.m_value = value;
-        return ret;
+        Color res;
+        res.m_value = value;
+        return res;
     }
 
     /**

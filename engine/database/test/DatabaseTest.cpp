@@ -76,7 +76,7 @@ TEST_F(BitmapAccessTest, BitmapAccess)
     }
     {
         BitmapAccess access(ddh);
-        EXPECT_EQ(LSR_NO_ERROR, access.getError());
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, access.getError());
     }
 }
 
@@ -88,21 +88,21 @@ TEST_F(BitmapAccessTest, getBitmap)
         StaticBitmap bmp = access.getBitmap(0, 0);
         EXPECT_EQ(0, bmp.getId());
         EXPECT_EQ(NULL, bmp.getData());
-        EXPECT_EQ(LSR_NO_ERROR, access.getError());
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, access.getError());
     }
     {
         // bitmapId out of bounds
         StaticBitmap bmp = access.getBitmap(0x1fff, 0);
         EXPECT_EQ(0, bmp.getId());
         EXPECT_EQ(NULL, bmp.getData());
-        EXPECT_EQ(LSR_NO_ERROR, access.getError());
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, access.getError());
     }
     {
         // bitmapId out of bounds - skin fallback
         StaticBitmap bmp = access.getBitmap(0x1fff, 1);
         EXPECT_EQ(0, bmp.getId());
         EXPECT_EQ(NULL, bmp.getData());
-        EXPECT_EQ(LSR_NO_ERROR, access.getError());
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, access.getError());
     }
 }
 
@@ -112,20 +112,20 @@ TEST_F(DatabaseTest, Database)
     // empty ddhbin
     {
         Database db(NULL);
-        EXPECT_EQ(LSRError(LSR_DB_DDHBIN_EMPTY), db.getError());
+        EXPECT_EQ(LSREngineError(LSR_DB_DDHBIN_EMPTY), db.getError());
     }
     // invalid ddhbin
     {
         U8 buf[] = { 1, 4, 55 };
         Database db(reinterpret_cast<DDHType*>(&buf));
-        EXPECT_EQ(LSRError(LSR_DB_DDHBIN_VERSION_MISMATCH), db.getError());
+        EXPECT_EQ(LSREngineError(LSR_DB_DDHBIN_VERSION_MISMATCH), db.getError());
     }
 }
 
 TEST_F(DatabaseTest, getBitmap)
 {
     Database db(m_ddh);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), db.getError());
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), db.getError());
     const LsrImage* image = db.getBitmap(1).getData();
     ASSERT_TRUE(image != NULL);
     EXPECT_EQ(102u, image->getWidth());
@@ -141,7 +141,7 @@ TEST_F(DatabaseTest, getBitmap)
 TEST_F(DatabaseTest, pageDatabase)
 {
     Database db(m_ddh);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), db.getError());
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), db.getError());
 
     const PageDatabaseType* pageDB = db.getDdh()->GetPageDatabase();
     EXPECT_EQ(1u, pageDB->GetPageCount());
@@ -159,7 +159,7 @@ TEST_F(DatabaseTest, panelDatabase)
     const Area panelArea(10, 153, 380, 224);
     const Area breakArea(20, 2, 119, 70);
     Database db(m_ddh);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), db.getError());
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), db.getError());
 
     const PanelDatabaseType* panelDB = db.getDdh()->GetPanelDatabase();
     EXPECT_EQ(2u, panelDB->GetPanelCount());
@@ -216,7 +216,7 @@ TEST_F(DatabaseTest, panelDatabase)
 TEST_F(DatabaseTest, fuDatabase)
 {
     Database db(m_ddh);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), db.getError());
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), db.getError());
 
     const DDHType* fudb = db.getDdh();
     EXPECT_EQ(4u, fudb->GetFUCount());

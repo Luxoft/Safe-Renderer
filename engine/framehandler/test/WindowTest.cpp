@@ -47,14 +47,14 @@ protected:
     {
         lsr::WindowDefinition winDef;
 
-        lsr::LSRErrorCollector error(LSR_NO_ERROR);
+        lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
         lsr::Window* window = lsr::Window::create(m_widgetPool,
                                                   m_db,
                                                   m_dsp,
                                                   winDef,
                                                   &m_context,
                                                   error);
-        EXPECT_EQ(LSR_NO_ERROR, error.get());
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, error.get());
 
         return window;
     }
@@ -98,7 +98,7 @@ TEST_F(WindowTest, CreateWindowWithWrongPanelsTest)
     };
     Database db(&ddh);
 
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     lsr::WindowDefinition winDef;
     lsr::Window* window = lsr::Window::create(m_widgetPool,
                                               db,

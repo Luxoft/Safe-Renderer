@@ -38,7 +38,7 @@ TEST(InputStreamTest, TestNormalInitialization)
     uint8_t buffer[1024] = {0u};
     InputStream stream(buffer, sizeof(buffer));
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(sizeof(buffer), stream.bytesToRead());
 }
 
@@ -46,7 +46,7 @@ TEST(InputStreamTest, TestInitializationWithZeroBuffer)
 {
     InputStream stream(NULL, 0u);
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
     EXPECT_EQ(0u, stream.bytesToRead());
 }
 
@@ -55,12 +55,12 @@ TEST(InputStreamTest, TestInitializationWithWrongBuffer)
     uint8_t buffer[1024] = {0u};
     InputStream stream1(NULL, sizeof(buffer));
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream1.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream1.getError());
     EXPECT_EQ(0u, stream1.bytesToRead());
 
     InputStream stream2(buffer, 0u);
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream2.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream2.getError());
     EXPECT_EQ(0u, stream2.bytesToRead());
 }
 
@@ -109,10 +109,10 @@ TEST(InputStreamTest, TestBytesToReadWithCorruptedData)
 
     uint16_t data16 = 0;
     stream >> data16;
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
     EXPECT_EQ(expected, stream.bytesToRead());
 
-    corrupter->setError(LSR_NO_ERROR);
+    corrupter->setError(COM_NO_ERROR);
 
     corrupter->setPos(32);
     expected = 0;
@@ -135,7 +135,7 @@ TEST(InputStreamTest, TestRead)
     InputStream stream(buffer, sizeof(buffer));
     uint32_t readedDataLen = stream.read(actualBuffer, sizeof(actualBuffer));
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(sizeof(actualBuffer), readedDataLen);
 
     for (uint8_t index = 0; index < sizeof(actualBuffer); ++index)
@@ -157,7 +157,7 @@ TEST(InputStreamTest, TestReadToEmptyBuffer1)
     InputStream stream(buffer, sizeof(buffer));
     uint32_t readedDataLen = stream.read(NULL, sizeof(actualBuffer));
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_INPUT_DATA), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_INPUT_DATA, stream.getError());
     EXPECT_EQ(0u, readedDataLen);
 }
 
@@ -174,7 +174,7 @@ TEST(InputStreamTest, TestReadToEmptyBuffer2)
     InputStream stream(buffer, sizeof(buffer));
     uint32_t readedDataLen = stream.read(actualBuffer, 0);
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_INPUT_DATA), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_INPUT_DATA, stream.getError());
     EXPECT_EQ(0u, readedDataLen);
 }
 
@@ -191,7 +191,7 @@ TEST(InputStreamTest, TestReadWithBigDataBySteps)
     InputStream stream(buffer, sizeof(buffer));
     uint32_t readedDataLen = stream.read(actualBuffer, sizeof(actualBuffer));
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(sizeof(actualBuffer), readedDataLen);
 
     uint8_t expIndex = 0;
@@ -201,7 +201,7 @@ TEST(InputStreamTest, TestReadWithBigDataBySteps)
     }
 
     readedDataLen = stream.read(actualBuffer, sizeof(actualBuffer));
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(sizeof(actualBuffer), readedDataLen);
 
     for (uint8_t actIndex = 0; actIndex < sizeof(actualBuffer); ++actIndex, ++expIndex)
@@ -210,7 +210,7 @@ TEST(InputStreamTest, TestReadWithBigDataBySteps)
     }
 
     readedDataLen = stream.read(actualBuffer, sizeof(actualBuffer));
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
     EXPECT_EQ(0u, readedDataLen);
 }
 
@@ -227,7 +227,7 @@ TEST(InputStreamTest, TestReadWithBigDataByOneStep)
     InputStream stream(buffer, sizeof(buffer));
     uint32_t readedDataLen = stream.read(actualBuffer, sizeof(actualBuffer));
 
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
     EXPECT_EQ(0u, readedDataLen);
 
     for (uint16_t actIndex = 0; actIndex < sizeof(actualBuffer); ++actIndex)
@@ -249,7 +249,7 @@ TEST(InputStreamTest, TestReadFromEmptyBuffer)
     InputStream stream(buffer, sizeof(buffer));
     uint32_t readedDataLen = stream.read(actualBuffer, sizeof(actualBuffer));
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
     EXPECT_EQ(sizeof(actualBuffer), readedDataLen);
 
     for (uint8_t index = 0; index < sizeof(actualBuffer); ++index)
@@ -258,7 +258,7 @@ TEST(InputStreamTest, TestReadFromEmptyBuffer)
     }
 
     readedDataLen = stream.read(actualBuffer, sizeof(actualBuffer));
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
     EXPECT_EQ(0u, readedDataLen);
 }
 
@@ -267,12 +267,12 @@ TEST(InputStreamTest, TestSetError)
     uint8_t buffer[1024] = {0u};
     InputStream stream(buffer, sizeof(buffer));
 
-    LSRError error = LSR_COMM_NOT_ENOUGH_BUFFER_SIZE;
+    ComError error = COM_NOT_ENOUGH_BUFFER_SIZE;
     stream.setError(error);
 
     EXPECT_EQ(error, stream.getError());
 
-    stream.setError(LSR_COMM_NOT_ENOUGH_INPUT_DATA);
+    stream.setError(COM_NOT_ENOUGH_INPUT_DATA);
     EXPECT_EQ(error, stream.getError());
 }
 
@@ -312,7 +312,7 @@ TEST(InputStreamTest, TestOperatorWithBoolWithEmptyBuffer)
     bool actValue = false;
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithBoolWithWrongBuffer1)
@@ -324,7 +324,7 @@ TEST(InputStreamTest, TestOperatorWithBoolWithWrongBuffer1)
     bool actValue = false;
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithBoolWithWrongBuffer2)
@@ -336,7 +336,7 @@ TEST(InputStreamTest, TestOperatorWithBoolWithWrongBuffer2)
     bool actValue = false;
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithInt8)
@@ -376,7 +376,7 @@ TEST(InputStreamTest, TestOperatorWithInt8WithEmptyBuffer)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithInt8WithWrongBuffer1)
@@ -389,7 +389,7 @@ TEST(InputStreamTest, TestOperatorWithInt8WithWrongBuffer1)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithInt8WithWrongBuffer2)
@@ -402,7 +402,7 @@ TEST(InputStreamTest, TestOperatorWithInt8WithWrongBuffer2)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithUInt8)
@@ -442,7 +442,7 @@ TEST(InputStreamTest, TestOperatorWithUInt8WithEmptyBuffer)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithUInt8WithWrongBuffer1)
@@ -455,7 +455,7 @@ TEST(InputStreamTest, TestOperatorWithUInt8WithWrongBuffer1)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithUInt8WithWrongBuffer2)
@@ -468,7 +468,7 @@ TEST(InputStreamTest, TestOperatorWithUInt8WithWrongBuffer2)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithInt16)
@@ -520,7 +520,7 @@ TEST(InputStreamTest, TestOperatorWithInt16WithEmptyBuffer)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithInt16WithWrongBuffer1)
@@ -539,7 +539,7 @@ TEST(InputStreamTest, TestOperatorWithInt16WithWrongBuffer1)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithInt16WithWrongBuffer2)
@@ -558,7 +558,7 @@ TEST(InputStreamTest, TestOperatorWithInt16WithWrongBuffer2)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithUInt16)
@@ -610,7 +610,7 @@ TEST(InputStreamTest, TestOperatorWithUInt16WithEmptyBuffer)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithUInt16WithWrongBuffer1)
@@ -629,7 +629,7 @@ TEST(InputStreamTest, TestOperatorWithUInt16WithWrongBuffer1)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithUInt16WithWrongBuffer2)
@@ -648,7 +648,7 @@ TEST(InputStreamTest, TestOperatorWithUInt16WithWrongBuffer2)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithInt32)
@@ -700,7 +700,7 @@ TEST(InputStreamTest, TestOperatorWithInt32WithEmptyBuffer)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithInt32WithWrongBuffer1)
@@ -719,7 +719,7 @@ TEST(InputStreamTest, TestOperatorWithInt32WithWrongBuffer1)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithInt32WithWrongBuffer2)
@@ -738,7 +738,7 @@ TEST(InputStreamTest, TestOperatorWithInt32WithWrongBuffer2)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithUInt32)
@@ -790,7 +790,7 @@ TEST(InputStreamTest, TestOperatorWithUInt32WithEmptyBuffer)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithUInt32WithWrongBuffer1)
@@ -809,7 +809,7 @@ TEST(InputStreamTest, TestOperatorWithUInt32WithWrongBuffer1)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST(InputStreamTest, TestOperatorWithIntU32WithWrongBuffer2)
@@ -828,5 +828,5 @@ TEST(InputStreamTest, TestOperatorWithIntU32WithWrongBuffer2)
 
     stream >> actValue;
     EXPECT_EQ(expValue, actValue);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }

@@ -32,7 +32,7 @@
 
 #include <OutputStream.h>
 #include <LsrTypes.h>
-#include <LSRError.h>
+#include <ComError.h>
 
 namespace lsr
 {

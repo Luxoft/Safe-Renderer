@@ -82,33 +82,33 @@ TEST(DataStatusTest, TestConvertToLSRErrorRetrunValid)
 {
     DataStatus value(DataStatus::VALID);
 
-    EXPECT_EQ(LSR_NO_ERROR, value.convertToLSRError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, value.convertToLSRError());
 }
 
 TEST(DataStatusTest, TestConvertToLSRErrorRetrunInValid)
 {
     DataStatus value(DataStatus::INVALID);
 
-    EXPECT_EQ(LSR_DATASTATUS_INVALID, value.convertToLSRError());
+    EXPECT_EQ(LSR_ERR_DATASTATUS_INVALID, value.convertToLSRError());
 }
 
 TEST(DataStatusTest, TestConvertToLSRErrorRetrunNotAvaiable)
 {
     DataStatus value(DataStatus::NOT_AVAILABLE);
 
-    EXPECT_EQ(LSR_DATASTATUS_NOT_AVAIABLE, value.convertToLSRError());
+    EXPECT_EQ(LSR_ERR_DATASTATUS_NOT_AVAILABLE, value.convertToLSRError());
 }
 
 TEST(DataStatusTest, TestConvertToLSRErrorRetrunInconsistent)
 {
     DataStatus value(DataStatus::INCONSISTENT);
 
-    EXPECT_EQ(LSR_DATASTATUS_INCONSISTENT, value.convertToLSRError());
+    EXPECT_EQ(LSR_ERR_DATASTATUS_INCONSISTENT, value.convertToLSRError());
 }
 
 TEST(DataStatusTest, TestConvertToLSRErrorRetrunWrongData)
 {
     DataStatus value(static_cast<DataStatus::Enum>(0xAAAA));
 
-    EXPECT_EQ(LSR_DATASTATUS_INCONSISTENT, value.convertToLSRError());
+    EXPECT_EQ(LSR_ERR_DATASTATUS_INCONSISTENT, value.convertToLSRError());
 }

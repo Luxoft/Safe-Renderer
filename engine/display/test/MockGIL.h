@@ -45,6 +45,9 @@ struct IGIL
     virtual void gilDrawQuad(GILContext ctx, int32_t x1, int32_t y1, int32_t u1, int32_t v1, int32_t x2, int32_t y2, int32_t u2, int32_t v2) = 0;
     virtual GILBoolean gilSwapBuffers(GILSurface surface) = 0;
     virtual GILBoolean gilVerify(GILContext ctx, int32_t x1, int32_t y1, int32_t u1, int32_t v1, int32_t x2, int32_t y2, int32_t u2, int32_t v2) = 0;
+    virtual GILError gilGetError(GILContext context) = 0;
+    virtual GILBoolean gilHandleWindowEvents(GILContext context) = 0;
+    virtual void gilSync(GILContext context) = 0;
 };
 
 struct MockGIL : public IGIL
@@ -65,6 +68,9 @@ struct MockGIL : public IGIL
     MOCK_METHOD9(gilDrawQuad, void(GILContext ctx, int32_t x1, int32_t y1, int32_t u1, int32_t v1, int32_t x2, int32_t y2, int32_t u2, int32_t v2));
     MOCK_METHOD1(gilSwapBuffers, GILBoolean(GILSurface surface));
     MOCK_METHOD9(gilVerify, GILBoolean(GILContext ctx, int32_t x1, int32_t y1, int32_t u1, int32_t v1, int32_t x2, int32_t y2, int32_t u2, int32_t v2));
+    MOCK_METHOD1(gilGetError, GILError(GILContext context));
+    MOCK_METHOD1(gilHandleWindowEvents, GILBoolean(GILContext context));
+    MOCK_METHOD1(gilSync, void(GILContext context));
 };
 
 struct gil_context_t
@@ -73,5 +79,8 @@ struct gil_context_t
 struct gil_texture_t
 {};
 
+struct gil_surface_t
+{};
+
 typedef ::testing::StrictMock<MockGIL> MockGILStrict;
-extern MockGILStrict* gilMock;
+extern IGIL* gilMock;

@@ -38,6 +38,9 @@
 
 using namespace lsr;
 
+namespace
+{
+
 /// "Telltales.ddh:Default Page"
 const U16 ddh_pageDatabase_page0_panelId[] = {
     1,
@@ -992,9 +995,9 @@ const FUClassType* ddh_fU[] = {
 
 const DDHType ddh = {
     1793021406U, //attr: imagesChecksum
-    1238911288U, //attr: schemaChecksum
-    328704U, //attr: schemaVersion
-    328704U, //attr: serializerVersion
+    2678546308U, //attr: schemaChecksum
+    328960U, //attr: schemaVersion
+    328960U, //attr: serializerVersion
     &ddh_pageDatabase, // ref: pageDatabase
     &ddh_panelDatabase, // ref: panelDatabase
     &ddh_hMIGlobalSettings, // ref: hMIGlobalSettings
@@ -1004,6 +1007,7 @@ const DDHType ddh = {
     4, // ref: fU (list size)
 };
 
+} // anonymous namespace
 
 namespace Telltales
 {

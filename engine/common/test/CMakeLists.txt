@@ -50,5 +50,7 @@ GUNITTEST_COMMON(
 
 GUNITTEST_COMMON(
     NAME CommonTest
-    FILES AssertionTest.cpp LSRErrorCollectorTest.cpp
+    FILES AssertionTest.cpp
+          LSRErrorCollectorTest.cpp
+          TimerTest.cpp
 )

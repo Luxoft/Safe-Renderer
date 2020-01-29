@@ -18,6 +18,9 @@ endif()
 
 include_directories(
     ${GIL_BASE}/api
+    ${LSRENGINE}/common/api
+    ${LSRENGINE}/database/api
+    ${HMI_PROJECT_PATH}
 )
 
 if(SIMULATION OR UNIT_TESTS)
@@ -76,7 +79,7 @@ if(SIMULATION OR UNIT_TESTS)
     else()
          # dummy implementation
         set(GIL_SOURCES
-            ${GIL_BASE}/src/dummy/gil.c
+            ${GIL_BASE}/src/dummy/gil.cpp
             ${GIL_BASE}/src/dummy/crc32.h
         )
     endif()

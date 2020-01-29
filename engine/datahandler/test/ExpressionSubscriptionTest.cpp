@@ -31,7 +31,7 @@
 
 #include <DynamicDataType.h>
 #include <ExpressionType.h>
-#include <LsrLimits.h>
+#include <LSRLimits.h>
 
 #include <gtest/gtest.h>
 

@@ -38,6 +38,12 @@ class DisplayManager
 public:
     DisplayManager();
 
+    /**
+     * Returns the error code from the gil
+     * @see gilGetError() in gil.h
+     */
+    GILError getError() const;
+
 public: // but internal to the component
     GILContext getContext() const;
 

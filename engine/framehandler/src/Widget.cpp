@@ -31,46 +31,48 @@
 namespace lsr
 {
 
-LSRError Widget::dispose(WidgetPool& widgetPool, Widget* const pWidget)
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and limited by database structure (panels cannot be nested)
+LSREngineError Widget::dispose(WidgetPool& factory, Widget* const pWidget)
 {
-    LSRError error = LSR_NO_ERROR;
+    LSREngineError error = LSR_NO_ENGINE_ERROR;
     if (NULL != pWidget)
     {
         for (std::size_t idx = 0U; idx < pWidget->numChildren(); ++idx)
         {
+            static_cast<void>(error);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             // coverity[stack_use_unknown]
-            error = dispose(widgetPool, pWidget->childAt(idx));
-            if (error != LSR_NO_ERROR)
+            error = dispose(factory, pWidget->childAt(idx));
+            if (error != LSR_NO_ENGINE_ERROR)
             {
                 break;
             }
         }
 
-        if (error == LSR_NO_ERROR)
+        if (error == LSR_NO_ENGINE_ERROR)
         {
-            const WidgetType widgetType = pWidget->getType();
+            const WidgetType type = pWidget->getType();
 
-            switch (widgetType)
+            switch (type)
             {
             case WIDGET_TYPE_FRAME:
                 pWidget->~Widget();
-                error = widgetPool.framePool().deallocate(pWidget);
+                error = factory.framePool().deallocate(pWidget);
                 break;
             case WIDGET_TYPE_PANEL:
                 pWidget->~Widget();
-                error = widgetPool.panelPool().deallocate(pWidget);
+                error = factory.panelPool().deallocate(pWidget);
                 break;
             case WIDGET_TYPE_BITMAP_FIELD:
                 pWidget->~Widget();
-                error = widgetPool.bitmapFieldPool().deallocate(pWidget);
+                error = factory.bitmapFieldPool().deallocate(pWidget);
                 break;
             case WIDGET_TYPE_REF_BITMAP_FIELD:
                 pWidget->~Widget();
-                error = widgetPool.referenceBitmapFieldPool().deallocate(pWidget);
+                error = factory.referenceBitmapFieldPool().deallocate(pWidget);
                 break;
             case WIDGET_TYPE_WINDOW:
                 pWidget->~Widget();
-                error = widgetPool.windowPool().deallocate(pWidget);
+                error = factory.windowPool().deallocate(pWidget);
                 break;
             default:
                 error = LSR_POOL_INVALID_OBJECT;
@@ -80,17 +82,19 @@ LSRError Widget::dispose(WidgetPool& widgetPool, Widget* const pWidget)
     }
     else
     {
+        static_cast<void>(error);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
         error = LSR_POOL_INVALID_OBJECT;
     }
 
     return error;
 }
 
+// coverity[misra_cpp_2008_rule_0_1_10_violation : FALSE] Constructor is called by derived classes, e.g. Field
 Widget::Widget()
-    : NonCopyable<Widget>()
+    : NonCopyable()
     , m_childrenCount(0U)
     , m_isInvalidated(true)
-    , m_error(LSR_NO_ERROR)
+    , m_error(LSR_NO_ENGINE_ERROR)
     , m_pVisibilityExpr(NULL)
     , m_isVisible(false)
 {
@@ -106,13 +110,7 @@ Widget::~Widget()
 
 Widget* Widget::childAt(const std::size_t index) const
 {
-    Widget* pRes = NULL;
-    if (index < m_childrenCount)
-    {
-        pRes = m_children[index];
-    }
-
-    return pRes;
+    return (index < m_childrenCount) ? m_children[index] : NULL;
 }
 
 void Widget::invalidate()
@@ -120,10 +118,11 @@ void Widget::invalidate()
     m_isInvalidated = true;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and limited by database structure (panels cannot be nested)
 bool Widget::isInvalidated() const
 {
-    bool ret = m_isInvalidated;
-    if (!ret)
+    bool res = m_isInvalidated;
+    if (!res)
     {
         for (std::size_t i = 0U; i < m_childrenCount; ++i)
         {
@@ -131,43 +130,41 @@ bool Widget::isInvalidated() const
             // coverity[stack_use_unknown]
             if (m_children[i]->isInvalidated())
             {
-                ret = true;
+                res = true;
                 break;
             }
         }
     }
-    return ret;
+    return res;
 }
 
 bool Widget::addChild(Widget* const pChild)
 {
-    bool res = false;
-    if (m_childrenCount < MAX_WIDGET_CHILDREN_COUNT)
+    const bool addable = (m_childrenCount < MAX_WIDGET_CHILDREN_COUNT);
+    if (addable)
     {
         m_children[m_childrenCount] = pChild;
-        m_childrenCount++;
-        res = true;
+        ++m_childrenCount;
     }
-
-    return res;
+    return addable;
 }
 
-void Widget::setArea(const Area& area)
+void Widget::setArea(const Area& rect)
 {
-    m_area = area;
+    m_area = rect;
 }
 
 bool Widget::setArea(const AreaType* const pDdhArea)
 {
-    bool res = false;
-    if (NULL != pDdhArea)
+    const bool assignable = (NULL != pDdhArea);
+    if (assignable)
     {
         m_area = Area(pDdhArea);
-        res = true;
     }
-    return res;
+    return assignable;
 }
 
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and limited by database structure (panels cannot be nested)
 void Widget::update(const U32 monotonicTimeMs)
 {
     updateVisibility(/* monotonicTimeMs */);
@@ -180,13 +177,14 @@ void Widget::update(const U32 monotonicTimeMs)
     }
 }
 
-void Widget::draw(Canvas& canvas, const Area& area)
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and limited by database structure (panels cannot be nested)
+void Widget::draw(Canvas& dst, const Area& rect)
 {
     m_isInvalidated = false;
 
     if (isVisible())
     {
-        onDraw(canvas, area);
+        onDraw(dst, rect);
 
         for (std::size_t i = 0U; i < m_childrenCount; ++i)
         {
@@ -194,17 +192,18 @@ void Widget::draw(Canvas& canvas, const Area& area)
             ASSERT(pChild != NULL);
 
             Area childArea(pChild->getArea());
-            childArea.moveByFP(area.getLeftFP(), area.getTopFP());
+            childArea.moveByFP(rect.getLeftFP(), rect.getTopFP());
 
             // coverity[stack_use_unknown]
-            pChild->draw(canvas, childArea);
+            pChild->draw(dst, childArea);
         }
     }
 }
 
-bool Widget::verify(Canvas& canvas, const Area& area)
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and limited by database structure (panels cannot be nested)
+bool Widget::verify(Canvas& dst, const Area& rect)
 {
-    bool result = onVerify(canvas, area);
+    bool result = onVerify(dst, rect);
 
     if (result)
     {
@@ -214,12 +213,13 @@ bool Widget::verify(Canvas& canvas, const Area& area)
             ASSERT(pChild != NULL);
 
             Area childArea(pChild->getArea());
-            childArea.moveByFP(area.getLeftFP(), area.getTopFP());
+            childArea.moveByFP(rect.getLeftFP(), rect.getTopFP());
 
             // coverity[stack_use_unknown]
-            if (!pChild->verify(canvas, childArea))
+            if (!pChild->verify(dst, childArea))
             {
                 result = false;
+                static_cast<void>(result);  // suppress MISRA 0-1-6: Value is not used on this path
             }
         }
     }
@@ -227,7 +227,8 @@ bool Widget::verify(Canvas& canvas, const Area& area)
     return result;
 }
 
-LSRError Widget::getError() const
+// coverity[misra_cpp_2008_rule_7_5_4_violation] Recursion is required by design and limited by database structure (panels cannot be nested)
+LSREngineError Widget::getError() const
 {
     LSRErrorCollector error = m_error.get();
 
@@ -237,7 +238,7 @@ LSRError Widget::getError() const
         ASSERT(pChild != NULL);
 
         // coverity[stack_use_unknown]
-        const LSRError childError = pChild->getError();
+        const LSREngineError childError = pChild->getError();
         error = childError;
     }
 
@@ -252,11 +253,13 @@ void Widget::updateVisibility(/* const U32 monotonicTimeMs */)
         bool tmpValue = false;
         if (tryToUpdateValue(*m_pVisibilityExpr, tmpValue))
         {
+            static_cast<void>(visible);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             visible = tmpValue;
         }
     }
     else
     {
+        static_cast<void>(visible);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
         visible = true;
     }
 

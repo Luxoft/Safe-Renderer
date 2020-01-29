@@ -39,7 +39,7 @@
 #include <DisplayManager.h>
 #include <WindowDefinition.h>
 
-#include <LsrLimits.h>
+#include <LSRLimits.h>
 
 #include <AreaType.h>
 #include <ExpressionTermType.h>
@@ -202,7 +202,7 @@ TEST(WidgetTest, DisposeBitmapFieldTest)
                                                        &context);
     EXPECT_TRUE(helper.isBitMapPoolFilled());
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), lsr::Widget::dispose(widgetPool, field));
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), lsr::Widget::dispose(widgetPool, field));
 
     EXPECT_FALSE(helper.isBitMapPoolFilled());
 }
@@ -225,7 +225,7 @@ TEST(WidgetTest, DisposeReferenceBitmapFieldTest)
                                                                          &context);
     EXPECT_TRUE(helper.isReferenceBitMapPoolFilled());
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), lsr::Widget::dispose(widgetPool, field));
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), lsr::Widget::dispose(widgetPool, field));
 
     EXPECT_FALSE(helper.isReferenceBitMapPoolFilled());
 }
@@ -248,7 +248,7 @@ TEST(WidgetTest, DisposePanelTest)
                                                 &context);
     EXPECT_TRUE(helper.isPanelPoolFilled());
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), lsr::Widget::dispose(widgetPool, panel));
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), lsr::Widget::dispose(widgetPool, panel));
 
     EXPECT_FALSE(helper.isPanelPoolFilled());
 }
@@ -268,7 +268,7 @@ TEST(WidgetTest, DisposeFrameTest)
 
     EXPECT_TRUE(helper.isFramePoolFilled());
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), lsr::Widget::dispose(widgetPool, frame));
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), lsr::Widget::dispose(widgetPool, frame));
 
     EXPECT_FALSE(helper.isFramePoolFilled());
 }
@@ -291,7 +291,7 @@ TEST(WidgetTest, DisposeWindowTest)
 
     EXPECT_TRUE(helper.isWindowPoolFilled());
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), lsr::Widget::dispose(widgetPool, window));
+    EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), lsr::Widget::dispose(widgetPool, window));
 
     EXPECT_FALSE(helper.isWindowPoolFilled());
 }
@@ -300,7 +300,7 @@ TEST(WidgetTest, DisposeNullObjTest)
 {
     lsr::WidgetPool widgetPool;
 
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT),
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT),
               lsr::Widget::dispose(widgetPool, NULL));
 }
 
@@ -309,7 +309,7 @@ TEST(WidgetTest, DisposeObjWithWrongTypeTest)
     U8 buf[sizeof(WrongWidget)];
     WrongWidget* widget = new (buf) WrongWidget();
     lsr::WidgetPool widgetPool;
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT),
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT),
               lsr::Widget::dispose(widgetPool, widget));
 }
 
@@ -322,14 +322,14 @@ TEST(WidgetTest, DisposeObjWithWrongChildrenTypeTest)
     widget->addChild(child);
 
     lsr::WidgetPool widgetPool;
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT),
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT),
               lsr::Widget::dispose(widgetPool, widget));
 }
 
 TEST(WidgetTest, GetErrorTest1)
 {
     WrongWidget widget;
-    LSRError expectedError = LSR_DATASTATUS_NOT_AVAIABLE;
+    LSREngineError expectedError = LSR_ERR_DATASTATUS_NOT_AVAILABLE;
     widget.setError(expectedError);
 
     EXPECT_EQ(expectedError, widget.getError());
@@ -338,19 +338,19 @@ TEST(WidgetTest, GetErrorTest1)
 TEST(WidgetTest, GetErrorTest2)
 {
     WrongWidget widget;
-    LSRError expectedError = LSR_POOL_IS_CORRUPTED;
+    LSREngineError expectedError = LSR_POOL_IS_CORRUPTED;
     widget.setError(expectedError);
     EXPECT_EQ(expectedError, widget.getError());
 
     // Set some error state which is less worse that previous one.
-    widget.setError(LSR_DATASTATUS_NOT_AVAIABLE);
+    widget.setError(LSR_ERR_DATASTATUS_NOT_AVAILABLE);
     EXPECT_EQ(expectedError, widget.getError());
 }
 
 TEST(WidgetTest, GetChildErrorTest)
 {
     WrongWidget widget;
-    widget.setError(LSR_DATASTATUS_NOT_AVAIABLE);
+    widget.setError(LSR_ERR_DATASTATUS_NOT_AVAILABLE);
 
     WrongWidget child;
     child.setError(LSR_POOL_IS_CORRUPTED);
@@ -366,7 +366,7 @@ TEST(WidgetTest, GetParentErrorTest)
     widget.setError(LSR_POOL_IS_CORRUPTED);
 
     WrongWidget child;
-    child.setError(LSR_DATASTATUS_NOT_AVAIABLE);
+    child.setError(LSR_ERR_DATASTATUS_NOT_AVAILABLE);
 
     widget.addChild(&child);
 
@@ -445,7 +445,7 @@ TEST(WidgetTest, IsVisibleWithWrongExprTest)
     widget.update(0U);
 
     EXPECT_FALSE(widget.isVisible());
-    EXPECT_EQ(LSR_DATASTATUS_INCONSISTENT, widget.getError());
+    EXPECT_EQ(LSR_ERR_DATASTATUS_INCONSISTENT, widget.getError());
 }
 
 TEST(WidgetTest, OnDrawTest)

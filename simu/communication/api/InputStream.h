@@ -29,7 +29,7 @@
 
 #include <stdint.h>  // <cstdint> cannot be used (C++11)
 
-#include "LSRError.h"
+#include "ComError.h"
 
 namespace lsr
 {
@@ -37,7 +37,7 @@ namespace lsr
 /**
  * This class is needed to encapsulate reading data from the buffer.
  * Internal state of the class can be read by method @c getError, which returns
- * @c LSRError flag. Each method can set this flag and user can analyze it.
+ * @c LSREngineError flag. Each method can set this flag and user can analyze it.
  * If error flag is raised up, it can't be overwritten by success value of this flag.
  * If error flag is raised up, no future operations will be evaluated.
  */
@@ -47,7 +47,7 @@ public:
     /**
      * Construct the object.
      * It checks the values of @c pBuffer and @c bufferSize.
-     * If at least one of them is invalid, the flag @c LSR_COMM_NOT_ENOUGH_BUFFER_SIZE
+     * If at least one of them is invalid, the flag @c COM_NOT_ENOUGH_BUFFER_SIZE
      * will be set.
      * Class doesn't take the ownership of the buffer.
      * It only encapsulates access to this buffer and helps with reading data from it.
@@ -64,9 +64,9 @@ public:
      * If there was an error in the sequence of operations, the error from first operation
      * will be returned.
      *
-     * @return value of error flag. See @c LSRError.
+     * @return value of error flag. See @c LSREngineError.
      */
-    LSRError getError() const;
+    ComError getError() const;
 
     /**
      * With this method user can set error inside the stream.
@@ -78,7 +78,7 @@ public:
      *
      * @param[in] error value of the error which should be set.
      */
-    void setError(const LSRError error);
+    void setError(const ComError error);
 
     /**
      * Method provides information about how much unread data in bytes still remains in the buffer.
@@ -116,17 +116,17 @@ private:
     const uint8_t* m_pBuffer;
     uint32_t m_bufferSize;
     uint32_t m_pos;
-    LSRError m_error;
+    ComError m_error;
 };
 
-inline LSRError InputStream::getError() const
+inline ComError InputStream::getError() const
 {
     return m_error;
 }
 
-inline void InputStream::setError(const LSRError error)
+inline void InputStream::setError(const ComError error)
 {
-    if (m_error == LSR_NO_ERROR)
+    if (m_error == COM_NO_ERROR)
     {
         m_error = error;
     }

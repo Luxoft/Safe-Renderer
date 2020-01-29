@@ -50,14 +50,14 @@ protected:
 
     lsr::Frame* create()
     {
-        lsr::LSRErrorCollector error(LSR_NO_ERROR);
+        lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
         lsr::Frame* frame = lsr::Frame::create(m_widgetPool,
                                                m_db,
                                                1U,
                                                NULL,
                                                &m_context,
                                                error);
-        EXPECT_EQ(LSR_NO_ERROR, error.get());
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, error.get());
 
         return frame;
     }
@@ -101,7 +101,7 @@ TEST_F(FrameTest, CreateFrameWithWrongPanelTest)
     };
     Database db(&ddh);
 
-    lsr::LSRErrorCollector error(LSR_NO_ERROR);
+    lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
     lsr::Frame* frame = lsr::Frame::create(m_widgetPool,
                                            db,
                                            1U,

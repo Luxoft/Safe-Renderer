@@ -94,7 +94,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetMajorVersion)
     InputStream stream(m_buffer, m_bufferSize);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(m_majorVersion, reader.getMajorVersion());
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetMinorVersion)
@@ -102,7 +102,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetMinorVersion)
     InputStream stream(m_buffer, m_bufferSize);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(m_minorVersion, reader.getMinorVersion());
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetRegistrationMode)
@@ -110,7 +110,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetRegistrationMode)
     InputStream stream(m_buffer, m_bufferSize);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(m_mode, reader.getRegistrationMode());
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetWrongRegistration1)
@@ -121,7 +121,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetWrongRegistration1)
     InputStream stream(m_buffer, m_bufferSize);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(RegistrationMode::UNKNOWN, reader.getRegistrationMode());
-    EXPECT_EQ(LSRError(LSR_ODI_INVALID_FIELD_IN_MSG), stream.getError());
+    EXPECT_EQ(COM_INVALID_FIELD_IN_MSG, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetWrongRegistration2)
@@ -132,7 +132,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetWrongRegistration2)
     InputStream stream(m_buffer, m_bufferSize);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(static_cast<RegistrationMode::Val>(expectedMode), reader.getRegistrationMode());
-    EXPECT_EQ(LSRError(LSR_ODI_INVALID_FIELD_IN_MSG), stream.getError());
+    EXPECT_EQ(COM_INVALID_FIELD_IN_MSG, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetRemoteUid)
@@ -140,7 +140,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetRemoteUid)
     InputStream stream(m_buffer, m_bufferSize);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(m_uid, reader.getRemoteUid());
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetRemoteUidtWithNotEnougthBuffer1)
@@ -148,7 +148,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetRemoteUidtWithNotEnougthBuffer1)
     InputStream stream(m_buffer, m_bufferSize - 1);
     RegistrationMsgReader reader(stream);
     reader.getRemoteUid();
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetRemoteUidWithNotEnougthBuffer2)
@@ -156,7 +156,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetRemoteUidWithNotEnougthBuffer2)
     InputStream stream(m_buffer, 7);
     RegistrationMsgReader reader(stream);
     reader.getRemoteUid();
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetRemoteUidWithNotEnougthBuffer3)
@@ -164,7 +164,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetRemoteUidWithNotEnougthBuffer3)
     InputStream stream(m_buffer, 8);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(m_uid, reader.getRemoteUid());
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetFuCount)
@@ -172,7 +172,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetFuCount)
     InputStream stream(m_buffer, m_bufferSize);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(m_number, reader.getFuCount());
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetFuCountWithNotEnougthBuffer1)
@@ -180,7 +180,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetFuCountWithNotEnougthBuffer1)
     InputStream stream(m_buffer, m_bufferSize - 1);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(m_number, reader.getFuCount());
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetFuCountWithNotEnougthBuffer2)
@@ -188,7 +188,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetFuCountWithNotEnougthBuffer2)
     InputStream stream(m_buffer, 7);
     RegistrationMsgReader reader(stream);
     reader.getFuCount();
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetFuCountWithNotEnougthBuffer3)
@@ -196,7 +196,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetFuCountWithNotEnougthBuffer3)
     InputStream stream(m_buffer, 8);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(m_number, reader.getFuCount());
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetNextFu)
@@ -205,16 +205,16 @@ TEST_F(RegistrationMsgReaderTest, TestGetNextFu)
     RegistrationMsgReader reader(stream);
     U8 fuCount = reader.getFuCount();
     EXPECT_EQ(m_number, fuCount);
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 
     for (U8 index=0; index < fuCount; ++index)
     {
         EXPECT_EQ(m_fuList[index], reader.getNextFu());
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+        EXPECT_EQ(COM_NO_ERROR, stream.getError());
     }
 
     reader.getNextFu();
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetFuWithNotEnougthBuffer1)
@@ -225,11 +225,11 @@ TEST_F(RegistrationMsgReaderTest, TestGetFuWithNotEnougthBuffer1)
     for (U8 index=0; index < m_number - 1; ++index)
     {
         reader.getNextFu();
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+        EXPECT_EQ(COM_NO_ERROR, stream.getError());
     }
 
     reader.getNextFu();
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetFuWithNotEnougthBuffer3)
@@ -237,7 +237,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetFuWithNotEnougthBuffer3)
     InputStream stream(m_buffer, 7);
     RegistrationMsgReader reader(stream);
     reader.getNextFu();
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetFuWithLargeNumber)
@@ -248,7 +248,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetFuWithLargeNumber)
     InputStream stream(m_buffer, m_bufferSize);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(expectedCount, reader.getFuCount());
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestGetFuWithZeroFu)
@@ -258,7 +258,7 @@ TEST_F(RegistrationMsgReaderTest, TestGetFuWithZeroFu)
     InputStream stream(m_buffer, 8u);
     RegistrationMsgReader reader(stream);
     EXPECT_EQ(0u, reader.getFuCount());
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), stream.getError());
+    EXPECT_EQ(COM_NO_ERROR, stream.getError());
 }
 
 
@@ -266,11 +266,11 @@ TEST_F(RegistrationMsgReaderTest, TestDeserializeWithWrongBuffer)
 {
     InputStream stream1(NULL, m_bufferSize);
     RegistrationMsgReader reader1(stream1);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream1.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream1.getError());
 
     InputStream stream2(m_buffer, 0u);
     RegistrationMsgReader reader2(stream2);
-    EXPECT_EQ(LSRError(LSR_COMM_NOT_ENOUGH_BUFFER_SIZE), stream2.getError());
+    EXPECT_EQ(COM_NOT_ENOUGH_BUFFER_SIZE, stream2.getError());
 }
 
 TEST_F(RegistrationMsgReaderTest, TestSerializeDeserialize)
@@ -290,7 +290,7 @@ TEST_F(RegistrationMsgReaderTest, TestSerializeDeserialize)
 
     const U16 expectedMsgSize = msg.getSize();
     outStream << msg;
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), outStream.getError());
+    EXPECT_EQ(COM_NO_ERROR, outStream.getError());
     EXPECT_EQ(expectedMsgSize, outStream.bytesWritten());
 
     InputStream inStream(buffer, sizeof(buffer));
@@ -308,5 +308,5 @@ TEST_F(RegistrationMsgReaderTest, TestSerializeDeserialize)
         EXPECT_EQ(m_fuList[index], reader.getNextFu());
     }
 
-    EXPECT_EQ(LSRError(LSR_NO_ERROR), inStream.getError());
+    EXPECT_EQ(COM_NO_ERROR, inStream.getError());
 }

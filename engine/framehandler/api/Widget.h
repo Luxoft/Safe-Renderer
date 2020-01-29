@@ -28,8 +28,8 @@
 ******************************************************************************/
 
 #include <LsrTypes.h>
-#include <LsrLimits.h>
-#include <LSRError.h>
+#include <LSRLimits.h>
+#include <LSREngineError.h>
 #include <LSRErrorCollector.h>
 #include <NonCopyable.h>
 
@@ -49,19 +49,20 @@ class WidgetPool;
  *
  * @reqid SW_ENG_068, SW_ENG_070, SW_ENG_071, SW_ENG_073
  */
-class Widget: private NonCopyable<Widget>
+// coverity[misra_cpp_2008_rule_12_8_2_violation] Base class NonCopyable hides assignment operator
+class Widget : private NonCopyable
 {
 public:
     /**
-     * Method call the @c widgets destructor and disposes given @c pWidget from @c widgetPool.
+     * Method call the @c widgets destructor and disposes given @c pWidget from @c WidgetPool.
      *
-     * @param[in] widgetPool the pool, where @c pWidget object was previously allocated.
+     * @param[in] factory    the pool, where @c pWidget object was previously allocated.
      * @param[in] pWidget    the object which should be disposed.
      *
-     * @return @c LSR_NO_ERROR if dispose was successful, and other values of
-     *         @c LSRError in other cases.
+     * @return @c LSR_NO_ENGINE_ERROR if dispose was successful, and other values of
+     *         @c LSREngineError in other cases.
      */
-    static LSRError dispose(WidgetPool& widgetPool, Widget* const pWidget);
+    static LSREngineError dispose(WidgetPool& factory, Widget* const pWidget);
 
     /**
      * Informs the widget about the monotonic system time
@@ -76,21 +77,21 @@ public:
     /**
      * Draws the widget on the given canvas.
      *
-     * @param[in] canvas canvas, see @c Canvas.
-     * @param[in] area area in absolute coordinates.
+     * @param[in] dst  destination canvas, see @c Canvas.
+     * @param[in] rect area in absolute coordinates.
      */
-    void draw(Canvas& canvas, const Area& area);
+    void draw(Canvas& dst, const Area& rect);
 
     /**
      * Performs a pixel verification on the given canvas
      *
-     * @param[in] canvas canvas, see @c Canvas.
-     * @param[in] area area in absolute coordinates.
+     * @param[in] dst  destination canvas, see @c Canvas.
+     * @param[in] rect area in absolute coordinates.
      *
      * @returns @c false if any error was detected, @c true if there's no error
      *          detected or no error check performed.
      */
-    bool verify(Canvas& canvas, const Area& area);
+    bool verify(Canvas& dst, const Area& rect);
 
     /**
      * Returns the child at the given index.
@@ -116,9 +117,9 @@ public:
     /**
      * Method return the worst error, which can occur inside @c Widget children.
      *
-     * @return the worst error. See @c LSRError.
+     * @return the worst error. See @c LSREngineError.
      */
-    LSRError getError() const;
+    LSREngineError getError() const;
 
     virtual ~Widget();
 
@@ -155,9 +156,9 @@ protected:
     bool addChild(Widget* const pChild);
 
     /**
-     * @param[in] area area in relative coordinates to widgets parent
+     * @param[in] rect area in relative coordinates to widgets parent
      */
-    void setArea(const Area& area);
+    void setArea(const Area& rect);
     bool setArea(const AreaType* const pDdhArea);
 
     /**
@@ -165,7 +166,7 @@ protected:
      *
      * @param[in] error error value which should be saved.
      */
-    void setError(const LSRError error);
+    void setError(const LSREngineError error);
 
     /**
      * Method should be used for updating (evaluating) internal widgets parameters such as
@@ -186,10 +187,10 @@ protected:
      *
      * Should be implemented in children.
      *
-     * @param[in] canvas the canvas which shall implement drawing.
-     * @param[in] area   area of widget, were it shall be drawn.
+     * @param[in] dst  the destination canvas which shall implement drawing.
+     * @param[in] rect area of widget, were it shall be drawn.
      */
-    virtual void onDraw(Canvas& canvas, const Area& area) = 0;
+    virtual void onDraw(Canvas& dst, const Area& rect) const = 0;
 
     /**
      * Methods provides functionality to check video output.
@@ -198,10 +199,10 @@ protected:
      *
      * Should be implemented in children.
      *
-     * @param[in] canvas the canvas which shall implement drawing.
-     * @param[in] area   area of widget, were it shall be drawn.
+     * @param[in] dst  the destination canvas which shall implement drawing.
+     * @param[in] rect area of widget, were it shall be drawn.
      */
-    virtual bool onVerify(Canvas& canvas, const Area& area) = 0;
+    virtual bool onVerify(Canvas& dst, const Area& rect) = 0;
 
     /**
      * Returns the widgets type, see @c WidgetType.
@@ -278,7 +279,7 @@ inline const Area& Widget::getArea() const
     return m_area;
 }
 
-inline void Widget::setError(const LSRError error)
+inline void Widget::setError(const LSREngineError error)
 {
     m_error = error;
 }
@@ -296,18 +297,15 @@ inline void Widget::setVisibilityExpression(const BoolExpression* const pExpr)
 template <class T, class K>
 bool Widget::tryToUpdateValue(const T& expr, K& value)
 {
-    bool res = false;
     const DataStatus status = expr.getValue(value);
-    if (status == DataStatus::VALID)
-    {
-        res = true;
-    }
-    else
+
+    const bool valueIsValid = (status == DataStatus::VALID);
+    if (!valueIsValid)
     {
         setError(status.convertToLSRError());
     }
 
-    return res;
+    return valueIsValid;
 }
 
 } // namespace lsr

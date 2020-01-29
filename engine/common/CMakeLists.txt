@@ -28,16 +28,15 @@ include_directories(
 
 set(COMMON_HEADERS
     ${COMMON_BASE}/api/Assertion.h
-    ${COMMON_BASE}/api/HealthLog.h
     ${COMMON_BASE}/api/LongTermPtr.h
     ${COMMON_BASE}/api/NodeDataLength.h
     ${COMMON_BASE}/api/NonCopyable.h
     ${COMMON_BASE}/api/Pool.h
     ${COMMON_BASE}/api/PoolMarker.h
     ${COMMON_BASE}/api/PooledObjectFactory.h
-    ${COMMON_BASE}/api/LSRError.h
-    ${COMMON_BASE}/api/LsrLimits.h
+    ${COMMON_BASE}/api/LSREngineError.h
     ${COMMON_BASE}/api/LsrTypes.h
+    ${COMMON_BASE}/api/Timer.h
 )
 
 set(COMMON_SOURCES

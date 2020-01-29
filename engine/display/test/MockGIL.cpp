@@ -25,7 +25,7 @@
 ******************************************************************************/
 #include "MockGIL.h"
 
-MockGILStrict* gilMock = NULL;
+IGIL* gilMock = NULL;
 
 void gilInit(GILConfig config)
 {
@@ -106,3 +106,19 @@ GILBoolean gilVerify(GILContext ctx, int32_t x1, int32_t y1, int32_t u1, int32_t
 {
     return gilMock->gilVerify(ctx, x1, y1, u1, v1, x2, y2, u2, v2);
 }
+
+GILError gilGetError(GILContext context)
+{
+    return gilMock->gilGetError(context);
+}
+
+GILBoolean gilHandleWindowEvents(GILContext context)
+{
+    return gilMock->gilHandleWindowEvents(context);
+}
+
+void gilSync(GILContext context)
+{
+    return gilMock->gilSync(context);
+}
+

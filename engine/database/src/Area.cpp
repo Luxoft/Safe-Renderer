@@ -53,14 +53,6 @@ Area::Area(const AreaType* const pArea)
     setArea(pArea);
 }
 
-Area::Area(const Area& other):
-    m_x(other.m_x),
-    m_y(other.m_y),
-    m_width(other.m_width),
-    m_height(other.m_height)
-{
-}
-
 Area::Area(const I32 left, const I32 top, const I32 right, const I32 bottom)
 {
     m_x = fromIntegerToFP(left);

@@ -45,21 +45,21 @@ protected:
 
     lsr::BitmapField* createField(const StaticBitmapFieldType* ddh)
     {
-        lsr::LSRErrorCollector error(LSR_NO_ERROR);
+        lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
         lsr::BitmapField* field =
             lsr::BitmapField::create(m_widgetPool,
                                      m_db,
                                      ddh,
                                      &m_context,
                                      error);
-        EXPECT_EQ(LSR_NO_ERROR, error.get());
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, error.get());
 
         return field;
     }
 
     lsr::BitmapField* createWrongField(const StaticBitmapFieldType* ddh)
     {
-        lsr::LSRErrorCollector error(LSR_NO_ERROR);
+        lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
         lsr::BitmapField* field =
             lsr::BitmapField::create(m_widgetPool,
                                      m_db,
@@ -142,7 +142,7 @@ TEST_F(BitmapFieldTest, OnUpdateTest)
     field->draw(m_canvas, area);
 
     EXPECT_EQ(expectedId, lsr::DatabaseAccessor::instance().getRequestedBitmapId());
-    EXPECT_EQ(LSR_NO_ERROR, field->getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
 }
 
 TEST_F(BitmapFieldTest, OnUpdateWithTheSameValueTest)
@@ -171,7 +171,7 @@ TEST_F(BitmapFieldTest, OnUpdateWithTheSameValueTest)
 
     EXPECT_EQ(expectedId, lsr::DatabaseAccessor::instance().getRequestedBitmapId());
 
-    EXPECT_EQ(LSR_NO_ERROR, field->getError());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
 }
 
 TEST_F(BitmapFieldTest, OnUpdateWrongValueTest)
@@ -192,7 +192,7 @@ TEST_F(BitmapFieldTest, OnUpdateWrongValueTest)
     field->update(0U);
     field->draw(m_canvas, area);
 
-    EXPECT_EQ(LSR_DATASTATUS_NOT_AVAIABLE, field->getError());
+    EXPECT_EQ(LSR_ERR_DATASTATUS_NOT_AVAILABLE, field->getError());
 }
 
 TEST_F(BitmapFieldTest, DrawBitmapFieldTest)

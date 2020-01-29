@@ -38,7 +38,7 @@ namespace lsr
 
 BitmapAccess::BitmapAccess(const DDHType* const ddh)
 : m_ddh(ddh)
-, m_error(LSR_NO_ERROR)
+, m_error(LSR_NO_ENGINE_ERROR)
 {
     if (NULL == ddh)
     {
@@ -46,36 +46,36 @@ BitmapAccess::BitmapAccess(const DDHType* const ddh)
     }
 }
 
-StaticBitmap BitmapAccess::getBitmap(const BitmapId bitmapId, const U16 skin) const
+StaticBitmap BitmapAccess::getBitmap(const BitmapId id, const U16 skin) const
 {
     const BitmapStateDefinitionType* pState = NULL;
-    if (bitmapId != 0U)
+    if (id != 0U)
     {
-        const BitmapDefinitionType* const pBitmapDef = getBitmapDefinition(bitmapId, skin);
+        const BitmapDefinitionType* const pBitmapDef = getBitmapDefinition(id, skin);
         if (pBitmapDef != NULL)
         {
+            static_cast<void>(pState);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
             pState = pBitmapDef->GetDefault();
         }
     }
     return StaticBitmap(*this, pState);
 }
 
-const BitmapDefinitionType *BitmapAccess::getBitmapDefinition(const BitmapId bitmapId, const U16 skinIx) const
+const BitmapDefinitionType* BitmapAccess::getBitmapDefinition(const BitmapId id, const U16 skinIx) const
 {
     /**
      * There are several ways to find the BitmapDefinitionType.
      * The skinBitmapTable ensures O(1) access
      * Alternatively the SkinType could be searched (binary search: O(log)) or guessed (O(1) for default skin)
      */
-    const BitmapDefinitionType* result = NULL;
     const SkinDatabaseType* const skinDB = m_ddh->GetSkinDatabase();
 
     // Try with assigned/specified skin
     const SkinType* const pSkin = skinDB->GetSkin(skinIx);
-    result = (pSkin != NULL) ? pSkin->GetBitmap(bitmapId - 1U) : NULL;
+    const BitmapDefinitionType* const result = (pSkin != NULL) ? pSkin->GetBitmap(id - 1U) : NULL;
     if (result != NULL)
     {
-        ASSERT(result->GetBitmapId() == bitmapId);
+        ASSERT(result->GetBitmapId() == id);
     }
     return result;
 }
@@ -86,7 +86,7 @@ const LsrImage* BitmapAccess::getBitmapBuffer(const StaticBitmap& bitmap) const
     return (pStateBitmap != NULL) ? pStateBitmap->GetFile() : NULL;
 }
 
-LSRError BitmapAccess::getError() const
+LSREngineError BitmapAccess::getError() const
 {
     return m_error;
 }

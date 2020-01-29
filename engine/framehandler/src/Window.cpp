@@ -50,18 +50,20 @@ Window::Window(DisplayManager& dsp, const WindowDefinition& winDef)
 
 bool Window::render()
 {
-    bool res = false;
-    if (isInvalidated())
+    const bool renderingIsRequired = isInvalidated();
+    if (renderingIsRequired)
     {
         m_canvas.makeCurrent();
-        const Color color;
-        m_canvas.clear(color);
+        m_canvas.clear(Color::fromColorValue(0U));
         draw(m_canvas, getArea());
         m_canvas.swapBuffers();
-
-        res = true;
+        const LSREngineError canvasError = m_canvas.getError();
+        if (canvasError != LSR_NO_ENGINE_ERROR)
+        {
+            setError(canvasError);
+        }
     }
-    return res;
+    return renderingIsRequired;
 }
 
 bool Window::verify()
@@ -69,6 +71,11 @@ bool Window::verify()
     m_canvas.makeCurrent();
     const bool verified = Widget::verify(m_canvas, getArea());
     m_canvas.sync();
+    const LSREngineError canvasError = m_canvas.getError();
+    if (canvasError != LSR_NO_ENGINE_ERROR)
+    {
+        setError(canvasError);
+    }
     return verified;
 }
 
@@ -77,47 +84,48 @@ bool Window::handleWindowEvents()
     return m_canvas.handleWindowEvents();
 }
 
-bool Window::setup(WidgetPool& widgetPool,
+bool Window::setup(WidgetPool& factory,
                    const Database& db,
                    DataContext* const pContext,
                    LSRErrorCollector& error)
 {
-    bool success = true;
+    bool successful = true;
 
     // Currently there's one frame, but there might be more
-    const FrameId frameId = 1U;
+    const FrameId id = 1U;
 
-    Frame* const pFrame = Frame::create(widgetPool, db, frameId, this, pContext, error);
+    Frame* const pFrame = Frame::create(factory, db, id, this, pContext, error);
     /**
-     * While @c MAX_FRAMES_COUNT < @c MAX_WIDGET_CHILDREN_COUNT,
-     * @c addChild method will always return @c true value.
-     * That's why we have coverage gap here.
-     */
+    * While @c MAX_FRAMES_COUNT < @c MAX_WIDGET_CHILDREN_COUNT,
+    * @c addChild method will always return @c true value.
+    * That's why we have coverage gap here.
+    */
     if ((NULL == pFrame) || (!addChild(pFrame)))
     {
-        success = false;
+        static_cast<void>(successful);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+        successful = false;
     }
-    return success;
+    return successful;
 }
 
-Window* Window::create(WidgetPool& widgetPool,
+Window* Window::create(WidgetPool& factory,
                        const Database& db,
                        DisplayManager& dsp,
                        const WindowDefinition& winDef,
                        DataContext* const pContext,
                        LSRErrorCollector& error)
 {
-    LSRError tmpError = LSR_NO_ERROR;
-    void* const pRawMemory = widgetPool.windowPool().allocate(tmpError);
+    LSREngineError tmpError = LSR_NO_ENGINE_ERROR;
+    void* const pRawMemory = factory.windowPool().allocate(tmpError);
     error = tmpError;
 
     Window* pWnd = new(pRawMemory)Window(dsp, winDef);
     if (NULL != pWnd)
     {
-        if (!pWnd->setup(widgetPool, db, pContext, error))
+        if (!pWnd->setup(factory, db, pContext, error))
         {
             pWnd->~Window();
-            error = widgetPool.windowPool().deallocate(pRawMemory);
+            error = factory.windowPool().deallocate(pRawMemory);
             pWnd = NULL;
         }
     }
@@ -130,7 +138,7 @@ void Window::onUpdate(const U32 monotonicTimeMs)
     static_cast<void>(monotonicTimeMs);  // ignore unused variable
 }
 
-void Window::onDraw(Canvas& /* canvas */, const Area& /* area */)
+void Window::onDraw(Canvas& /* dst */, const Area& /* rect */) const
 {
 }
 
@@ -139,4 +147,4 @@ bool Window::onVerify(Canvas&, const Area&)
     return true;
 }
 
-}
+} // namespace lsr

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://docbook.org/ns/docbook" version="5.0">
+  <title>Changelog For Release 0.3.X</title>
+  <section>
+    <title>Release 0.3.0</title>
+    <section>
+      <title>New Features</title>
+      <informaltable>
+        <tgroup cols="2">
+          <colspec colname="col2" colnum="2" colwidth="4*"/>
+          <tbody>
+            <row>
+              <entry>Feature 409</entry>
+              <entry>
+                <para>Enabled project specific <filename>LSRLimits.h</filename>. </para>
+                <para>In order to build the LSR the cmake variable
+  <parameter>HMI_PROJECT_PATH</parameter> needs to be defined now. It shall
+  point to a path where <filename>LSRLimits.h</filename> can be found.</para>
+              </entry>
+            </row>
+            <row>
+              <entry>Feature 398</entry>
+              <entry>
+                <para><emphasis role="bold">Requirement ID:</emphasis> REQ-013-SW Aging
+  time</para>
+                <para>Added timer utility class: <classname>lsr::Timer</classname></para>
+              </entry>
+            </row>
+            <row>
+              <entry>Feature 377</entry>
+              <entry>
+                <para>Added error reporting for drawing errors. Errors from
+  <filename>gil.h</filename> (<function>gilGetError()</function>) are now
+  reported to <function>lsrGetError()</function>.</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </section>
+  </section>
+</section>

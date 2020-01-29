@@ -31,61 +31,38 @@
 #include "FUClassType.h"
 #include "DynamicDataEntryType.h"
 #include "LsrTypes.h"
-#include "pil.h"
 
 #include <algorithm>
-
-namespace
-{
-    // TODO: find common place - check if overflow is implemented correctly
-    bool isElapsed(const U32 startTime, const U32 timeout)
-    {
-        const U32 currentTime = pilGetMonotonicTime();
-        bool result = false;
-        if (currentTime >= startTime)
-        {
-            // normal case
-            result = (currentTime - startTime) > timeout;
-        }
-        else
-        {
-            // integer overflow for monotonic time
-            result = (0xffffffff - (startTime - currentTime)) > timeout;
-        }
-        return result;
-    }
-}
 
 namespace lsr
 {
 
 bool DynamicDataEntry_Comparer::operator()(DynamicDataEntry const& entry, const U32 value) const
 {
-    return key(entry.fu->fUClassId, entry.data->dataId) < value;
+    return key(entry.fu->GetFUClassId(), entry.data->GetDataId()) < value;
 }
 
 DataHandler::DataHandler(const Database& db)
 : IDataHandler()
 , m_numDataEntries(0U)
-, m_error(LSR_NO_ERROR)
+, m_error(LSR_NO_ENGINE_ERROR)
 {
     const DDHType* const ddh = db.getDdh();
     if (NULL != ddh)
     {
-        for (U16 i = 0u; i < ddh->GetFUCount(); ++i)
+        for (U16 i = 0U; i < ddh->GetFUCount(); ++i)
         {
             const FUClassType* fu = ddh->GetFU(i);
             ASSERT(NULL != fu);
-            for (U16 k = 0u; k < fu->GetDynamicDataEntryCount(); ++k)
+            for (U16 k = 0U; k < fu->GetDynamicDataEntryCount(); ++k)
             {
-                const DynamicDataEntryType* data = fu->GetDynamicDataEntry(k);
-                ASSERT(NULL != data);
-                if (m_numDataEntries < MAX_DYNAMIC_DATA)
+                const DynamicDataEntryType* const data = fu->GetDynamicDataEntry(k);
+                if (REQUIRE(NULL != data) && (m_numDataEntries < MAX_DYNAMIC_DATA))
                 {
                     m_dataEntries[m_numDataEntries].fu = fu;
                     m_dataEntries[m_numDataEntries].data = data;
                     m_dataEntries[m_numDataEntries].value = 0U;
-                    m_dataEntries[m_numDataEntries].timestamp = 0U;
+                    m_dataEntries[m_numDataEntries].refreshTimer = Timer();
                     m_dataEntries[m_numDataEntries].status = fu->GetInternal() ? DataStatus::VALID : DataStatus::NOT_AVAILABLE;
                     ++m_numDataEntries;
                 }
@@ -102,21 +79,22 @@ DataHandler::DataHandler(const Database& db)
     }
 }
 
-DataStatus DataHandler::getNumber(const DynamicData& dataId,
+DataStatus DataHandler::getNumber(const DynamicData& id,
     Number &value) const
 {
-    const DynamicDataEntry* const entry = find(dataId);
+    const DynamicDataEntry* const entry = find(id);
     DataStatus status = DataStatus::NOT_AVAILABLE;
     if (NULL != entry)
     {
         value = Number(entry->value, entry->data->GetDataType());
-        const U16 repeatTimeout = entry->data->GetRepeatTimeout();
+        const U32 repeatTimeout = static_cast<U32>(entry->data->GetRepeatTimeout());
         status = entry->status;
         if (repeatTimeout > 0U)
         {
             // check for aged data
-            if (isElapsed(entry->timestamp, static_cast<U32>(repeatTimeout)))
+            if (entry->refreshTimer.hasExpired(repeatTimeout))
             {
+                static_cast<void>(status);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
                 status = DataStatus::NOT_AVAILABLE;
             }
         }
@@ -124,36 +102,36 @@ DataStatus DataHandler::getNumber(const DynamicData& dataId,
     return status;
 }
 
-bool DataHandler::setData(const DynamicData& dataId,
+bool DataHandler::setData(const DynamicData& id,
     const Number& value,
     const DataStatus status)
 {
-    bool success = false;
-    DynamicDataEntry* const entry = find(dataId);
-    if ((NULL != entry) && (entry->data->GetDataType() == value.getType()))
+    DynamicDataEntry* const entry = find(id);
+    const bool found = ((NULL != entry) && (entry->data->GetDataType() == value.getType()));
+    if (found)
     {
         entry->value = value.getU32();
         entry->status = status;
-        entry->timestamp = pilGetMonotonicTime();
-        success = true;
+        entry->refreshTimer.start();
     }
-    return success;
+    return found;
 }
 
-const DynamicDataEntry* DataHandler::find(const DynamicData& data) const
+const DynamicDataEntry* DataHandler::find(const DynamicData& id) const
 {
-    return const_cast<DataHandler*>(this)->find(data);
+    // coverity[misra_cpp_2008_rule_5_2_5_violation] Avoids code duplication
+    return const_cast<DataHandler*>(this)->find(id);
 }
 
-DynamicDataEntry* DataHandler::find(const DynamicData& data)
+DynamicDataEntry* DataHandler::find(const DynamicData& id)
 {
     DynamicDataEntry* const pDataEntry = std::lower_bound(
         &m_dataEntries[0],
         &m_dataEntries[m_numDataEntries],
-        DynamicDataEntry_Comparer::key(data.getFUClassId(), data.getDataId()),
+        DynamicDataEntry_Comparer::key(id.getFUClassId(), id.getDataId()),
         DynamicDataEntry_Comparer());
 
-    return (((pDataEntry != &m_dataEntries[m_numDataEntries]) && (pDataEntry->fu->fUClassId == data.getFUClassId()) && (pDataEntry->data->dataId == data.getDataId())) ? pDataEntry : NULL);
+    return (((pDataEntry != &m_dataEntries[m_numDataEntries]) && (pDataEntry->fu->GetFUClassId() == id.getFUClassId()) && (pDataEntry->data->GetDataId() == id.getDataId())) ? pDataEntry : NULL);
 }
 
-}
+} // namespace lsr

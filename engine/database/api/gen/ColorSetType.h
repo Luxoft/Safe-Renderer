@@ -5,6 +5,7 @@
 **
 **   File:        ColorSetType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -32,35 +33,42 @@
 namespace lsr
 {
 
+/**
+ * ColorSetType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct ColorSetType
 {
-    const U16 defaultDisplayBackgroundColorId;
-    const U16 defaultPageBackgroundColorId;
-    const U16 defaultPanelBackgroundColorId;
+    const U16 m_defaultDisplayBackgroundColorId;
+    const U16 m_defaultPageBackgroundColorId;
+    const U16 m_defaultPanelBackgroundColorId;
 
 
     /**
      * Returns the value of the defaultDisplayBackgroundColorId attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetDefaultDisplayBackgroundColorId() const
     {
-        return defaultDisplayBackgroundColorId;
+        return m_defaultDisplayBackgroundColorId;
     }
 
     /**
      * Returns the value of the defaultPageBackgroundColorId attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetDefaultPageBackgroundColorId() const
     {
-        return defaultPageBackgroundColorId;
+        return m_defaultPageBackgroundColorId;
     }
 
     /**
      * Returns the value of the defaultPanelBackgroundColorId attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetDefaultPanelBackgroundColorId() const
     {
-        return defaultPanelBackgroundColorId;
+        return m_defaultPanelBackgroundColorId;
     }
 
 };

@@ -40,4 +40,9 @@ Texture* DisplayManager::loadTexture(const StaticBitmap& bmp)
     return m_textureCache.load(bmp);
 }
 
+GILError DisplayManager::getError() const
+{
+    return gilGetError(m_context);
+}
+
 }

@@ -5,6 +5,7 @@
 **
 **   File:        AreaType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -32,44 +33,52 @@
 namespace lsr
 {
 
+/**
+ * AreaType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct AreaType
 {
-    const I16 xCoord;
-    const I16 yCoord;
-    const I16 width;
-    const I16 height;
+    const I16 m_xCoord;
+    const I16 m_yCoord;
+    const I16 m_width;
+    const I16 m_height;
 
 
     /**
      * Returns the value of the xCoord attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     I16 GetXCoord() const
     {
-        return xCoord;
+        return m_xCoord;
     }
 
     /**
      * Returns the value of the yCoord attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     I16 GetYCoord() const
     {
-        return yCoord;
+        return m_yCoord;
     }
 
     /**
      * Returns the value of the width attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     I16 GetWidth() const
     {
-        return width;
+        return m_width;
     }
 
     /**
      * Returns the value of the height attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     I16 GetHeight() const
     {
-        return height;
+        return m_height;
     }
 
 };

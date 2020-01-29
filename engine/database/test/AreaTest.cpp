@@ -27,6 +27,7 @@
 #include "gtest/gtest.h"
 #include "Area.h"
 #include "AreaType.h"
+#include <iostream>
 
 using lsr::Area;
 using lsr::AreaType;
@@ -40,6 +41,27 @@ namespace
         return static_cast<I32>(value * (1 << FIXED_POINT_BITS));
     }
 }
+
+namespace lsr
+{
+
+/**
+ * Streaming operator for comparing lsr::Area in unit tests.
+ *
+ * @note Argument-dependent lookup requires this operator to be declared in the namespace
+ *       ddh, which is associated to the parameter @p area.
+ *       Otherwise the operator has to be declared before it is used in TestAssert.h,
+ *       which means this header would have to be included just before including
+ *       <cppunit/extensions/HelperMacros.h>.
+ */
+std::ostream& operator<<(std::ostream& out, const lsr::Area& area)
+{
+    out << "x:" << area.getLeft() << ", y:" << area.getTop();
+    out << ", w:" << area.getWidth() << ", h:" << area.getHeight();
+    return out;
+}
+
+} // namespace lsr
 
 TEST(AreaTest, toString)
 {

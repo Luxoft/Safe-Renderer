@@ -45,6 +45,8 @@ class BitmapExpression P_FINAL: public NumberExpression
 {
 public:
     BitmapExpression();
+    //BitmapExpression(const BitmapExpression&);  Base class NonCopyable hides copy constructor
+    //BitmapExpression& operator=(const BitmapExpression&);  Base class NonCopyable hides assignment operator
 
     /**
      * Returns the current value.
@@ -54,10 +56,6 @@ public:
      * @return status of @c value, see @c DataStatus.
      */
     DataStatus getValue(BitmapId& value) const;
-
-private:
-    BitmapExpression(const BitmapExpression&);
-    BitmapExpression& operator=(const BitmapExpression&);
 };
 
 } // namespace datahandler;

@@ -28,13 +28,11 @@
 ******************************************************************************/
 
 #include "LsrTypes.h"
-#ifdef UNIT_TEST
-#include <iostream>
-#endif
+#include <DatabaseTypes.h>
+
 
 namespace lsr
 {
-    struct AreaType;
 
 /**
 *   Class to represent an area on the display.
@@ -52,9 +50,10 @@ class Area
 public:
     Area();
     explicit Area(const AreaType* const pArea);
-    Area(const Area& other);
     Area(const I32 left, const I32 top, const I32 right, const I32 bottom);
     ~Area();
+    //Area(const Area& other);  Use generated copy constructor
+    //Area& operator=(const Area& other);  Use generated assignment operator
 
     /**
     *   Converts integer pixel into sub pixel resolution fixed point
@@ -146,25 +145,6 @@ private:
     I32 m_width;    ///< Internal sub pixel resolution fixed point horizontal size
     I32 m_height;   ///< Internal sub pixel resolution fixed point vertical size
 };
-
-
-#ifdef UNIT_TEST
-/**
- * Streaming operator for comparing lsr::Area in unit tests.
- *
- * @note Argument-dependent lookup requires this operator to be declared in the namespace
- *       ddh, which is associated to the parameter @p area.
- *       Otherwise the operator has to be declared before it is used in TestAssert.h,
- *       which means this header would have to be included just before including
- *       <cppunit/extensions/HelperMacros.h>.
- */
-inline std::ostream& operator<<(std::ostream& out, const lsr::Area& area)
-{
-    out << "x:" << area.getLeft() << ", y:" << area.getTop();
-    out << ", w:" << area.getWidth() << ", h:" << area.getHeight();
-    return out;
-}
-#endif // UNIT_TEST
 
 } // namespace lsr
 

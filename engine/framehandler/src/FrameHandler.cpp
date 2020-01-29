@@ -38,13 +38,13 @@ namespace lsr
 {
 
 FrameHandler::FrameHandler(Database& db, IDataHandler& dataHandler, DisplayManager& dsp)
-    : NonCopyable<FrameHandler>()
+    : NonCopyable()
     , m_db(db)
     , m_widgetPool()
     , m_dataHandler(dataHandler)
     , m_dataContext(dataHandler)
     , m_display(dsp)
-    , m_error(LSR_NO_ERROR)
+    , m_error(LSR_NO_ENGINE_ERROR)
     , m_pWindow(NULL)
 {
     // since we don't use exceptions we need an extra initialize method to capture errors (start())
@@ -57,7 +57,7 @@ FrameHandler::~FrameHandler()
 
 bool FrameHandler::start()
 {
-    ASSERT(m_db.getError() == LSR_NO_ERROR);
+    ASSERT(m_db.getError() == LSR_NO_ENGINE_ERROR);
 
     if (m_pWindow != NULL)
     {
@@ -110,7 +110,7 @@ bool FrameHandler::handleWindowEvents()
     return m_pWindow->handleWindowEvents();
 }
 
-LSRError FrameHandler::getError()
+LSREngineError FrameHandler::getError()
 {
     if (NULL != m_pWindow)
     {

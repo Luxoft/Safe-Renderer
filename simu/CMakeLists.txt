@@ -31,7 +31,7 @@ include_directories(
     ${SIMU_BASE}/src
     ${SIMU_BASE}/communication/api
     ${SIMU_BASE}/odi/api
-    ${LSRROOT}/test/database/Telltales/Output
+    ${HMI_PROJECT_PATH}
 )
 
 set(SIMU_HEADERS

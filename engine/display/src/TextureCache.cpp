@@ -39,17 +39,19 @@ TextureCache::TextureCache(const DisplayManager& dsp)
 
 Texture* TextureCache::load(const StaticBitmap& bmp)
 {
-    Texture* texture = NULL;
+    Texture* pTexture = NULL;
     const U16 id = bmp.getId();
     if ((id > 0U) && (id <= MAX_TEXTURES))
     {
-        texture = &m_textures[id - 1U];
-        if (!texture->isLoaded())
+        static_cast<void>(pTexture);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+        pTexture = &m_textures[id - 1U];
+        if (!pTexture->isLoaded())
         {
-            texture->load(m_displayManager.getContext(), bmp.getData());
+            pTexture->load(m_displayManager.getContext(), bmp.getData());
         }
     }
-    return texture;
+    // coverity[misra_cpp_2008_rule_9_3_2_violation]
+    return pTexture;
 }
 
-}
+} // namespace lsr

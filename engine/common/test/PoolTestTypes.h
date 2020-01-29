@@ -125,18 +125,18 @@ public:
 
     void* allocate()
     {
-        LSRError error = LSR_NO_ERROR;
+        LSREngineError error = LSR_NO_ENGINE_ERROR;
         void* ptr = this->m_pool->allocate(error);
-        EXPECT_EQ(LSRError(LSR_NO_ERROR), error);
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR), error);
         EXPECT_TRUE(NULL != ptr);
         return ptr;
     }
 
-    LSRError allocateFailed()
+    LSREngineError allocateFailed()
     {
-        LSRError error = LSR_NO_ERROR;
+        LSREngineError error = LSR_NO_ENGINE_ERROR;
         const void* ptr = this->m_pool->allocate(error);
-        EXPECT_TRUE(error != LSRError(LSR_NO_ERROR));
+        EXPECT_TRUE(error != LSREngineError(LSR_NO_ENGINE_ERROR));
         EXPECT_TRUE(NULL == ptr);
         return error;
     }

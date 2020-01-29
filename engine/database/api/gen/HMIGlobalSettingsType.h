@@ -5,6 +5,7 @@
 **
 **   File:        HMIGlobalSettingsType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,31 +32,35 @@
 
 namespace lsr
 {
-struct DisplaySizeType;
-struct ColorSetType;
 
+/**
+ * HMIGlobalSettingsType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct HMIGlobalSettingsType
 {
-    const DisplaySizeType* const displaySize;
-    const ColorSetType* const colorSet;
+    const DisplaySizeType* const m_displaySize;
+    const ColorSetType* const m_colorSet;
 
 
     /**
      * Returns a pointer to the displaySize child reference.
      * The size of the display in pixels
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const DisplaySizeType* GetDisplaySize() const
     {
-        return displaySize;
+        return m_displaySize;
     }
 
     /**
      * Returns a pointer to the colorSet child reference.
      * Defines which colors shall be used for backgrounds, field types, specific fields, etc.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const ColorSetType* GetColorSet() const
     {
-        return colorSet;
+        return m_colorSet;
     }
 
 };

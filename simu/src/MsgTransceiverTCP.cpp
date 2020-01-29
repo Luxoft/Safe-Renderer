@@ -479,7 +479,7 @@ bool MsgTransceiverTCP::GetSocketWriteStatus(bool& result, int s_timeout, int us
     return true;
 }
 
-LSRError MsgTransceiverTCP::transmitMessage(const U8 *pData, U32 dataLen)
+ComError MsgTransceiverTCP::transmitMessage(const U8 *pData, U32 dataLen)
 {
     //printf("MsgTransceiverTCP::TransmitMessage, socket: %d, type: %d, header len: %d, data len: %d\n", m_socket, messageType, HEADER_SIZE, dataLen);
 
@@ -490,12 +490,12 @@ LSRError MsgTransceiverTCP::transmitMessage(const U8 *pData, U32 dataLen)
 
     if (!InternalSend(m_headerBuffer, HEADER_SIZE))
     {
-        return LSR_UNKNOWN_ERROR;
+        return COM_UNKNOWN_ERROR;
     }
 
     if (!InternalSend(pData+1, dataLen-1))
     {
-        return LSR_UNKNOWN_ERROR;
+        return COM_UNKNOWN_ERROR;
     }
 
     if (m_state == WAIT_FOR_CONNECTED)
@@ -504,7 +504,7 @@ LSRError MsgTransceiverTCP::transmitMessage(const U8 *pData, U32 dataLen)
         m_state = CONNECTED_WAIT_FOR_HEADER;
         m_pMsgTransceiverTCPObserver->OnConnect(this);
     }
-    return LSR_NO_ERROR;
+    return COM_NO_ERROR;
 }
 
 #ifdef PROXY_FU

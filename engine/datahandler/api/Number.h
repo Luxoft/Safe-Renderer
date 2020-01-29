@@ -63,15 +63,6 @@ public:
     Number(const U32 val, const DynamicDataTypeEnumeration type);
 
     /**
-     * Constructs the object and initializes it with another @c Number object.
-     *
-     * @param[in] rhs object which should be cloned.
-     */
-    Number(const Number& rhs);
-
-    Number& operator=(const Number& rhs);
-
-    /**
      * Returns value in U32 representation.
      *
      * @return value.
@@ -117,23 +108,8 @@ inline Number::Number(const U32 val, const DynamicDataTypeEnumeration type)
     , m_type(type)
 {}
 
-inline Number::Number(const Number& rhs)
-    : m_value(rhs.m_value)
-    , m_type(rhs.m_type)
-{}
-
 inline Number::~Number()
 {}
-
-inline Number& Number::operator=(const Number& rhs)
-{
-    if (this != &rhs)
-    {
-        m_value = rhs.m_value;
-        m_type = rhs.m_type;
-    }
-    return *this;
-}
 
 inline U32 Number::getU32() const
 {

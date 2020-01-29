@@ -5,6 +5,7 @@
 **
 **   File:        DDHType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -31,30 +32,28 @@
 
 namespace lsr
 {
-struct PageDatabaseType;
-struct PanelDatabaseType;
-struct HMIGlobalSettingsType;
-struct ColorDatabaseType;
-struct SkinDatabaseType;
-struct FUClassType;
 
+/**
+ * DDHType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct DDHType
 {
-    const U32 imagesChecksum;
-    const U32 schemaChecksum;
-    const U32 schemaVersion;
-    const U32 serializerVersion;
-    const PageDatabaseType* const pageDatabase;
-    const PanelDatabaseType* const panelDatabase;
-    const HMIGlobalSettingsType* const hMIGlobalSettings;
-    const ColorDatabaseType* const colorDatabase;
-    const SkinDatabaseType* const skinDatabase;
-    const FUClassType* const *fU;
-    const U16 fUCount;
+    const U32 m_imagesChecksum;
+    const U32 m_schemaChecksum;
+    const U32 m_schemaVersion;
+    const U32 m_serializerVersion;
+    const PageDatabaseType* const m_pageDatabase;
+    const PanelDatabaseType* const m_panelDatabase;
+    const HMIGlobalSettingsType* const m_hMIGlobalSettings;
+    const ColorDatabaseType* const m_colorDatabase;
+    const SkinDatabaseType* const m_skinDatabase;
+    const FUClassType* const* const m_fU;
+    const U16 m_fUCount;
 
-    static const U32 SERIALIZER_VERSION = 0x50400U;  ///< Version of the serializer
-    static const U32 SCHEMA_VERSION = 0x50400U;  ///< Version of the schema
-    static const U32 SCHEMA_CHECKSUM = 0x49D84938U;  ///< Checksum of the schema
+    static const U32 SERIALIZER_VERSION = 0x50500U;  ///< Version of the serializer
+    static const U32 SCHEMA_VERSION = 0x50500U;  ///< Version of the schema
+    static const U32 SCHEMA_CHECKSUM = 0x9FA75F84U;  ///< Checksum of the schema
 
     bool IsVersionOK() const
     {
@@ -63,20 +62,24 @@ struct DDHType
             (GetSchemaChecksum() == SCHEMA_CHECKSUM);
     }
 
-    const char* GetErrorMessage() const
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
+    const char_t* GetErrorMessage() const
     {
-        const char* errorMessage = "";
+        const char_t* errorMessage = "";
         if (GetSerializerVersion() != SERIALIZER_VERSION)
         {
-            errorMessage = "Data has been serialized with another version of the serializer than what the HMI Engine expects (Expecting Serializer version: 5.4.0)";
+            static_cast<void>(errorMessage);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+            errorMessage = "Data has been serialized with another version of the serializer than what the HMI Engine expects (Expecting Serializer version: 5.5.0)";
         }
         else if (GetSchemaVersion() != SCHEMA_VERSION)
         {
-            errorMessage = "Data has been generated from another schema version than the HMI Engine expects (Expecting Schema Version: 5.4.x)";
+            static_cast<void>(errorMessage);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+            errorMessage = "Data has been generated from another schema version than the HMI Engine expects (Expecting Schema Version: 5.5.x)";
         }
         else if (GetSchemaChecksum() != SCHEMA_CHECKSUM)
         {
-            errorMessage = "Data has been generated from a schema version with another checksum than the HMI Engine expects (Expecting Schema checksum: 0x49d84938)";
+            static_cast<void>(errorMessage);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+            errorMessage = "Data has been generated from a schema version with another checksum than the HMI Engine expects (Expecting Schema checksum: 0x9fa75f84)";
         }
         else
         {
@@ -88,86 +91,96 @@ struct DDHType
     /**
      * Returns the value of the imagesChecksum attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U32 GetImagesChecksum() const
     {
-        return imagesChecksum;
+        return m_imagesChecksum;
     }
 
     /**
      * Returns the value of the schemaChecksum attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U32 GetSchemaChecksum() const
     {
-        return schemaChecksum;
+        return m_schemaChecksum;
     }
 
     /**
      * Returns the value of the schemaVersion attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U32 GetSchemaVersion() const
     {
-        return schemaVersion;
+        return m_schemaVersion;
     }
 
     /**
      * Returns the value of the serializerVersion attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U32 GetSerializerVersion() const
     {
-        return serializerVersion;
+        return m_serializerVersion;
     }
 
     /**
      * Returns a pointer to the pageDatabase child reference.
      * Contains definitions of pages. Every page belongs to a specific profile
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const PageDatabaseType* GetPageDatabase() const
     {
-        return pageDatabase;
+        return m_pageDatabase;
     }
 
     /**
      * Returns a pointer to the panelDatabase child reference.
      * Contains definitions of panels. Panels can be reused in different pages
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const PanelDatabaseType* GetPanelDatabase() const
     {
-        return panelDatabase;
+        return m_panelDatabase;
     }
 
     /**
      * Returns a pointer to the hMIGlobalSettings child reference.
      * The global settings for the project. Contains definitions of several settings needed for the HMI Engine and for the Editor to operate correctly
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const HMIGlobalSettingsType* GetHMIGlobalSettings() const
     {
-        return hMIGlobalSettings;
+        return m_hMIGlobalSettings;
     }
 
     /**
      * Returns a pointer to the colorDatabase child reference.
      * Contains definitions of colors. Only required on systems with color displays
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const ColorDatabaseType* GetColorDatabase() const
     {
-        return colorDatabase;
+        return m_colorDatabase;
     }
 
     /**
      * Returns a pointer to the skinDatabase child reference.
      *
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const SkinDatabaseType* GetSkinDatabase() const
     {
-        return skinDatabase;
+        return m_skinDatabase;
     }
 
     /**
      * Returns the number of fU elements.
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetFUCount() const
     {
-        return fUCount;
+        return m_fUCount;
     }
 
     /**
@@ -175,9 +188,11 @@ struct DDHType
      * This method checks the index and returns NULL if the item index exceeds the element count.
      * This is the list of all Functional Units known by the Engine
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     const FUClassType* GetFU(const U16 i) const
     {
-        return (i < fUCount) ? fU[i] : NULL;
+        // coverity[misra_cpp_2008_rule_5_0_15_violation]
+        return (i < m_fUCount) ? m_fU[i] : NULL;
     }
 
 };

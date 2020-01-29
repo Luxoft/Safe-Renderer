@@ -5,6 +5,7 @@
 **
 **   File:        DisplaySizeType.h
 **   Description:
+**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
@@ -32,26 +33,32 @@
 namespace lsr
 {
 
+/**
+ * DisplaySizeType
+ * @note member variables shall not be accessed by name - use the getter functions instead
+ */
 struct DisplaySizeType
 {
-    const U16 width;
-    const U16 height;
+    const U16 m_width;
+    const U16 m_height;
 
 
     /**
      * Returns the value of the width attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetWidth() const
     {
-        return width;
+        return m_width;
     }
 
     /**
      * Returns the value of the height attribute
      */
+    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
     U16 GetHeight() const
     {
-        return height;
+        return m_height;
     }
 
 };

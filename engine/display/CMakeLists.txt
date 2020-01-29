@@ -28,6 +28,7 @@ include_directories(
     ${LSRENGINE}/database/api/gen
     ${DISPLAY_BASE}/api
     ${DISPLAY_BASE}/src
+    ${HMI_PROJECT_PATH}
 )
 
 set(DISPLAY_HEADERS

@@ -55,6 +55,7 @@ void BoolExpression::setup(const ExpressionTermType* const pTerm, DataContext* c
 void BoolExpression::dispose()
 {
     m_pTerm = NULL;
+    m_pContext = NULL;
 }
 
 DataStatus BoolExpression::getValue(bool& value) const

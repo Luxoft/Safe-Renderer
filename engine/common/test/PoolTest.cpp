@@ -26,7 +26,7 @@
 
 #include "PoolTestTypes.h"
 
-#include <LSRError.h>
+#include <LSREngineError.h>
 
 #include <gtest/gtest.h>
 #include <cstddef>
@@ -58,14 +58,14 @@ TYPED_TEST(PoolTest, Allocate)
         prevCellSize = cellSize;
     }
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), this->allocateFailed());
 }
 
 TYPED_TEST(PoolTest, OverAllocate)
 {
     this->fillUpPool();
 
-    EXPECT_EQ(LSRError(LSR_POOL_IS_FULL), this->allocateFailed());
+    EXPECT_EQ(LSREngineError(LSR_POOL_IS_FULL), this->allocateFailed());
 }
 
 TYPED_TEST(PoolTest, Deallocate)
@@ -79,7 +79,7 @@ TYPED_TEST(PoolTest, Deallocate)
 
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
-        EXPECT_EQ(LSRError(LSR_NO_ERROR),
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR),
                   this->m_pool->deallocate(reinterpret_cast<void*>(objects[i])));
     }
 }
@@ -95,7 +95,7 @@ TYPED_TEST(PoolTest, Defragmentation)
 
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
-        EXPECT_EQ(LSRError(LSR_NO_ERROR),
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR),
                   this->m_pool->deallocate(reinterpret_cast<void*>(objects[i])));
         // Check, that next allocation will be on the last empty object.
         std::size_t ptr = reinterpret_cast<std::size_t>(this->allocate());
@@ -114,11 +114,11 @@ TYPED_TEST(PoolTest, DeallocateTwice)
 
     for (std::size_t i = 0U; i < TypeParam::PoolSize::value; ++i)
     {
-        EXPECT_EQ(LSRError(LSR_NO_ERROR),
+        EXPECT_EQ(LSREngineError(LSR_NO_ENGINE_ERROR),
                   this->m_pool->deallocate(reinterpret_cast<void*>(objects[i])));
-        EXPECT_EQ(LSRError(LSR_POOL_DOUBLE_DELETE),
+        EXPECT_EQ(LSREngineError(LSR_POOL_DOUBLE_DELETE),
                   this->m_pool->deallocate(reinterpret_cast<void*>(objects[i])));
-        EXPECT_EQ(LSRError(LSR_POOL_DOUBLE_DELETE),
+        EXPECT_EQ(LSREngineError(LSR_POOL_DOUBLE_DELETE),
                   this->m_pool->deallocate(reinterpret_cast<void*>(objects[i])));
     }
 }
@@ -127,7 +127,7 @@ TYPED_TEST(PoolTest, DeallocateFailedWithNullPointer)
 {
     this->fillUpPool();
 
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT),
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT),
               this->m_pool->deallocate(NULL));
 }
 
@@ -135,13 +135,13 @@ TYPED_TEST(PoolTest, DeallocateWithPointerFromAnotherBuffer)
 {
     // Pointer to memory before storage
     U8* ptr1 = reinterpret_cast<U8*>(this->allocate());
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT),
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT),
               this->m_pool->deallocate(ptr1 - 0x50));
 
     const std::size_t storageSize = sizeof(this->m_corrupter->storage);
 
     // Pointer to memory after storage
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT),
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT),
               this->m_pool->deallocate(ptr1 + storageSize + 1));
 }
 
@@ -154,21 +154,21 @@ TYPED_TEST(PoolTest, DeallocateWithShiftedPointer)
     const std::size_t storageSize = sizeof(this->m_corrupter->storage);
 
     // check at the position < cellSize
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT),
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT),
               this->m_pool->deallocate(ptr1 + 1));
 
     // check at the position > cellSize
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT),
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT),
               this->m_pool->deallocate(ptr1 + cellSize + 1));
 
     // check at very end
     U8* lastCell = ptr1 + storageSize - cellSize;
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT),
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT),
               this->m_pool->deallocate(lastCell + 1));
 
     // check after very end
     U8* end = ptr1 + storageSize;
-    EXPECT_EQ(LSRError(LSR_POOL_INVALID_OBJECT),
+    EXPECT_EQ(LSREngineError(LSR_POOL_INVALID_OBJECT),
               this->m_pool->deallocate(end));
 }
 
