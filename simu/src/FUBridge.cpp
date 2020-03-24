@@ -7,20 +7,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -32,19 +23,16 @@
 #include <MessageHeader.h>
 #include <RegistrationMsgReader.h>
 #include <DDHType.h>
-#include <FUClassType.h>
-#include <DynamicDataEntryType.h>
 #include <DataResponseMessage.h>
-#include <Engine.h>
+#include <DataHandler.h>
 #include <LSRErrorCollector.h>
 
 using namespace lsr;
 
 
-FUBridge::FUBridge(const DDHType* ddh, int port, const std::string& hostname, Engine& dh)
+FUBridge::FUBridge(DataHandler& dh, int port, const std::string& hostname)
 : m_session()
 , m_dataHandler(dh)
-, m_ddh(ddh)
 , m_transmitter(NULL)
 {
     m_session.Listen(hostname, port);
@@ -65,7 +53,6 @@ ComError FUBridge::handleIncomingData(uint32_t timeout)
     }
     return m_session.handleIncomingData(timeout);
 }
-
 
 ComError FUBridge::onMessage(IMsgTransmitter* pTransmitter, const U8 messageType, InputStream& stream)
 {
@@ -110,33 +97,27 @@ ComError FUBridge::onRegistration(IMsgTransmitter* pTransmitter, InputStream& st
 ComError FUBridge::subscribeAll()
 {
     U8 buf[256];
-    for (U16 i = 0; i < m_ddh->GetFUCount(); ++i)
+    for (DataHandler::iterator it = m_dataHandler.begin(); it != m_dataHandler.end(); ++it)
     {
-        const FUClassType* fu = m_ddh->GetFU(i);
-        if (!fu->GetInternal() && fu->GetFUClassId() != 0)
+        const DynamicData id(it->config.fuDataId);
+        OutputStream out(buf, sizeof(buf));
+        out << static_cast<U8>(MessageTypes::ODI);
+        out << static_cast<U8>(5); //data request
+        out << id.getFUClassId();
+        out << static_cast<U8>(0); // subscribe
+        out << static_cast<U8>(1); // display mask
+        out << static_cast<U8>(0); // validity
+        out << id.getDataId();
+        out << static_cast<U16>(0);
+        out << static_cast<U16>(0);
+        out << static_cast<U16>(0);
+        out << static_cast<U16>(0);
+        if (m_transmitter)
         {
-            for (U16 k = 0; k < fu->GetDynamicDataEntryCount(); ++k)
-            {
-                OutputStream out(buf, sizeof(buf));
-                out << static_cast<U8>(MessageTypes::ODI);
-                out << static_cast<U8>(5); //data request
-                out << fu->GetFUClassId();
-                out << static_cast<U8>(0); // subscribe
-                out << static_cast<U8>(1); // display mask
-                out << static_cast<U8>(0); // validity
-                const DynamicDataEntryType* data = fu->GetDynamicDataEntry(k);
-                out << data->GetDataId();
-                out << static_cast<U16>(0);
-                out << static_cast<U16>(0);
-                out << static_cast<U16>(0);
-                out << static_cast<U16>(0);
-                if (m_transmitter)
-                {
-                    m_transmitter->transmitMessage(buf, out.bytesWritten());
-                }
-            }
+            m_transmitter->transmitMessage(buf, out.bytesWritten());
         }
     }
+
     return COM_NO_ERROR;
 }
 
@@ -146,22 +127,14 @@ ComError FUBridge::subscribeAll()
  */
 void FUBridge::refresh()
 {
-    for (U16 i = 0; i < m_ddh->GetFUCount(); ++i)
+    for (DataHandler::iterator it = m_dataHandler.begin(); it != m_dataHandler.end(); ++it)
     {
-        const FUClassType* fu = m_ddh->GetFU(i);
-        if (!fu->GetInternal() && fu->GetFUClassId() != 0)
+        const DynamicData id(it->config.fuDataId);
+        Number value;
+        DataStatus status = m_dataHandler.getNumber(id, value);
+        if (DataStatus::VALID == status)
         {
-            const U16 fuId = fu->GetFUClassId();
-            for (U16 k = 0; k < fu->GetDynamicDataEntryCount(); ++k)
-            {
-                const U16 dataId = fu->GetDynamicDataEntry(k)->GetDataId();
-                Number value;
-                DataStatus status = m_dataHandler.getData(DynamicData(fuId, dataId), value);
-                if (DataStatus::VALID == status)
-                {
-                    m_dataHandler.setData(DynamicData(fuId, dataId), value, status);
-                }
-            }
+            m_dataHandler.setData(id, value, status);
         }
     }
 }

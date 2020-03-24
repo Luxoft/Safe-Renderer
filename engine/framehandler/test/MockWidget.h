@@ -10,28 +10,19 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
 #include <Widget.h>
+#include <Field.h>
+#include <WidgetChildren.h>
 #include <Canvas.h>
 #include <Area.h>
-
-#include <BoolExpression.h>
 
 #include <gmock/gmock.h>
 
@@ -40,27 +31,76 @@
 #pragma warning (disable : 4373)
 #endif
 
-class MockWidget: public lsr::Widget
+namespace lsr
+{
+    class MockField : public Field
+    {
+    public:
+        MOCK_METHOD1(setup, LSREngineError(const Database&));
+        MOCK_CONST_METHOD2(onDraw, void(Canvas&, const Area&));
+        MOCK_METHOD2(onVerify, bool(Canvas&, const Area&));
+
+        virtual bool isChildInvalidated() const P_OVERRIDE
+        {
+            return false;
+        }
+
+        virtual LSREngineError getChildError() const P_OVERRIDE
+        {
+            return LSR_NO_ENGINE_ERROR;
+        }
+    };
+}
+
+class WidgetWithChildren : public lsr::Widget
+{
+protected:
+    virtual void onDraw2(lsr::Canvas& dest, const lsr::Area& rect) const = 0;
+    virtual bool onVerify2(lsr::Canvas& dest, const lsr::Area& rect) = 0;
+public:
+    void onDraw(lsr::Canvas& dest, const lsr::Area& rect) const P_OVERRIDE P_FINAL
+    {
+        onDraw2(dest, rect);
+        m_children.draw(dest, rect);
+    }
+
+    bool onVerify(lsr::Canvas& dest, const lsr::Area& rect) P_OVERRIDE P_FINAL
+    {
+        bool res = onVerify2(dest, rect);
+        if (res)
+        {
+            res = m_children.verify(dest, rect);
+        }
+        return res;
+    }
+
+    LSREngineError getChildError() const P_OVERRIDE P_FINAL
+    {
+        return m_children.getError();
+    }
+
+    bool isChildInvalidated() const P_OVERRIDE P_FINAL
+    {
+        return m_children.isInvalidated();
+    }
+
+    bool addChild(WidgetWithChildren* child)
+    {
+        return m_children.addChild(child);
+    }
+private:
+    lsr::WidgetChildren<WidgetWithChildren, lsr::MAX_WIDGET_CHILDREN_COUNT> m_children;
+};
+
+class MockWidget: public WidgetWithChildren
 {
 public:
     MockWidget()
     {}
 
-    MOCK_METHOD1(onUpdate, void (const U32));
+    MOCK_CONST_METHOD2(onDraw2, void (lsr::Canvas&, const lsr::Area&));
 
-    MOCK_CONST_METHOD2(onDraw, void (lsr::Canvas&, const lsr::Area&));
-
-    MOCK_METHOD2(onVerify, bool (lsr::Canvas&, const lsr::Area&));
-
-    virtual Widget::WidgetType getType() const P_OVERRIDE
-    {
-        return Widget::WIDGET_TYPE_BITMAP_FIELD;
-    }
-
-    bool addChild(Widget* child)
-    {
-        return Widget::addChild(child);
-    }
+    MOCK_METHOD2(onVerify2, bool (lsr::Canvas&, const lsr::Area&));
 
     void invalidate()
     {
@@ -80,11 +120,6 @@ public:
     void setError(LSREngineError error)
     {
         Widget::setError(error);
-    }
-
-    void setVisibilityExpr(const lsr::BoolExpression* expr)
-    {
-        Widget::setVisibilityExpression(expr);
     }
 
     bool isVisible() const

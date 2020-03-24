@@ -22,19 +22,6 @@ include_directories(
 
 GUNITTEST_APP(
     NAME EngineAppTest
-    FILES EngineAppTest.cpp
-    TestDBInvalidBitmap.cpp
-    ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
+    FILES EngineAppTest.cpp TelltalesEngineTest.cpp
 )
 
-add_executable(
-    lsr_simu_capi_test
-    lsr_simu_capi.c
-    ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
-)
-
-target_link_libraries(lsr_simu_capi_test
-    engine
-    pilSample
-    gilSample
-)

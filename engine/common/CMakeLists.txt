@@ -33,9 +33,9 @@ set(COMMON_HEADERS
     ${COMMON_BASE}/api/NonCopyable.h
     ${COMMON_BASE}/api/Pool.h
     ${COMMON_BASE}/api/PoolMarker.h
-    ${COMMON_BASE}/api/PooledObjectFactory.h
     ${COMMON_BASE}/api/LSREngineError.h
     ${COMMON_BASE}/api/LsrTypes.h
+    ${COMMON_BASE}/api/ReturnValue.h
     ${COMMON_BASE}/api/Timer.h
 )
 

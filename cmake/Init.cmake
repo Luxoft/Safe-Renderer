@@ -1,15 +1,35 @@
 if(NOT DEFINED LSR_INITED)
-    message(STATUS "Start set project options")
+    message(STATUS "Start set project ${PROJECT_NAME} options")
 
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
     include(Common)
     include(Variables)
+
     include(Version)
+    message(STATUS "--> ${PROJECT_NAME} version is ${LSR_VERSION_MAJOR}.${LSR_VERSION_MINOR}.${LSR_VERSION_PATCH}")
+
+    include(GitRevision)
+    getGitRevision(
+        REVISION_VAR "GIT_LSR_REVISION"
+        SHORT_REVISION_VAR "GIT_LSR_REVISION_SHORT"
+    )
+    message(STATUS "git revision is ${GIT_LSR_REVISION}; short revision is ${GIT_LSR_REVISION_SHORT}")
+
+    if(LSR_PACKAGE_INIT)
+        include(Package)
+        setPackageName(
+            MAJOR "${LSR_VERSION_MAJOR}"
+            MINOR "${LSR_VERSION_MINOR}"
+            PATCH "${LSR_VERSION_PATCH}"
+            DEV_BUILD "${DEVELOPMENT_BUILD}"
+            UNIT_TESTS "${UNIT_TESTS}"
+        )
+    endif()
+
     if(COVERAGE)
         include(Coverage)
     endif()
-    include(Package)
 
     if(UNIT_TESTS)
         enable_testing()
@@ -22,8 +42,6 @@ if(NOT DEFINED LSR_INITED)
     message(STATUS "--> Sizeof void* ${CMAKE_SIZEOF_VOID_P}")
 
     include(PlatformSpecific)
-
-    message(STATUS "Init Project ${PROJECT_NAME} ver.${LSR_VERSION_MAJOR}.${LSR_VERSION_MINOR}.${LSR_VERSION_PATCH}")
 
     set(LSR_INITED ON)
 endif()

@@ -10,20 +10,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -94,14 +85,10 @@ typedef uint32_t U32;
 typedef uint64_t U64;
 typedef int64_t I64;
 
-typedef U16 DataId; ///< The numerical ID for a dynamic data type in a FU
-typedef U16 FUClassId; ///< The numerical ID for a FU Class.
-typedef U16 EventId; ///< The numerical ID for a event from a FU
-typedef U8 IndicationId; ///< The numerical ID for an indication
-
 /** Max Align type */
 #if(_MSC_VER >= 1800 || __cplusplus >= 201103L)
 #include <cstddef>
+// coverity[misra_cpp_2008_rule_0_1_5_violation] used by optional Pool.h
 typedef std::max_align_t P_MAX_ALIGN;
 #else
  /**
@@ -118,6 +105,7 @@ typedef std::max_align_t P_MAX_ALIGN;
   * which is an integer value (of type std::size_t, always a power of 2))
   * That's why we place simple double value here.
   */
+// coverity[misra_cpp_2008_rule_0_1_5_violation] used by optional Pool.h
 typedef double P_MAX_ALIGN;
 #endif
 
@@ -135,13 +123,18 @@ namespace lsr
 {
 
 class Area;
-class DataContext;
 class Database;
 class DisplayManager;
 class StaticBitmap;
 class Window;
+class Frame;
 
 } // namespace lsr
+
+namespace unittest
+{
+    class EngineTest;
+} // namespace unittest
 
 
 /*! @} */

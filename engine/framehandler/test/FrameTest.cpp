@@ -7,20 +7,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -29,17 +20,18 @@
 #include <Frame.h>
 
 #include <LSRErrorCollector.h>
-#include <PageDatabaseType.h>
 #include <PanelDatabaseType.h>
-#include <PageType.h>
 #include <HMIGlobalSettingsType.h>
 #include <DisplaySizeType.h>
 #include <DDHType.h>
 #include <Telltales.hpp>
+#include "MockWidget.h"
 
 #include <gtest/gtest.h>
 
 using namespace lsr;
+using testing::_;
+using testing::Return;
 
 class FrameTest: public WidgetTestBase
 {
@@ -48,88 +40,66 @@ protected:
         : m_db(Telltales::getDDH())
     {}
 
-    lsr::Frame* create()
-    {
-        lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
-        lsr::Frame* frame = lsr::Frame::create(m_widgetPool,
-                                               m_db,
-                                               1U,
-                                               NULL,
-                                               &m_context,
-                                               error);
-        EXPECT_EQ(LSR_NO_ENGINE_ERROR, error.get());
-
-        return frame;
-    }
-
     lsr::Database m_db;
 };
 
 TEST_F(FrameTest, CreateFrameTest)
 {
-    lsr::Frame* frame = create();
-    EXPECT_TRUE(NULL != frame);
+    lsr::Frame frame;
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, frame.setup(m_db));
 }
 
 TEST_F(FrameTest, CreateFrameWithWrongPanelTest)
 {
-    PanelId panelIds[] = { 1U };
-    PageType page = { panelIds, 1, NULL, NULL };
-    PageType* pages[] = { &page };
-    PageDatabaseType pageDB = { pages, 1 };
-
     AreaType area = { 0U, 0U, 0U, 0U };
     PanelType p1 = {&area, NULL, NULL, 0U}; // broken panel (without visibility set)
-    PanelType* panels1[] = { &p1 };
-    PanelDatabaseType panelDB1 = {panels1, 1};
-
-    DisplaySizeType displaySize = { 0U, 0U };
-    HMIGlobalSettingsType globalSettings = { &displaySize, NULL };
-
-    const DDHType ddh = {
-        0U,
-        DDHType::SCHEMA_CHECKSUM,
-        DDHType::SCHEMA_VERSION,
-        DDHType::SERIALIZER_VERSION,
-        &pageDB,
-        &panelDB1,
-        &globalSettings,
-        NULL,
-        NULL,
-        NULL,
-        0U
-    };
-    Database db(&ddh);
-
+    Database db(Telltales::getDDH());
     lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
-    lsr::Frame* frame = lsr::Frame::create(m_widgetPool,
-                                           db,
-                                           1U,
-                                           NULL,
-                                           &m_context,
-                                           error);
-    EXPECT_EQ(LSR_DB_INCONSISTENT, error.get());
-    EXPECT_TRUE(NULL == frame);
+    lsr::Frame frame;
+    lsr::Panel panel(&p1);
+    frame.addChild(panel);
+    EXPECT_EQ(LSR_DB_INCONSISTENT, frame.setup(m_db));
+}
+
+TEST_F(FrameTest, AddToManyPanels)
+{
+    AreaType area = { 0U, 0U, 0U, 0U };
+    ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    PanelType p1 = {&area, &visible, NULL, 0U}; // broken panel (without visibility set)
+    lsr::Frame frame;
+    lsr::Panel panel(&p1);
+    for (U32 i = 0U; i < MAX_PANELS_COUNT; ++i)
+    {
+        frame.addChild(panel);
+        EXPECT_EQ(LSR_NO_ENGINE_ERROR, frame.getError());
+    }
+    frame.addChild(panel);
+    EXPECT_EQ(LSR_DB_INCONSISTENT, frame.getError());
 }
 
 TEST_F(FrameTest, VerifyTest)
 {
     lsr::Area area;
-    lsr::Frame* frame = create();
-    EXPECT_TRUE(NULL != frame);
-    EXPECT_TRUE(frame->verify(m_canvas, area));
+    lsr::Frame frame;
+    frame.setup(m_db);
+    EXPECT_TRUE(frame.verify(m_canvas, area));
 }
 
 TEST_F(FrameTest, DrawTest)
 {
-    lsr::Area area;
-    lsr::Frame* frame = create();
+    const AreaType areaType = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const PanelType panelType = {&areaType, &visible, NULL, 0U};
+    const lsr::Area area;
+    lsr::Frame frame;
+    Panel panel(&panelType);
+    MockField field;
+    frame.addChild(panel);
+    panel.addChild(field);
 
-    EXPECT_TRUE(NULL != frame);
+    EXPECT_CALL(field, setup(_)).WillOnce(Return(LSR_NO_ENGINE_ERROR));
+    EXPECT_CALL(field, onDraw(_,_));
 
-    frame->update(0U);
-    frame->draw(m_canvas, area);
-
-    // All bitmaps should be drawn
-    EXPECT_TRUE(lsr::DisplayAccessor::instance().wasDrawBitmapExecuted());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, frame.setup(m_db));
+    frame.draw(m_canvas, area);
 }

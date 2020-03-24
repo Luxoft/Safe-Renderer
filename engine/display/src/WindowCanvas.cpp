@@ -7,20 +7,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -32,9 +23,9 @@ namespace lsr
 {
 
 WindowCanvas::WindowCanvas(DisplayManager& dsp, const WindowDefinition& config)
-: Canvas(dsp, static_cast<U16>(config.width), static_cast<U16>(config.height))
+: Canvas(dsp, static_cast<U16>(config.getWidth()), static_cast<U16>(config.getHeight()))
 {
-    m_surface = gilCreateWindow(config.id, config.xPos, config.yPos, config.width, config.height);
+    m_surface = gilCreateWindow(config.getWindowId(), config.getX(), config.getY(), config.getWidth(), config.getHeight());
 }
 
 void WindowCanvas::makeCurrent()

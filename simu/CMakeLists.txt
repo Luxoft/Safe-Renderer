@@ -18,19 +18,17 @@ endif()
 
 include_directories(
     ${LSRROOT}/engine/common/api
-    ${LSRROOT}/engine/communication/api #for FUBridge
-    ${LSRROOT}/engine/odi/api #for FUBridge
     ${LSRROOT}/engine/database/api/gen #for FUBridge
     ${LSRROOT}/engine/database/api #for FUBridge
     ${LSRROOT}/engine/lsr/api
     ${LSRROOT}/engine/framehandler/api
-    ${LSRROOT}/engine/datahandler/api
     ${LSRROOT}/engine/display/api
     ${LSRROOT}/gil/api
     ${LSRROOT}/pil/api
     ${SIMU_BASE}/src
     ${SIMU_BASE}/communication/api
     ${SIMU_BASE}/odi/api
+    ${SIMU_BASE}/datahandler/api
     ${HMI_PROJECT_PATH}
 )
 
@@ -59,10 +57,12 @@ endif()
 
 add_subdirectory(communication)
 add_subdirectory(odi)
+add_subdirectory(datahandler)
 
 add_library(odicomm STATIC
     $<TARGET_OBJECTS:communication>
     $<TARGET_OBJECTS:odi>
+    $<TARGET_OBJECTS:datahandler>
 )
 
 add_executable(lsr_simu

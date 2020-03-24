@@ -7,20 +7,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -32,44 +23,6 @@
 
 namespace lsr
 {
-
-Field* Field::create(WidgetPool& factory,
-                     const Database& db,
-                     const BaseFieldChoiceType* const pDdh,
-                     DataContext* const pContext,
-                     LSRErrorCollector& error)
-{
-    Field* pField = NULL;
-    switch (pDdh->GetBaseFieldChoiceTypeChoice())
-    {
-    case BaseFieldChoiceType::STATICBITMAPFIELD_CHOICE:
-    {
-        static_cast<void>(pField);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
-        pField = BitmapField::create(factory,
-                                    db,
-                                    pDdh->GetStaticBitmapField(),
-                                    pContext,
-                                    error);
-        break;
-    }
-    case BaseFieldChoiceType::REFERENCEBITMAPFIELD_CHOICE:
-    {
-        static_cast<void>(pField);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
-        pField = ReferenceBitmapField::create(factory,
-                                             db,
-                                             pDdh->GetReferenceBitmapField(),
-                                             pContext,
-                                             error);
-        break;
-    }
-    default:
-    {
-        error = LSR_DB_INCONSISTENT;
-        break;
-    }
-    }
-    return pField;
-}
 
 Field::Field()
 : Widget()

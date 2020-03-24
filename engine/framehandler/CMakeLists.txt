@@ -27,6 +27,7 @@ include_directories(
     ${LSRENGINE}/database/api/gen
     ${LSRENGINE}/datahandler/api
     ${LSRENGINE}/display/api
+    ${LSRENGINE}/lsr/api
     ${LSRROOT}/gil/api
     ${FRAMEHANDLER_BASE}/api
     ${FRAMEHANDLER_BASE}/src
@@ -41,7 +42,6 @@ set(FRAMEHANDLER_HEADERS
     ${FRAMEHANDLER_BASE}/api/Panel.h
     ${FRAMEHANDLER_BASE}/api/ReferenceBitmapField.h
     ${FRAMEHANDLER_BASE}/api/Widget.h
-    ${FRAMEHANDLER_BASE}/api/WidgetPool.h
     ${FRAMEHANDLER_BASE}/api/Window.h
 )
 

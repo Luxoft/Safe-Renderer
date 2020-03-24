@@ -32,13 +32,10 @@ include_directories(
 )
 
 set(LSR_HEADERS
-    ${LSR_BASE}/api/lsr.h
     ${LSR_BASE}/api/Engine.h
 )
 
 set(LSR_SOURCES
-    ${LSR_BASE}/src/lsr.cpp
-    ${LSR_BASE}/src/lsr_p.h
     ${LSR_BASE}/src/Engine.cpp
 )
 

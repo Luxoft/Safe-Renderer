@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Common variables -->
-<!ENTITY ChangeLogDate "2020-01-27">
-<!ENTITY ChangeLogRelease "0.3.0">
+<!ENTITY ChangeLogDate "2020-03-23">
+<!ENTITY ChangeLogRelease "0.4.0">
 <!ENTITY ChangeLogIssuer "Arwed Richert">
-<!ENTITY CopyrightYear "2017">
+<!ENTITY CopyrightYear "2020">
 
 <!-- Luxoft Safe Renderer -->
 <!ENTITY ChangeLogProduct_LSR "Luxoft Safe Renderer">

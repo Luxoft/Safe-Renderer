@@ -7,26 +7,18 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
 #include "HMIProject.h"
 #include "Engine.h"
 #include "FUBridge.h"
+#include "DataHandler.h"
 #include "OdiTypes.h"
 #include "DDHType.h"
 #include "LSRErrorCollector.h"
@@ -43,6 +35,21 @@
 #include <algorithm>
 
 #include <imx6_rendering_configuration.h>
+
+
+namespace fu
+{
+    static const U32 FUTELLTALES_BREAKON = 0x002a0001U;  // FU:42 DataId:1
+    static const U32 FUTELLTALES_BREAKOFF = 0x002a0002U;  // FU:42 DataId:2
+    static const U32 FUTELLTALES_AIRBAG = 0x002a0003U;  // FU:42 DataId:3
+
+    // must be sorted by FUDataId
+    static const lsr::DataHandler::DataEntryType dataIdList[] = {
+        { FUTELLTALES_BREAKON, lsr::DATATYPE_BOOLEAN, 0U },
+        { FUTELLTALES_BREAKOFF, lsr::DATATYPE_BOOLEAN, 0U },
+        { FUTELLTALES_AIRBAG, lsr::DATATYPE_BOOLEAN, 0U },
+    };
+}
 
 struct TCPConfig
 {
@@ -81,22 +88,6 @@ struct LSRConfiguration
 
 namespace
 {
-    void makeAbsolutePath(std::string& fileName, const std::string& filePath)
-    {
-        if (fileName.length() == 0)
-        {
-            // Do nothing
-        }
-        else if (fileName.length() > 2 && (fileName[0] == '\\' || fileName[1] == ':'))
-        {
-            // This path is already absolute.
-        }
-        else
-        {
-            fileName.insert(0, filePath);
-        }
-    }
-
     // Usage message and config options enum
     void usage(char* name)
     {
@@ -279,6 +270,42 @@ namespace
 
         return res;
     }
+
+    /**
+     * Updates the HMI elements according to the stored values in the data handler
+     */
+    void updateHMI(Telltales::HMI& hmi, const lsr::DataHandler& dh)
+    {
+        lsr::Number airbagValue;
+        lsr::Number breakOnValue;
+        lsr::Number breakOffValue;
+        const lsr::DataStatus airbagStatus = dh.getNumber(lsr::DynamicData(fu::FUTELLTALES_AIRBAG), airbagValue);
+        const lsr::DataStatus breakOnStatus = dh.getNumber(lsr::DynamicData(fu::FUTELLTALES_AIRBAG), breakOnValue);
+        const lsr::DataStatus breakOffStatus = dh.getNumber(lsr::DynamicData(fu::FUTELLTALES_AIRBAG), breakOffValue);
+        // setup the reference images
+        if (airbagStatus == lsr::DataStatus::VALID)
+        {
+            hmi.getReferencePanel_Airbag().setVisible(airbagValue.getBool());
+        }
+        else
+        {
+            hmi.getReferencePanel_Airbag().setVisible(true);
+        }
+
+        if ((breakOnStatus == lsr::DataStatus::VALID) && (breakOffStatus == lsr::DataStatus::VALID))
+        {
+            const bool vis = breakOnValue.getBool() || !breakOffValue.getBool();
+            hmi.getReferencePanel_Break().setVisible(vis);
+        }
+        else
+        {
+            hmi.getReferencePanel_Break().setVisible(true);
+        }
+
+        // setup the bitmaps for drawing (fallback rendering is used)
+        hmi.getContentPanel_Airbag().setVisible(hmi.getReferencePanel_Airbag().getVerificationErrors() > 10U);
+        hmi.getContentPanel_Break().setVisible(hmi.getReferencePanel_Break().getVerificationErrors() > 5U);
+    }
 }
 
 int main(int argc, char* argv[])
@@ -307,19 +334,21 @@ int main(int argc, char* argv[])
                 std::min(sizeof(config.checkDevice), configuration.vcConfig.checkDev.size()));
 
         gilInit(&config);
-        lsr::Engine engine(Telltales::getDDH());
+        Telltales::HMI hmi;
+        lsr::Engine engine(Telltales::getDDH(), hmi);
         lsr::Engine::Error err = engine.getError();
         // Database errors are fatal (may yield undefined behaviour)
         if (!err.isError())
         {
-            lsr::FUBridge bridge(Telltales::getDDH(),
+            lsr::DataHandler dataHandler(fu::dataIdList, sizeof(fu::dataIdList) / sizeof(fu::dataIdList[0]));
+            lsr::FUBridge bridge(dataHandler,
                 configuration.tcpConfig.port,
-                configuration.tcpConfig.hostname,
-                engine);
+                configuration.tcpConfig.hostname);
 
             while (!isErrorCritical(err) && engine.handleWindowEvents() == false)
             {
                 static_cast<void>(bridge.handleIncomingData(30)); //receive from Editor
+                updateHMI(hmi, dataHandler);
                 engine.render();
                 err = engine.getError();
                 if (!engine.verify())

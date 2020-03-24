@@ -32,12 +32,6 @@ GUNITTEST_COMMON(
 )
 
 GUNITTEST_COMMON(
-    NAME PooledObjectFactoryTest
-    FILES PooledObjectFactoryTest.cpp
-          SelfCheckerClass.h
-)
-
-GUNITTEST_COMMON(
     NAME NodeDataLengthTest
     FILES NodeDataLengthTest.cpp
 )
@@ -53,4 +47,5 @@ GUNITTEST_COMMON(
     FILES AssertionTest.cpp
           LSRErrorCollectorTest.cpp
           TimerTest.cpp
+          ReturnValueTest.cpp
 )

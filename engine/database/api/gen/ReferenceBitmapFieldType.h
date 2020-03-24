@@ -5,26 +5,17 @@
 **
 **   File:        ReferenceBitmapFieldType.h
 **   Description:
-**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
+**   Generator:   7db08a476f8107a993e0bf7183b0cf60031dad3e
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Renderer is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Renderer.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -39,20 +30,10 @@ namespace lsr
  */
 struct ReferenceBitmapFieldType
 {
-    const U32 m_errorCounterFUDataId;
     const AreaType* const m_area;
     const ExpressionTermType* const m_visible;
     const ExpressionTermType* const m_bitmap;
 
-
-    /**
-     * Returns the value of the errorCounterFUDataId attribute
-     */
-    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
-    U32 GetErrorCounterFUDataId() const
-    {
-        return m_errorCounterFUDataId;
-    }
 
     /**
      * Returns a pointer to the area child reference.

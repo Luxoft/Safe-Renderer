@@ -10,28 +10,19 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
 #include "Widget.h"
+#include "WidgetChildren.h"
+#include <Field.h>
 
 #include <ddh_defs.h>
-
-#include <BoolExpression.h>
 
 namespace lsr
 {
@@ -44,27 +35,6 @@ namespace lsr
 class Panel P_FINAL : public Widget
 {
 public:
-    /**
-     * Method creates a @c Panel object and all its children  with given @c WidgetPool according
-     * to configuration @c pDdhPanel.
-     *
-     * @param[in]  factory    pool which provides allocation an @c Panel object.
-     * @param[in]  db         object provides work with database.
-     * @param[in]  pDdhPanel  @c PanelType ddh configuration.
-     * @param[in]  pContext   data context, which shall be used for evaluation.
-     * @param[out] error      error state will be equal to @c LSR_NO_ENGINE_ERROR if
-     *                        operation succeeded, other @c LSREngineError values otherwise.
-     *
-     * @return pointer to @c Panel object if initialization of object was successful,
-     *         @c NULL otherwise.
-     */
-    static Panel* create(WidgetPool& factory,
-                         const Database& db,
-                         const PanelType* const pDdhPanel,
-                         DataContext* const pContext,
-                         LSRErrorCollector& error);
-
-private:
     /**
      * Create an object.
      *
@@ -83,16 +53,16 @@ private:
      *
      * @return @c true if object initialization succeeded, @c false otherwise.
      */
-    bool setup(WidgetPool& factory,
-               const Database& db,
-               DataContext* const pContext,
-               LSRErrorCollector& error);
+    LSREngineError setup(const Database& db);
 
     /**
-     * Method does nothing. It is a stub method
+     * Adds a child field to the panel.
+     * Sets the internal error state to LSR_DB_INCONSISTENT if no child could be added
+     * @param childField child field to add
      */
-    virtual void onUpdate(const U32 monotonicTimeMs) P_OVERRIDE;
+    void addChild(Field& childField);
 
+private:
     /**
      * Method does nothing. It is a stub method
      */
@@ -103,23 +73,13 @@ private:
      */
     virtual bool onVerify(Canvas& dst, const Area& rect) P_OVERRIDE;
 
-    /**
-     * Method returns type of the widget.
-     *
-     * @return @c WIDGET_TYPE_PANEL value.
-     */
-    virtual WidgetType getType() const P_OVERRIDE;
+    virtual LSREngineError getChildError() const P_OVERRIDE;
 
-    bool setupVisibilityExpr(DataContext* const pContext);
+    virtual bool isChildInvalidated() const P_OVERRIDE;
 
     const PanelType* m_pDdh;
-    BoolExpression m_visibilityExpr;
+    WidgetChildren<Field, MAX_WIDGET_CHILDREN_COUNT> m_children;
 };
-
-inline Panel::WidgetType Panel::getType() const
-{
-    return WIDGET_TYPE_PANEL;
-}
 
 } // namespace lsr
 

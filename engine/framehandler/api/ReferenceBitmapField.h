@@ -10,27 +10,21 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
 #include "Field.h"
+#include <ddh_defs.h>
 
-#include <BoolExpression.h>
-#include <BitmapExpression.h>
+namespace unittest
+{
+    class ReferenceBitmapFieldTest;
+}
 
 namespace lsr
 {
@@ -46,56 +40,47 @@ namespace lsr
  */
 class ReferenceBitmapField P_FINAL : public Field
 {
+    friend class unittest::ReferenceBitmapFieldTest;
+    friend class unittest::EngineTest;
 public:
-    /**
-     * Method creates a @c ReferenceBitmapField object with given @c WidgetPool according
-     * to configuration @c pDdh.
-     *
-     * @param[in]  factory    pool which provides allocation an @c BitmapField object.
-     * @param[in]  db         object provides work with database.
-     * @param[in]  pDdh       @c lsr::StaticBitmapFieldType ddh configuration.
-     * @param[in]  pContext   data context, which shall be used for evaluation.
-     * @param[out] error      error state will be equal to @c LSR_NO_ENGINE_ERROR if
-     *                        operation succeeded, other @c LSREngineError values otherwise.
-     *
-     * @return pointer to @c ReferenceBitmapField object if initialization of object
-     *         was successful, @c NULL otherwise.
-     */
-    static ReferenceBitmapField* create(WidgetPool& factory,
-                                        const Database& db,
-                                        const ReferenceBitmapFieldType* const pDdh,
-                                        DataContext* const pContext,
-                                        LSRErrorCollector& error);
-
-private:
     /**
      * Create an object.
      *
-     * @param[in] db   object provides work with database.
      * @param[in] pDdh @c lsr::ReferenceBitmapFieldType ddh configuration.
      */
-    ReferenceBitmapField(const Database& db, const ReferenceBitmapFieldType* const pDdh);
+    explicit ReferenceBitmapField(const ReferenceBitmapFieldType* const pDdh);
+
+    virtual LSREngineError setup(const Database& db) P_OVERRIDE;
 
     /**
-     * Method initialize object.
-     *
-     * @param[in]  pContext data context, which shall be used for evaluation.
-     * @param[out] error    error state will be equal to @c LSR_NO_ENGINE_ERROR if
-     *                      operation succeeded, other @c LSREngineError values otherwise.
-     *
-     * @return @c true if object initialization succeeded, @c false otherwise.
+     * Returns the cumulated number of verification errors
+     * Each verification failure will increase the counter by 1 (@see onVerify())
+     * The error counter is reset when:
+     * - the field is verified in invisible state
+     * - the error counter is explicitly reset by clearVerificationErrors()
+     * @return number of verification errors
      */
-    bool setup(DataContext* const pContext, LSRErrorCollector& error);
+    U32 getVerificationErrors() const
+    {
+        return m_verificationErrors;
+    }
 
     /**
-     * Method updates internal variables (evaluates value of bitmap ID).
-     * If new value differs from the older one, the invalidated flag
-     * will be risen (see @c lsr::Widget::invalidate method).
-     *
-     * @param[in] monotonicTimeMs current monotonic system time in milliseconds.
+     * Resets the number of verification errors to zero
      */
-    virtual void onUpdate(const U32 monotonicTimeMs) P_OVERRIDE;
+    void clearVerificationErrors();
 
+    /**
+     * Returns the result of the most recent verification (@see onVerify())
+     * Defaults to false until verification is triggered for the first time
+     * @return false if the last onVerify() reported an error, true otherwise
+     */
+    bool getLastVerificationResult() const
+    {
+        return m_verified;
+    }
+
+private:
     /**
      * Method does nothing. This widget can't be drawn.
      */
@@ -114,43 +99,24 @@ private:
      */
     virtual bool onVerify(Canvas& dst, const Area& rect) P_OVERRIDE;
 
-    /**
-     * Method returns type of the widget.
-     *
-     * @return @c WIDGET_TYPE_REF_BITMAP_FIELD value.
-     */
-    virtual Widget::WidgetType getType() const P_OVERRIDE;
+    virtual LSREngineError getChildError() const
+    {
+        return LSR_NO_ENGINE_ERROR;
+    }
 
-    bool setupVisibilityExpr(DataContext* const pContext);
-    bool setupBitmapExr(DataContext* const pContext);
+    virtual bool isChildInvalidated() const
+    {
+        return false;
+    }
 
-    /**
-     * Method increments error counter inside @c DataHandler object.
-     *
-     * As error counter is stored in the @c DataHandler object as data linked with internal FU,
-     * there can be error while getting this value from @c DataHandler.
-     * In this case the appropriate error flag will be risen.
-     *
-     * If there will be an error in setting data to @c DataHandler
-     * (see @c lsr::DataHandler::setData method)
-     * the @c lsr::LSR_DH_INVALID_DATA_ID error will be risen.
-     */
-    void incrementErrorCounter();
-
-    void resetErrorCounter();
+    bool setupBitmapExpr();
 
     const ReferenceBitmapFieldType* m_pDdh;
-    const Database& m_db;
-    BoolExpression m_visibilityExpr;
-    BitmapExpression m_bitmapExpr;
-    DataContext* m_pContext;
+    const Database* m_pDatabase;
     BitmapId m_bitmapId;
+    U32 m_verificationErrors;
+    bool m_verified;
 };
-
-inline Widget::WidgetType ReferenceBitmapField::getType() const
-{
-    return WIDGET_TYPE_REF_BITMAP_FIELD;
-}
 
 } // namespace lsr
 

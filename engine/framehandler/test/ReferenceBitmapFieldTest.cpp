@@ -7,20 +7,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -37,57 +28,23 @@ using ::testing::_;
 
 using namespace lsr;
 
+namespace unittest
+{
+
 class ReferenceBitmapFieldTest: public WidgetTestBase
 {
 protected:
     ReferenceBitmapFieldTest()
         : m_db(Telltales::getDDH())
-        , m_counterDataId(255U, 43U)
     {
     }
 
-    void setCounterToDH(U32 counter, lsr::DynamicDataTypeEnumeration type, lsr::DataStatus status)
+    void setVerificationErrors(ReferenceBitmapField& field, U32 value)
     {
-        const lsr::Number counterNum(counter, type);
-        m_dataHandler.setNumber(counterNum, m_counterDataId, status);
-    }
-
-    void setDefaultCounterToDH()
-    {
-        const lsr::Number counterNum(0U, lsr::DATATYPE_INTEGER);
-        m_dataHandler.setNumber(counterNum, m_counterDataId, lsr::DataStatus::VALID);
-    }
-
-    lsr::ReferenceBitmapField* createField(const ReferenceBitmapFieldType* ddh)
-    {
-        lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
-        lsr::ReferenceBitmapField* field =
-            lsr::ReferenceBitmapField::create(m_widgetPool,
-                                              m_db,
-                                              ddh,
-                                              &m_context,
-                                              error);
-        EXPECT_EQ(LSR_NO_ENGINE_ERROR, error.get());
-        return field;
-    }
-
-    lsr::ReferenceBitmapField* createInconsistentField(
-            const ReferenceBitmapFieldType* ddh)
-    {
-        lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
-        lsr::ReferenceBitmapField* field =
-            lsr::ReferenceBitmapField::create(m_widgetPool,
-                                              m_db,
-                                              ddh,
-                                              &m_context,
-                                              error);
-        EXPECT_EQ(LSR_DB_INCONSISTENT, error.get());
-
-        return field;
+        field.m_verificationErrors = value;
     }
 
     Database m_db;
-    const DynamicData m_counterDataId;
 };
 
 TEST_F(ReferenceBitmapFieldTest, CreateBitmapFieldTest)
@@ -95,374 +52,208 @@ TEST_F(ReferenceBitmapFieldTest, CreateBitmapFieldTest)
     const AreaType area = { 0U, 0U, 0U, 0U };
     const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
     const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
-    const ReferenceBitmapFieldType fieldType = { 43U, &area, &visible, &bmp };
+    const ReferenceBitmapFieldType fieldType = { &area, &visible, &bmp };
 
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
-    EXPECT_TRUE(NULL != field);
+    lsr::ReferenceBitmapField field(&fieldType);
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.setup(m_db));
 }
 
 TEST_F(ReferenceBitmapFieldTest, CreateWrongBitmapFieldTest1)
 {
     const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
     const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
-    const ReferenceBitmapFieldType fieldType = { 43U, NULL, &visible, &bmp };
+    const ReferenceBitmapFieldType fieldType = { NULL, &visible, &bmp };
 
-    lsr::ReferenceBitmapField* field = createInconsistentField(&fieldType);
-
-    EXPECT_TRUE(NULL == field);
+    lsr::ReferenceBitmapField field(&fieldType);
+    EXPECT_EQ(LSR_DB_INCONSISTENT, field.setup(m_db));
 }
 
 TEST_F(ReferenceBitmapFieldTest, CreateWrongBitmapFieldTest2)
 {
     const AreaType area = { 0U, 0U, 0U, 0U };
     const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, 23U, NULL };
-    const ReferenceBitmapFieldType fieldType = { 43U, &area, NULL, &bmp };
-    lsr::ReferenceBitmapField* field = createInconsistentField(&fieldType);
+    const ReferenceBitmapFieldType fieldType = { &area, NULL, &bmp };
 
-    EXPECT_TRUE(NULL == field);
+    lsr::ReferenceBitmapField field(&fieldType);
+    EXPECT_EQ(LSR_DB_INCONSISTENT, field.setup(m_db));
 }
 
 TEST_F(ReferenceBitmapFieldTest, CreateWrongBitmapFieldTest3)
 {
     const AreaType area = { 0U, 0U, 0U, 0U };
     const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const ReferenceBitmapFieldType fieldType = { 43U, &area, &visible, NULL};
-    lsr::ReferenceBitmapField* field = createInconsistentField(&fieldType);
+    const ReferenceBitmapFieldType fieldType = { &area, &visible, NULL};
 
-    EXPECT_TRUE(NULL == field);
-}
-
-TEST_F(ReferenceBitmapFieldTest, OnUpdateTest)
-{
-    const AreaType areaType = { 0U, 0U, 0U, 0U };
-    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
-
-    U16 expectedId = 6U;
-    initDataHandler(expectedId);
-    setDefaultCounterToDH();
-
-    lsr::DisplayAccessor::instance().setVerifyFlag(true);
-
-    lsr::Area area(&areaType);
-
-    field->update(0U);
-    field->verify(m_canvas, area);
-
-    EXPECT_EQ(expectedId, lsr::DatabaseAccessor::instance().getRequestedBitmapId());
-    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
-}
-
-TEST_F(ReferenceBitmapFieldTest, OnUpdateWithTheSameValueTest)
-{
-    const AreaType areaType = { 0U, 0U, 0U, 0U };
-    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
-
-    U16 expectedId = 6U;
-    initDataHandler(expectedId);
-    setDefaultCounterToDH();
-
-    lsr::DisplayAccessor::instance().setVerifyFlag(true);
-
-    lsr::Area area(&areaType);
-
-    field->update(0U);
-    field->verify(m_canvas, area);
-
-    EXPECT_EQ(expectedId, lsr::DatabaseAccessor::instance().getRequestedBitmapId());
-
-    // update again, the value should be the same
-    field->update(0U);
-    field->verify(m_canvas, area);
-
-    EXPECT_EQ(expectedId, lsr::DatabaseAccessor::instance().getRequestedBitmapId());
-
-    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
-}
-
-TEST_F(ReferenceBitmapFieldTest, OnUpdateWrongValueTest)
-{
-    const AreaType areaType = { 0U, 0U, 0U, 0U };
-    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
-
-    U16 expectedId = 6U;
-    initDHWithOutdatedData(expectedId);
-    setDefaultCounterToDH();
-
-    lsr::Area area(&areaType);
-
-    field->update(0U);
-    field->verify(m_canvas, area);
-
-    EXPECT_EQ(LSR_ERR_DATASTATUS_NOT_AVAILABLE, field->getError());
+    lsr::ReferenceBitmapField field(&fieldType);
+    EXPECT_EQ(LSR_DB_INCONSISTENT, field.setup(m_db));
 }
 
 TEST_F(ReferenceBitmapFieldTest, VerifyTest)
 {
+    U16 expectedId = 6U;
     const AreaType areaType = { 0U, 0U, 0U, 0U };
     const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, expectedId, NULL };
 
-    U16 expectedId = 6U;
-    initDataHandler(expectedId);
-    setDefaultCounterToDH();
+    const ReferenceBitmapFieldType fieldType = { &areaType, &visible, &bmp };
+    lsr::ReferenceBitmapField field(&fieldType);
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.setup(m_db));
+    EXPECT_FALSE(field.getLastVerificationResult());
+
+    EXPECT_CALL(m_mockCanvas, verify(_, _)).WillOnce(Return(true));
 
     lsr::Area area(&areaType);
-
-    field->update(0U);
-    EXPECT_TRUE(field->verify(m_canvas, area));
-
-    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
+    EXPECT_TRUE(field.verify(m_canvas, area));
+    EXPECT_EQ(0U, field.getVerificationErrors());
+    EXPECT_TRUE(field.getLastVerificationResult());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, VerifyWithInvisibleWidgetTest)
 {
+    U16 expectedId = 6U;
     const AreaType areaType = { 0U, 0U, 0U, 0U };
     const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 0U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, expectedId, NULL };
 
-    U16 expectedId = 6U;
-    initDataHandler(expectedId);
-    setDefaultCounterToDH();
+    const ReferenceBitmapFieldType fieldType = { &areaType, &visible, &bmp };
+    lsr::ReferenceBitmapField field(&fieldType);
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.setup(m_db));
+    EXPECT_FALSE(field.getLastVerificationResult());
+
+    EXPECT_CALL(m_mockCanvas, verify(_, _)).Times(0);
 
     lsr::Area area(&areaType);
-
-    field->update(0U);
-    EXPECT_TRUE(field->verify(m_canvas, area));
-
-    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
+    EXPECT_TRUE(field.verify(m_canvas, area));
+    EXPECT_EQ(0U, field.getVerificationErrors());
+    EXPECT_TRUE(field.getLastVerificationResult());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, VerifyFailsTest)
 {
+    const U16 expectedId = 6U;
     const AreaType areaType = { 0U, 0U, 0U, 0U };
     const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, expectedId, NULL };
+    const ReferenceBitmapFieldType fieldType = { &areaType, &visible, &bmp };
 
-    U16 expectedId = 6U;
-    initDataHandler(expectedId);
+    lsr::ReferenceBitmapField field(&fieldType);
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.setup(m_db));
+    EXPECT_FALSE(field.getLastVerificationResult());
 
     lsr::Area area(&areaType);
+    EXPECT_CALL(m_mockCanvas, verify(_, _)).WillOnce(Return(false));
 
-    lsr::DisplayAccessor::instance().setVerifyFlag(false);
-
-    // Prepare error counter inside DH
-    const U32 counter = 46U;
-    const lsr::DataStatus expectedStatus = lsr::DataStatus::VALID;
-    setCounterToDH(counter, lsr::DATATYPE_INTEGER, expectedStatus);
-
-    const lsr::Number expectedNum(counter + 1U, lsr::DATATYPE_INTEGER);
-    EXPECT_CALL(m_dataHandler, setData(m_counterDataId, expectedNum, expectedStatus))
-        .WillOnce(Return(true));
-
-    field->update(0U);
-
-    EXPECT_FALSE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
+    EXPECT_FALSE(field.verify(m_canvas, area));
+    EXPECT_EQ(1U, field.getVerificationErrors());
+    EXPECT_FALSE(field.getLastVerificationResult());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.getError());
 }
 
 TEST_F(ReferenceBitmapFieldTest, VerifyFailsWithVeryLargeCounterValueTest)
 {
+    const U16 expectedId = 6U;
     const AreaType areaType = { 0U, 0U, 0U, 0U };
     const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, expectedId, NULL };
+    const ReferenceBitmapFieldType fieldType = { &areaType, &visible, &bmp };
 
-    U16 expectedId = 6U;
-    initDataHandler(expectedId);
+    lsr::ReferenceBitmapField field(&fieldType);
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.setup(m_db));
 
-    lsr::Area area(&areaType);
+    const lsr::Area area(&areaType);
+    EXPECT_CALL(m_mockCanvas, verify(_, _)).Times(2).WillRepeatedly(Return(false));
 
-    lsr::DisplayAccessor::instance().setVerifyFlag(false);
+    setVerificationErrors(field, U32_MAX - 1);
+    EXPECT_FALSE(field.verify(m_canvas, area));
+    EXPECT_EQ(U32_MAX, field.getVerificationErrors());
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.getError());
+    EXPECT_FALSE(field.getLastVerificationResult());
 
-    // Prepare error counter inside DH
-    const U32 counter = U32_MAX;
-    const lsr::DataStatus expectedStatus = lsr::DataStatus::VALID;
-    setCounterToDH(counter, lsr::DATATYPE_INTEGER, expectedStatus);
-
-    // Countervalue shouldn't changed.
-    const lsr::Number expectedNum(U32_MAX, lsr::DATATYPE_INTEGER);
-    EXPECT_CALL(m_dataHandler, setData(m_counterDataId, expectedNum, expectedStatus))
-        .WillOnce(Return(true));
-
-    field->update(0U);
-
-    EXPECT_FALSE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
+    EXPECT_FALSE(field.verify(m_canvas, area));
+    EXPECT_EQ(U32_MAX, field.getVerificationErrors());
+    EXPECT_FALSE(field.getLastVerificationResult());
 }
 
 TEST_F(ReferenceBitmapFieldTest, ResetErrorCounterValueTest)
 {
+    const U16 expectedId = 6U;
     const AreaType areaType = { 0U, 0U, 0U, 0U };
     const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, expectedId, NULL };
+    const ReferenceBitmapFieldType fieldType = { &areaType, &visible, &bmp };
 
-    U16 expectedId = 6U;
-    initDataHandler(expectedId);
+    lsr::ReferenceBitmapField field(&fieldType);
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.setup(m_db));
+    EXPECT_CALL(m_mockCanvas, verify(_, _)).WillOnce(Return(false)).WillOnce(Return(false));
 
-    lsr::Area area(&areaType);
+    EXPECT_FALSE(field.getLastVerificationResult());
+    EXPECT_EQ(0U, field.getVerificationErrors());
+    const lsr::Area area(&areaType);
 
-    lsr::DisplayAccessor::instance().setVerifyFlag(false);
+    EXPECT_FALSE(field.verify(m_canvas, area));
+    EXPECT_EQ(1U, field.getVerificationErrors());
+    EXPECT_FALSE(field.getLastVerificationResult());
 
-    // Prepare error counter inside DH
-    const U32 counter = 46U;
-    const lsr::DataStatus expectedStatus = lsr::DataStatus::VALID;
-    setCounterToDH(counter, lsr::DATATYPE_INTEGER, expectedStatus);
+    EXPECT_FALSE(field.verify(m_canvas, area));
+    EXPECT_EQ(2U, field.getVerificationErrors());
+    EXPECT_FALSE(field.getLastVerificationResult());
 
-    const lsr::Number expectedNum(counter + 1U, lsr::DATATYPE_INTEGER);
-    EXPECT_CALL(m_dataHandler, setData(m_counterDataId, expectedNum, expectedStatus))
-        .WillOnce(Return(true));
+    EXPECT_CALL(m_mockCanvas, verify(_, _)).WillOnce(Return(true));
 
-    field->update(0U);
+    // verification succeeds, error count is kept
+    EXPECT_TRUE(field.verify(m_canvas, area));
+    EXPECT_EQ(2U, field.getVerificationErrors());
+    EXPECT_TRUE(field.getLastVerificationResult());
 
-    EXPECT_FALSE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
-
-    // Now, verify will return true
-    lsr::DisplayAccessor::instance().setVerifyFlag(true);
-
-    const lsr::Number zeroNum(0U, lsr::DATATYPE_INTEGER);
-    EXPECT_CALL(m_dataHandler, setData(m_counterDataId, zeroNum, expectedStatus))
-        .WillOnce(Return(true));
-
-    field->update(0U);
-
-    EXPECT_TRUE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field->getError());
+    field.setVisible(false);
+    EXPECT_TRUE(field.verify(m_canvas, area));
+    EXPECT_EQ(0U, field.getVerificationErrors());
+    EXPECT_TRUE(field.getLastVerificationResult());
 }
 
-TEST_F(ReferenceBitmapFieldTest, VerifyFailsWithWrongErrorCounterValueTest1)
+TEST_F(ReferenceBitmapFieldTest, ClearVerificationErrors)
 {
+    const U16 expectedId = 6U;
     const AreaType areaType = { 0U, 0U, 0U, 0U };
     const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, expectedId, NULL };
+    const ReferenceBitmapFieldType fieldType = { &areaType, &visible, &bmp };
 
-    U16 expectedId = 6U;
-    initDataHandler(expectedId);
+    lsr::ReferenceBitmapField field(&fieldType);
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.setup(m_db));
+    EXPECT_CALL(m_mockCanvas, verify(_, _)).WillOnce(Return(false)).WillOnce(Return(false));
+    const lsr::Area area(&areaType);
 
-    lsr::Area area(&areaType);
+    EXPECT_FALSE(field.verify(m_canvas, area));
+    EXPECT_FALSE(field.verify(m_canvas, area));
 
-    lsr::DisplayAccessor::instance().setVerifyFlag(false);
+    EXPECT_FALSE(field.getLastVerificationResult());
+    EXPECT_EQ(2U, field.getVerificationErrors());
 
-    // Check if error counter was incremented inside DataHandler
-    const U32 counter = 46U;
-    setCounterToDH(counter, lsr::DATATYPE_INTEGER, lsr::DataStatus::NOT_AVAILABLE);
+    field.clearVerificationErrors();
 
-    EXPECT_CALL(m_dataHandler, setData(_, _, _))
-        .Times(0);
-
-    field->update(0U);
-    EXPECT_FALSE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_ERR_DATASTATUS_NOT_AVAILABLE, field->getError());
-}
-
-TEST_F(ReferenceBitmapFieldTest, VerifyFailsWithWrongErrorCounterValueTest2)
-{
-    const AreaType areaType = { 0U, 0U, 0U, 0U };
-    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
-
-    U16 expectedId = 6U;
-    initDataHandler(expectedId);
-
-    lsr::Area area(&areaType);
-
-    lsr::DisplayAccessor::instance().setVerifyFlag(false);
-
-    // Check if error counter was incremented inside DataHandler
-    const U32 counter = 46U;
-    setCounterToDH(counter, lsr::DATATYPE_DECIMAL, lsr::DataStatus::VALID);
-
-    // method SetData shouldn't be called
-    EXPECT_CALL(m_dataHandler, setData(_, _, _))
-        .Times(0);
-
-    // Here should be a magic
-    field->update(0U);
-    EXPECT_FALSE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_ERR_DATASTATUS_INCONSISTENT, field->getError());
-}
-
-TEST_F(ReferenceBitmapFieldTest, VerifyFailsWithSetDataToDHFailedTest)
-{
-    const AreaType areaType = { 0U, 0U, 0U, 0U };
-    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
-
-    U16 expectedId = 6U;
-    initDataHandler(expectedId);
-
-    lsr::Area area(&areaType);
-
-    lsr::DisplayAccessor::instance().setVerifyFlag(false);
-
-    // Prepare error counter inside DH
-    const U32 counter = 46U;
-    const lsr::DataStatus expectedStatus = lsr::DataStatus::VALID;
-    setCounterToDH(counter, lsr::DATATYPE_INTEGER, expectedStatus);
-
-    const lsr::Number expectedNum(counter + 1U, lsr::DATATYPE_INTEGER);
-
-    // Set, DH can't set error counter
-    EXPECT_CALL(m_dataHandler, setData(m_counterDataId, expectedNum, expectedStatus))
-        .WillOnce(Return(false));
-
-    field->update(0U);
-    EXPECT_FALSE(field->verify(m_canvas, area));
-    EXPECT_EQ(LSR_DH_INVALID_DATA_ID, field->getError());
+    EXPECT_FALSE(field.getLastVerificationResult()); // last result is untouched
+    EXPECT_EQ(0U, field.getVerificationErrors());
 }
 
 TEST_F(ReferenceBitmapFieldTest, DrawMethodDrawsNothingTest)
 {
+    const U16 expectedId = 6U;
     const AreaType areaType = { 0U, 0U, 0U, 0U };
     const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
-    const DynamicDataType dataType = { 0U, DATATYPE_BITMAP_ID };
-    const ExpressionTermType bmp = { ExpressionTermType::DYNAMICDATA_CHOICE, 0U, &dataType };
-    const ReferenceBitmapFieldType fieldType = { m_counterDataId.getCombined(), &areaType, &visible, &bmp };
-    lsr::ReferenceBitmapField* field = createField(&fieldType);
+    const ExpressionTermType bmp = { ExpressionTermType::BITMAPID_CHOICE, expectedId, NULL };
+    const ReferenceBitmapFieldType fieldType = { &areaType, &visible, &bmp };
 
-    U16 expectedId = 6U;
-    initDataHandler(expectedId);
+    lsr::ReferenceBitmapField field(&fieldType);
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, field.setup(m_db));
 
     lsr::Area area(&areaType);
 
-    field->update(0U);
-    field->draw(m_canvas, area);
-
     // Check on empty implementation
-    EXPECT_FALSE(lsr::DisplayAccessor::instance().wasDrawBitmapExecuted());
+    EXPECT_CALL(m_mockCanvas, drawBitmap(_, _)).Times(0);
+    field.draw(m_canvas, area);
 }
+
+} // unittest

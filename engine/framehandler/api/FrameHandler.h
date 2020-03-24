@@ -10,36 +10,21 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
-
-#include <WidgetPool.h>
 
 #include <LsrTypes.h>
 #include <LSRErrorCollector.h>
 #include <NonCopyable.h>
-#include <DataContext.h>
-
-class FrameHandlerCorrupter;
+#include <Window.h>
 
 namespace lsr
 {
-
-class IDataHandler;
 
 /**
  * FrameHandler creates and stores all widgets and provide a functionality to work
@@ -58,13 +43,11 @@ public:
     /**
      * Constructs an object.
      *
+     * @param[in] hmi         reference to the HMI runtime objects (widgets)
      * @param[in] db          reference to @c Database object with widget configuration.
-     * @param[in] dataHandler pointer to @c IDataHandler object.
      * @param[in] dsp         reference to @c DisplayManager object.
      */
-    FrameHandler(Database& db, IDataHandler& dataHandler, DisplayManager& dsp);
-
-    ~FrameHandler();
+    FrameHandler(IHMI& hmi, Database& db, DisplayManager& dsp);
 
     /**
      * Creates the widgets.
@@ -72,14 +55,6 @@ public:
      * @return @c true if all widgets were successfully created, @c false otherwise.
      */
     bool start();
-
-    /**
-     * Informs object about the monotonic system time
-     * It's called once for every main loop iteration.
-     *
-     * @param[in] monotonicTimeMs current monotonic system time in milliseconds.
-     */
-    void update(const U32 monotonicTimeMs);
 
     /**
      * Method renders the hole widgets tree on some canvas.
@@ -115,15 +90,11 @@ public:
     LSREngineError getError();
 
 private:
-    friend class ::FrameHandlerCorrupter;
-
     Database& m_db;
-    WidgetPool m_widgetPool;
-    IDataHandler& m_dataHandler;
-    DataContext m_dataContext;
     DisplayManager& m_display;
     LSRErrorCollector m_error;
-    Window* m_pWindow;
+    Window m_window;
+    IHMI& m_hmi;
 };
 
 } // namespace lsr

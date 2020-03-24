@@ -44,6 +44,6 @@ Please use 'issues' on GitHub for Luxoft Safe-Renderer.
 Patches and pull requests are welcome.
 
 ## Copyright and License
-Copyright (c) 2018 Luxoft GmbH
+Copyright (c) 2018 - 2020 Luxoft GmbH
 
-This software is licensed under the LGPLv3 to protect Luxoft intellectual property. We are open for discussion about different licensing schemas - just get in contact with us (ARichert@luxoft.com)
+This software is licensed under the MPL-2.0 to protect Luxoft intellectual property. We are open for discussion about different licensing schemas - just get in contact with us (ARichert@luxoft.com)

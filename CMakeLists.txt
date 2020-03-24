@@ -7,8 +7,6 @@ message(STATUS "--> ${PROJECT_NAME} CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 # For inforamtion about project configuration loot to the @cmake/Variable.cmake
 include(Init)
 
-message(STATUS "--> ${PROJECT_NAME}: ${LSR_VERSION_MAJOR}.${LSR_VERSION_MINOR}.${LSR_VERSION_PATCH}")
-
 add_subdirectory(engine)
 add_subdirectory(gil)
 add_subdirectory(pil)

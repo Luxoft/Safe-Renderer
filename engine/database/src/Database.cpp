@@ -7,20 +7,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -28,12 +19,14 @@
 #include "ResourceBuffer.h"
 #include "DDHType.h"
 #include "Assertion.h"
+#include "BitmapDatabaseType.h"
+#include "BitmapType.h"
+#include "SkinnedBitmapType.h"
 
 namespace lsr
 {
 Database::Database(const DDHType* const ddh)
 : m_ddh(ddh)
-, m_bitmapAccess(m_ddh)
 , m_error(LSR_NO_ENGINE_ERROR)
 {
     if (m_ddh == NULL)
@@ -46,14 +39,23 @@ Database::Database(const DDHType* const ddh)
     }
     else
     {
-        m_error = m_bitmapAccess.getError();
+        // no error
     }
 }
 
 StaticBitmap Database::getBitmap(const BitmapId id) const
 {
-    ASSERT(m_ddh != NULL);
-    return m_bitmapAccess.getBitmap(id, 0U);
+    const BitmapStateDefinitionType* pState = NULL;
+    if (id != 0U)
+    {
+        const BitmapDatabaseType* const bitmapDB = m_ddh->GetBitmapDatabase();
+        const BitmapType* const pBmp = bitmapDB->GetBitmap(id - 1U);
+        const U16 skinIx = 0U;
+        const SkinnedBitmapType* const pSkin = (pBmp != NULL) ? pBmp->GetSkinnedBitmap(skinIx) : NULL;
+        static_cast<void>(pState);  // suppress MISRA 0-1-6: Value is overwritten without previous usage on this path
+        pState = (pSkin != NULL) ? pSkin->GetDefault() : NULL;
+    }
+    return StaticBitmap(pState);
 }
 
 } // namespace lsr

@@ -29,7 +29,6 @@ endif()
 
 add_subdirectory(common)
 add_subdirectory(database)
-add_subdirectory(datahandler)
 add_subdirectory(display)
 add_subdirectory(lsr)
 add_subdirectory(framehandler)
@@ -37,7 +36,6 @@ add_subdirectory(framehandler)
 add_library(${PROJECT_NAME} STATIC
     $<TARGET_OBJECTS:common>
     $<TARGET_OBJECTS:database>
-    $<TARGET_OBJECTS:datahandler>
     $<TARGET_OBJECTS:display>
     $<TARGET_OBJECTS:framehandler>
     $<TARGET_OBJECTS:lsr>

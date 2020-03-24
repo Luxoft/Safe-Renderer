@@ -3,9 +3,13 @@ include(GoogleTest)
 add_library(test_framehandler STATIC
     $<TARGET_OBJECTS:common>
     $<TARGET_OBJECTS:databasemock>
-    $<TARGET_OBJECTS:displaymock>
     $<TARGET_OBJECTS:framehandler>
-    $<TARGET_OBJECTS:datahandler>
+    ${LSRENGINE}/display/src/DisplayManager.cpp
+    ${LSRENGINE}/display/src/WindowCanvas.cpp
+    ${LSRENGINE}/display/src/TextureCache.cpp
+    ${LSRENGINE}/display/src/Texture.cpp
+    MockCanvas.cpp
+    TestCanvas.h
 )
 
 function(GUNITTEST_FRAMEHANDLER)
@@ -27,7 +31,6 @@ endfunction()
 include_directories(
     ${FRAMEHANDLER_BASE}/test
     ${FRAMEHANDLER_BASE}/test/ddhbuilders
-    ${LSRENGINE}/datahandler/test
     ${LSRENGINE}/database/test
     ${LSRENGINE}/common/test
     ${LSRENGINE}/display/test
@@ -37,9 +40,7 @@ include_directories(
 GUNITTEST_FRAMEHANDLER(
     NAME FrameHandlerTest
     FILES FrameHandlerTest.cpp
-          FrameHandlerCorrupter.h
           MockWidget.h
-          TestCanvas.h
           WidgetTestBase.h
           ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
 )
@@ -47,25 +48,12 @@ GUNITTEST_FRAMEHANDLER(
 GUNITTEST_FRAMEHANDLER(
     NAME WidgetsTest
     FILES BitmapFieldTest.cpp
-          FieldTest.cpp
           FrameTest.cpp
           MockWidget.h
           PanelTest.cpp
           ReferenceBitmapFieldTest.cpp
-          TestCanvas.h
-          WidgetPoolHelper.h
-          WidgetPoolHelper.cpp
           WidgetTest.cpp
           WidgetTestBase.h
           WindowTest.cpp
-          ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
-)
-
-GUNITTEST_FRAMEHANDLER(
-    NAME WidgetPoolTest
-    FILES WidgetPoolTest.cpp
-          WidgetPoolHelper.h
-          WidgetPoolHelper.cpp
-          WidgetPoolCorrupter.h
           ${LSRROOT}/test/database/Telltales/Output/Telltales.cpp
 )

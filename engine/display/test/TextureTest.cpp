@@ -7,20 +7,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -35,6 +26,9 @@ using ::testing::InSequence;
 
 using namespace lsr;
 
+namespace unittest
+{
+
 class TextureTest : public ::testing::Test
 {
     void SetUp() P_OVERRIDE
@@ -48,6 +42,11 @@ class TextureTest : public ::testing::Test
     }
 
 protected:
+    static U8 getPaletteColorSize(const LsrImage* const img)
+    {
+        return Texture::getPaletteColorSize(img);
+    }
+
     MockGILStrict gil;
     Texture tx;
     gil_context_t ctx;
@@ -71,6 +70,7 @@ TEST_F(TextureTest, empty)
     };
     tx.load(&ctx, &img);
     EXPECT_FALSE(tx.isLoaded());
+    EXPECT_EQ(0U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, rgb565)
@@ -94,6 +94,7 @@ TEST_F(TextureTest, rgb565)
     EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_RGB_565, data));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
+    EXPECT_EQ(0U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, rgb888)
@@ -117,6 +118,7 @@ TEST_F(TextureTest, rgb888)
     EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_RGB_888, data));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
+    EXPECT_EQ(0U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, bgr888)
@@ -140,6 +142,7 @@ TEST_F(TextureTest, bgr888)
     EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_BGR_888, data));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
+    EXPECT_EQ(0U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, rgba8888)
@@ -163,6 +166,7 @@ TEST_F(TextureTest, rgba8888)
     EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_RGBA_8888, data));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
+    EXPECT_EQ(0U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, bgra8888)
@@ -186,6 +190,7 @@ TEST_F(TextureTest, bgra8888)
     EXPECT_CALL(gil, gilTexPixels(&giltx, 3, 2, GIL_FORMAT_BGRA_8888, data));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
+    EXPECT_EQ(0U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, invalid)
@@ -206,6 +211,7 @@ TEST_F(TextureTest, invalid)
     };
     tx.load(&ctx, &img);
     EXPECT_FALSE(tx.isLoaded());
+    EXPECT_EQ(0U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, rgb565_palette_2bpp)
@@ -231,6 +237,7 @@ TEST_F(TextureTest, rgb565_palette_2bpp)
     EXPECT_CALL(gil, gilTexPalette2(&giltx, palette, 4));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
+    EXPECT_EQ(2U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, rgb888_palette_2bpp)
@@ -256,6 +263,7 @@ TEST_F(TextureTest, rgb888_palette_2bpp)
     EXPECT_CALL(gil, gilTexPalette3(&giltx, palette, 4));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
+    EXPECT_EQ(3U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, bgr888_palette_2bpp)
@@ -278,6 +286,7 @@ TEST_F(TextureTest, bgr888_palette_2bpp)
     // not supported by GIL
     tx.load(&ctx, &img);
     EXPECT_FALSE(tx.isLoaded());
+    EXPECT_EQ(3U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, rgba8888_palette_2bpp)
@@ -303,6 +312,7 @@ TEST_F(TextureTest, rgba8888_palette_2bpp)
     EXPECT_CALL(gil, gilTexPalette4(&giltx, palette, 4));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
+    EXPECT_EQ(4U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, bgra8888_palette_2bpp)
@@ -328,6 +338,7 @@ TEST_F(TextureTest, bgra8888_palette_2bpp)
     EXPECT_CALL(gil, gilTexPalette4(&giltx, palette, 4));
     tx.load(&ctx, &img);
     EXPECT_TRUE(tx.isLoaded());
+    EXPECT_EQ(4U, getPaletteColorSize(&img));
 }
 
 TEST_F(TextureTest, invalid_palette)
@@ -349,6 +360,7 @@ TEST_F(TextureTest, invalid_palette)
     };
     tx.load(&ctx, &img);
     EXPECT_FALSE(tx.isLoaded());
+    EXPECT_EQ(0U, getPaletteColorSize(&img));
 }
 
 // not supported
@@ -371,6 +383,7 @@ TEST_F(TextureTest, bgra8888_palette_4bpp)
     };
     tx.load(&ctx, &img);
     EXPECT_FALSE(tx.isLoaded());
+    EXPECT_EQ(4U, getPaletteColorSize(&img));
 }
 
 // not supported
@@ -393,4 +406,7 @@ TEST_F(TextureTest, bgra8888_palette_8bpp)
     };
     tx.load(&ctx, &img);
     EXPECT_FALSE(tx.isLoaded());
+    EXPECT_EQ(4U, getPaletteColorSize(&img));
 }
+
+} // namespace unittest

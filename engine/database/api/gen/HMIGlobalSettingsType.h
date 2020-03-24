@@ -5,26 +5,17 @@
 **
 **   File:        HMIGlobalSettingsType.h
 **   Description:
-**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
+**   Generator:   7db08a476f8107a993e0bf7183b0cf60031dad3e
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Renderer is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Renderer.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -40,7 +31,6 @@ namespace lsr
 struct HMIGlobalSettingsType
 {
     const DisplaySizeType* const m_displaySize;
-    const ColorSetType* const m_colorSet;
 
 
     /**
@@ -51,16 +41,6 @@ struct HMIGlobalSettingsType
     const DisplaySizeType* GetDisplaySize() const
     {
         return m_displaySize;
-    }
-
-    /**
-     * Returns a pointer to the colorSet child reference.
-     * Defines which colors shall be used for backgrounds, field types, specific fields, etc.
-     */
-    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
-    const ColorSetType* GetColorSet() const
-    {
-        return m_colorSet;
     }
 
 };

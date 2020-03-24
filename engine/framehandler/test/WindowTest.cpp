@@ -7,32 +7,29 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
 #include "WidgetTestBase.h"
+#include "MockWidget.h"
 
 #include <Window.h>
 #include <WindowDefinition.h>
 
 #include <LSRErrorCollector.h>
 #include <Telltales.hpp>
+#include <TelltalesHMI.hpp>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
+using testing::_;
+using testing::Return;
 
 using namespace lsr;
 
@@ -41,148 +38,127 @@ class WindowTest: public WidgetTestBase
 protected:
     WindowTest()
         : m_db(Telltales::getDDH())
+        , m_windef(Telltales::getDDH(), 0U)
     {}
 
-    lsr::Window* createWindow()
+    lsr::Database m_db;
+    lsr::WindowDefinition m_windef;
+    Telltales::HMI m_hmi;
+};
+
+class CustomHMI : public IHMI
+{
+public:
+    explicit CustomHMI()
+        : m_frame()
     {
-        lsr::WindowDefinition winDef;
-
-        lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
-        lsr::Window* window = lsr::Window::create(m_widgetPool,
-                                                  m_db,
-                                                  m_dsp,
-                                                  winDef,
-                                                  &m_context,
-                                                  error);
-        EXPECT_EQ(LSR_NO_ENGINE_ERROR, error.get());
-
-        return window;
     }
 
-    lsr::Database m_db;
+    virtual Frame* getFrame() P_OVERRIDE
+    {
+        return &m_frame;
+    }
+
+private:
+    lsr::Frame m_frame;
 };
 
 TEST_F(WindowTest, CreateWindowTest)
 {
-    lsr::Window* window = createWindow();
-    EXPECT_TRUE(NULL != window);
+    lsr::Window window(m_dsp, m_windef);
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, window.setup(m_hmi, m_db));
 }
 
 TEST_F(WindowTest, CreateWindowWithWrongPanelsTest)
 {
-    PanelId panelIds[] = { 1U };
-    PageType page = { panelIds, 1, NULL, NULL };
-    PageType* pages[] = { &page };
-    PageDatabaseType pageDB = { pages, 1 };
-
-    AreaType area = { 0U, 0U, 0U, 0U };
-    PanelType p1 = {&area, NULL, NULL, 0U}; // broken panel (without visibility set)
-    PanelType* panels1[] = { &p1 };
-    PanelDatabaseType panelDB1 = {panels1, 1};
-
-    DisplaySizeType displaySize = { 0U, 0U };
-    HMIGlobalSettingsType globalSettings = { &displaySize, NULL };
-
-    const DDHType ddh = {
-        0U,
-        DDHType::SCHEMA_CHECKSUM,
-        DDHType::SCHEMA_VERSION,
-        DDHType::SERIALIZER_VERSION,
-        &pageDB,
-        &panelDB1,
-        &globalSettings,
-        NULL,
-        NULL,
-        NULL,
-        0U
-    };
-    Database db(&ddh);
-
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const PanelType p1 = {&area, NULL, NULL, 0U}; // broken panel (without visibility set)
+    CustomHMI badHMI;
+    lsr::Panel panel(&p1);
+    badHMI.getFrame()->addChild(panel);
     lsr::LSRErrorCollector error(LSR_NO_ENGINE_ERROR);
-    lsr::WindowDefinition winDef;
-    lsr::Window* window = lsr::Window::create(m_widgetPool,
-                                              db,
-                                              m_dsp,
-                                              winDef,
-                                              &m_context,
-                                              error);
-
-    EXPECT_EQ(LSR_DB_INCONSISTENT, error.get());
-
-
-    EXPECT_TRUE(NULL == window);
+    lsr::Window window(m_dsp, m_windef);
+    EXPECT_EQ(LSR_DB_INCONSISTENT, window.setup(badHMI, m_db));
 }
 
 TEST_F(WindowTest, VerifyTest)
 {
-    lsr::Window* window = createWindow();
+    const AreaType area = { 0U, 0U, 0U, 0U };
+    const ExpressionTermType visible = { ExpressionTermType::BOOLEAN_CHOICE, 1U, NULL };
+    const PanelType p1 = {&area, &visible, NULL, 0U};
+    lsr::Window window(m_dsp, m_windef);
+    CustomHMI hmi;
+    lsr::Panel panel(&p1);
+    lsr::MockField field;
+    hmi.getFrame()->addChild(panel);
+    panel.addChild(field);
 
-    EXPECT_TRUE(NULL != window);
+    EXPECT_CALL(field, setup(_)).WillOnce(Return(LSR_NO_ENGINE_ERROR));
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, window.setup(hmi, m_db));
 
-    window->update(0U);
-    EXPECT_TRUE(window->verify());
+    EXPECT_CALL(field, onVerify(_, _)).WillOnce(Return(true));
+    EXPECT_TRUE(window.verify());
 
-    lsr::DisplayAccessor::instance().setVerifyFlag(false);
-    EXPECT_FALSE(window->verify());
+    EXPECT_CALL(field, onVerify(_, _)).WillOnce(Return(false));
+    EXPECT_FALSE(window.verify());
 }
 
 TEST_F(WindowTest, DrawTest)
 {
-    lsr::Window* window = createWindow();
+    MockField field;
+    m_hmi.getContentPanel().addChild(field);
+    lsr::Window window(m_dsp, m_windef);
 
-    EXPECT_TRUE(NULL != window);
+    EXPECT_CALL(field, setup(_)).WillOnce(Return(LSR_NO_ENGINE_ERROR));
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, window.setup(m_hmi, m_db));
 
-    lsr::Area area;
-
-    window->update(0U);
-    window->draw(m_canvas, area);
-
-    // All bitmaps should be drawn
-    EXPECT_TRUE(lsr::DisplayAccessor::instance().wasDrawBitmapExecuted());
+    const lsr::Area area;
+    EXPECT_CALL(field, onDraw(_, _)).Times(1);
+    window.draw(m_canvas, area);
 }
 
 TEST_F(WindowTest, RenderTest)
 {
-    lsr::Window* window = createWindow();
+    MockField field;
+    m_hmi.getContentPanel().addChild(field);
+    lsr::Window window(m_dsp, m_windef);
 
-    EXPECT_TRUE(NULL != window);
+    EXPECT_CALL(field, setup(_)).WillOnce(Return(LSR_NO_ENGINE_ERROR));
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, window.setup(m_hmi, m_db));
 
     lsr::Area area;
-
-    window->update(0U);
-    EXPECT_TRUE(window->render());
-
-    // All bitmaps should be drawn
-    EXPECT_TRUE(lsr::DisplayAccessor::instance().wasDrawBitmapExecuted());
+    EXPECT_CALL(field, onDraw(_, _)).Times(1);
+    EXPECT_TRUE(window.render());
 }
 
 TEST_F(WindowTest, RenderWithNotInvalidatedStateTest)
 {
-    lsr::Window* window = createWindow();
+    MockField field;
+    m_hmi.getContentPanel().addChild(field);
+    lsr::Window window(m_dsp, m_windef);
 
-    EXPECT_TRUE(NULL != window);
+    EXPECT_CALL(field, setup(_)).WillOnce(Return(LSR_NO_ENGINE_ERROR));
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, window.setup(m_hmi, m_db));
 
     lsr::Area area;
-
-    window->update(0U);
-    EXPECT_TRUE(window->render());
-
-    lsr::DisplayAccessor::instance().toDefault();
+    EXPECT_CALL(field, onDraw(_, _)).Times(1);
+    EXPECT_TRUE(window.render());
 
     // now we are in validated state
-    EXPECT_FALSE(window->render());
+    EXPECT_FALSE(window.render());
 
-    EXPECT_FALSE(lsr::DisplayAccessor::instance().wasDrawBitmapExecuted());
+    // invalidate
+    field.setVisible(false);
+    field.setVisible(true);
+    EXPECT_CALL(field, onDraw(_, _)).Times(1);
+    EXPECT_TRUE(window.render());
 }
 
 // test to fulfill coverage
 TEST_F(WindowTest, HandleWindowEventsTest)
 {
-    lsr::Window* window = createWindow();
+    lsr::Window window(m_dsp, m_windef);
+    EXPECT_EQ(LSR_NO_ENGINE_ERROR, window.setup(m_hmi, m_db));
 
-    EXPECT_TRUE(NULL != window);
-
-    window->handleWindowEvents();
-
-    EXPECT_FALSE(lsr::DisplayAccessor::instance().wasDrawBitmapExecuted());
+    window.handleWindowEvents();
 }

@@ -10,7 +10,7 @@ function(GUNITTEST_DATABASE)
     endif()
 
     GUNITTEST(NAME "database_${GUNITTEST_DATABASE_NAME}"
-        LIBS ${GUNITTEST_DATABASE_LIBS} ${ENGINE_PROJECT_NAME}
+        LIBS ${GUNITTEST_DATABASE_LIBS} ${ENGINE_PROJECT_NAME} gilSample
         WORKING_DIRECTORY ${GUNITTEST_DATABASE_WORKING_DIRECTORY}
         FILES ${GUNITTEST_DATABASE_FILES}
     )
@@ -23,22 +23,21 @@ endfunction()
 include_directories(
     ${LSRROOT}/pil/api
     ${LSRENGINE}/common/api
+    ${LSRENGINE}/framehandler/api
     ${LSRENGINE}/lsr/api
     ${DATABASE_BASE}/api
     ${DATABASE_BASE}/api/gen
     ${DATABASE_BASE}/src
+    ${HMI_PROJECT_PATH}
 )
 
 set(DATABASEMOCK_HEADERS
     ${DATABASE_HEADERS}
-    ${DATABASE_BASE}/test/DatabaseAccessor.h
 )
 
 set(DATABASEMOCK_SOURCES
     ${DATABASE_BASE}/src/Area.cpp
-    ${DATABASE_BASE}/src/BitmapAccess.cpp
     ${DATABASE_BASE}/src/LsrImage.cpp
-    ${DATABASE_BASE}/src/StaticBitmap.cpp
     ${DATABASE_BASE}/test/DatabaseMock.cpp
 )
 

@@ -7,19 +7,18 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
 endif()
 message(STATUS "--> BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS}")
 
+# To avoid setting package version set it to OFF
+if(NOT DEFINED LSR_PACKAGE_INIT)
+    option(LSR_PACKAGE_INIT "Init package in LSR" ON)
+endif()
+message(STATUS "--> LSR_PACKAGE_INIT: ${LSR_PACKAGE_INIT}")
+
+# Unit tests
 if(NOT DEFINED UNIT_TESTS)
     option(UNIT_TESTS "Building unit tests" OFF)
     set(UNIT_TESTS OFF)
 endif()
 message(STATUS "--> UNIT_TESTS: ${UNIT_TESTS}")
-
-if(NOT DEFINED HMI_PROJECT_PATH)
-    message(FATAL_ERROR "Please specify HMI_PROJECT_PATH, which contains the project specific LSRLimits.h. For running the demo you can use the test hmi 'test/database/Telltales'")
-endif()
-if(NOT IS_ABSOLUTE ${HMI_PROJECT_PATH})
-    set(HMI_PROJECT_PATH "${CMAKE_CURRENT_BINARY_DIR}/${HMI_PROJECT_PATH}")
-endif()
-message(STATUS "--> HMI_PROJECT_PATH: ${HMI_PROJECT_PATH}")
 
 #
 # Compiler configuration
@@ -64,8 +63,19 @@ if(NOT DEFINED LSRENGINE)
 endif()
 
 #
-# GIL version
+# Project configuration
 #
+
+# HMI project path
+if(NOT DEFINED HMI_PROJECT_PATH)
+    message(FATAL_ERROR "Please specify HMI_PROJECT_PATH, which contains the project specific LSRLimits.h. For running the demo you can use the test hmi 'test/database/Telltales'")
+endif()
+if(NOT IS_ABSOLUTE ${HMI_PROJECT_PATH})
+    set(HMI_PROJECT_PATH "${CMAKE_CURRENT_BINARY_DIR}/${HMI_PROJECT_PATH}")
+endif()
+message(STATUS "--> HMI_PROJECT_PATH: ${HMI_PROJECT_PATH}")
+
+# GIL version
 set(GIL_DUMMY "dummy" CACHE STRING "")
 set(GIL_WIN32_SW "sw_win32" CACHE STRING "")
 set(GIL_EGL_X11 "egl_x11" CACHE STRING "")
@@ -83,9 +93,7 @@ endif()
 
 message(STATUS "--> GIL: ${GIL}")
 
-#
 # Simu building
-#
 if(NOT DEFINED SIMULATION)
     option(SIMULATION "Building simulation project" OFF)
     set(SIMULATION OFF)

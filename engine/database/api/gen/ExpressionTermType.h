@@ -5,26 +5,17 @@
 **
 **   File:        ExpressionTermType.h
 **   Description:
-**   Generator:   c78c5138ac2e7c6506a52bfc6fbc0ef05f7ad869
+**   Generator:   7db08a476f8107a993e0bf7183b0cf60031dad3e
 **
 **   Copyright (C) 2017 Luxoft GmbH
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Renderer is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Renderer.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -43,14 +34,8 @@ struct ExpressionTermType
     typedef enum ExpressionTermTypeChoice_Tag
     {
         NONE = 0,
-        INTEGER_CHOICE,
-        UINT_CHOICE,
-        HEX_CHOICE,
         BOOLEAN_CHOICE,
         BITMAPID_CHOICE,
-        EXPRESSION_CHOICE,
-        DYNAMICDATA_CHOICE,
-        BITMAPIDTABLE_CHOICE,
     } ExpressionTermTypeChoice;
 
     const ExpressionTermTypeChoice choiceTag;
@@ -62,36 +47,6 @@ struct ExpressionTermType
     ExpressionTermTypeChoice GetExpressionTermTypeChoice() const
     {
         return choiceTag;
-    }
-    /**
-     * Returns the value of the integer choice option.
-     * Returns 0 if this choice is not the selected option
-     */
-    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
-    I32 GetInteger() const
-    {
-        return (choiceTag == INTEGER_CHOICE) ?
-            static_cast<I32>(choiceAttribute) : 0;
-    }
-    /**
-     * Returns the value of the uInt choice option.
-     * Returns 0 if this choice is not the selected option
-     */
-    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
-    U32 GetUInt() const
-    {
-        return (choiceTag == UINT_CHOICE) ?
-            static_cast<U32>(choiceAttribute) : 0U;
-    }
-    /**
-     * Returns the value of the hex choice option.
-     * Returns 0 if this choice is not the selected option
-     */
-    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
-    U32 GetHex() const
-    {
-        return (choiceTag == HEX_CHOICE) ?
-            static_cast<U32>(choiceAttribute) : 0U;
     }
     /**
      * Returns the value of the boolean choice option.
@@ -113,42 +68,6 @@ struct ExpressionTermType
         return (choiceTag == BITMAPID_CHOICE) ?
             static_cast<U16>(choiceAttribute) : 0U;
     }
-    /**
-     * Returns a pointer to the Expression choice option. Return NULL
-     * if this choice is not the selected option.
-     */
-    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
-    const ExpressionType* GetExpression() const
-    {
-        return (choiceTag == EXPRESSION_CHOICE) ?
-            // coverity[misra_cpp_2008_rule_5_2_8_violation]
-            static_cast<const ExpressionType*>(ptr) : NULL;
-    }
-
-    /**
-     * Returns a pointer to the DynamicData choice option. Return NULL
-     * if this choice is not the selected option.
-     */
-    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
-    const DynamicDataType* GetDynamicData() const
-    {
-        return (choiceTag == DYNAMICDATA_CHOICE) ?
-            // coverity[misra_cpp_2008_rule_5_2_8_violation]
-            static_cast<const DynamicDataType*>(ptr) : NULL;
-    }
-
-    /**
-     * Returns a pointer to the BitmapIdTable choice option. Return NULL
-     * if this choice is not the selected option.
-     */
-    // coverity[misra_cpp_2008_rule_0_1_10_violation] Generic code
-    const BitmapIdTableType* GetBitmapIdTable() const
-    {
-        return (choiceTag == BITMAPIDTABLE_CHOICE) ?
-            // coverity[misra_cpp_2008_rule_5_2_8_violation]
-            static_cast<const BitmapIdTableType*>(ptr) : NULL;
-    }
-
 };
 
 } // namespace lsr

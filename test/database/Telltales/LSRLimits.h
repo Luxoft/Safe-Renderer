@@ -10,20 +10,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -32,29 +23,45 @@
 
 namespace lsr
 {
-    /**
-     * Value describes maximum nesting level which @c lsr::Expression can have.
-     */
-    static const U32 MAX_EXPRESSION_NESTING = Telltales::MAX_EXPRESSION_NESTING;
-
     // FrameHandler constants
+    // coverity[misra_cpp_2008_rule_0_1_4_violation] used by tests
+    // coverity[misra_cpp_2008_rule_0_1_6_violation] used by tests
     static const U32 MAX_FRAMES_COUNT = Telltales::FRAME_COUNT;
+
+    // coverity[misra_cpp_2008_rule_0_1_4_violation] used by tests
+    // coverity[misra_cpp_2008_rule_0_1_6_violation] used by tests
     static const U32 MAX_PANELS_COUNT = Telltales::PANEL_COUNT;
+
+    // coverity[misra_cpp_2008_rule_0_1_4_violation] used by tests
+    // coverity[misra_cpp_2008_rule_0_1_6_violation] used by tests
     static const U32 MAX_BITMAPS_COUNT = 20U;
+
+    // coverity[misra_cpp_2008_rule_0_1_4_violation] used by tests
+    // coverity[misra_cpp_2008_rule_0_1_6_violation] used by tests
     static const U32 MAX_REFERENCE_BITMAPS_COUNT = 20U;
+
+    // coverity[misra_cpp_2008_rule_0_1_4_violation] used by tests
+    // coverity[misra_cpp_2008_rule_0_1_6_violation] used by tests
     static const U32 MAX_WINDOWS_COUNT = 1U;
+
+    // coverity[misra_cpp_2008_rule_0_1_4_violation] used by tests
+    // coverity[misra_cpp_2008_rule_0_1_6_violation] used by tests
     static const U32 MAX_WIDGET_CHILDREN_COUNT = 20U;
 
     // DataHandler constants
-    static const U32 MAX_DYNAMIC_DATA = Telltales::MAX_DYNAMIC_DATA;
+    // coverity[misra_cpp_2008_rule_0_1_4_violation] used by tests
+    // coverity[misra_cpp_2008_rule_0_1_6_violation] used by tests
+    static const U32 MAX_DYNAMIC_DATA = Telltales::DYNAMIC_DATA_COUNT;
 
     // Drawing constants
-    static const U32 MAX_TEXTURES = Telltales::MAX_TEXTURES;
+    // coverity[misra_cpp_2008_rule_0_1_4_violation] used by tests
+    // coverity[misra_cpp_2008_rule_0_1_6_violation] used by tests
+    static const U32 MAX_TEXTURES = Telltales::TEXTURES_COUNT;
 
     // unit tests require larger pools
     P_STATIC_ASSERT(MAX_REFERENCE_BITMAPS_COUNT >= Telltales::REFERENCE_BITMAP_FIELD_COUNT, "");
     P_STATIC_ASSERT(MAX_BITMAPS_COUNT >= Telltales::BITMAP_FIELD_COUNT, "");
-    P_STATIC_ASSERT(MAX_WIDGET_CHILDREN_COUNT >= Telltales::MAX_PANEL_CHILDREN, "");
+    P_STATIC_ASSERT(MAX_WIDGET_CHILDREN_COUNT >= Telltales::PANEL_CHILDREN_COUNT, "");
 }
 
 #endif // LUXOFTSAFERENDERER_LSRLIMITS_H

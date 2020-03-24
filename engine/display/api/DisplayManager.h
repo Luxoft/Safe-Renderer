@@ -10,20 +10,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -41,17 +32,29 @@ public:
     /**
      * Returns the error code from the gil
      * @see gilGetError() in gil.h
+     * @return GIL error code
      */
     GILError getError() const;
 
-public: // but internal to the component
+    /**
+     * Returns the GIL context associated with this DisplayManager
+     * @return GIL context
+     */
     GILContext getContext() const;
 
     /**
-     * loads the static bitmap into a texture unless it's already loaded
-     * loaded texture is returned
+     * Loads the static bitmap into a texture unless it's already loaded
+     * @param bmp static bitmap
+     * @return loaded GIL texture
      */
     Texture* loadTexture(const StaticBitmap& bmp);
+
+    /**
+     * Loads all static bitmaps which are defined in the HMI configuration
+     * @param db database component which contains the HMI definition
+     * @return true on success, false if at least on texture could not be loaded
+     */
+    bool loadAllTextures(const Database& db);
 
 private:
     TextureCache m_textureCache;

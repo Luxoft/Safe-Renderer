@@ -7,20 +7,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -30,44 +21,37 @@
 namespace lsr
 {
 
-Engine::Engine(const DDHType* const ddh)
+Engine::Engine(const DDHType* const ddh, IHMI& hmi)
 : m_db(ddh)
 , m_display()
-, m_dataHandler(m_db)
-, m_frameHandler(m_db, m_dataHandler, m_display)
+, m_frameHandler(hmi, m_db, m_display)
 , m_error(m_db.getError())
 {
     if (LSR_NO_ENGINE_ERROR == m_error)
     {
-        if (!m_frameHandler.start())
+        if (!m_display.loadAllTextures(m_db))
+        {
+            m_error = LSR_DB_INCONSISTENT;
+        }
+        else if (!m_frameHandler.start())
         {
             m_error = m_frameHandler.getError();
+        }
+        else
+        {
+            // no startup error
         }
     }
 }
 
 bool Engine::render()
 {
-    const U32 monotonicTime = pilGetMonotonicTime();
-    m_frameHandler.update(monotonicTime);
     return m_frameHandler.render();
 }
 
 bool Engine::verify()
 {
     return m_frameHandler.verify();
-}
-
-bool Engine::setData(const DynamicData& id,
-                     const Number& value,
-                     const DataStatus status)
-{
-    return m_dataHandler.setData(id, value, status);
-}
-
-DataStatus Engine::getData(const DynamicData& id, Number &value) const
-{
-    return m_dataHandler.getNumber(id, value);
 }
 
 bool Engine::handleWindowEvents()

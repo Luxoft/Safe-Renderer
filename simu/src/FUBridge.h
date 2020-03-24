@@ -10,20 +10,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -34,8 +25,7 @@
 
 namespace lsr
 {
-class Engine;
-struct DDHType;
+class DataHandler;
 
 /**
  * Provides a connection to non-asil functional units (like the FU Simulator in Populus Editor)
@@ -49,12 +39,11 @@ class FUBridge : public IMsgReceiver
 public:
     /**
      * Creates the FUBridge and starts the Server
-     * @param ddh database which contains information about the FUs which are used by the Engine
+     * @param dataHandler Reference to the dataHandler which shall receive the data
      * @param port server port (TCP/IP)
      * @param hostname server ip (TCP/IP)
-     * @param dataHandler Reference to the dataHandler which shall receive the data
      */
-    FUBridge(const DDHType* ddh, int port, const std::string& hostname, Engine& dataHandler);
+    FUBridge(DataHandler& dataHandler, int port, const std::string& hostname);
     ~FUBridge();
 
     /**
@@ -77,8 +66,7 @@ private:
     void refresh();
 
     ODIComSession m_session;
-    Engine& m_dataHandler;
-    const DDHType* m_ddh;
+    DataHandler& m_dataHandler;
     IMsgTransmitter *m_transmitter;
 };
 

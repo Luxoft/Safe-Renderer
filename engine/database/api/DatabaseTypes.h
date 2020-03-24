@@ -10,51 +10,32 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
 namespace lsr
 {
+typedef U16 BitmapId;
 
 struct AreaType;
 struct BaseFieldChoiceType;
-struct BitmapDefinitionType;
-struct BitmapIdTableType;
 struct BitmapStateDefinitionType;
-struct ColorDatabaseType;
-struct ColorMapType;
-struct ColorSetType;
 struct DDHType;
 struct DisplaySizeType;
-struct DynamicDataType;
-struct DynamicDataEntryType;
-struct EnumerationBitmapMapType;
 struct ExpressionTermType;
-struct ExpressionType;
-struct FUClassType;
 struct HMIGlobalSettingsType;
 struct LsrImage;
-struct PageDatabaseType;
-struct PageType;
 struct PanelDatabaseType;
 struct PanelType;
 struct ReferenceBitmapFieldType;
-struct SkinDatabaseType;
-struct SkinType;
+struct BitmapDatabaseType;
+struct BitmapType;
+struct SkinnedBitmapType;
 struct StaticBitmapFieldType;
 
 } // namespace lsr

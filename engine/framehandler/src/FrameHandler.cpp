@@ -7,20 +7,11 @@
 **
 **   This file is part of Luxoft Safe Renderer.
 **
-**   Luxoft Safe Renderer is free software: you can redistribute it and/or
-**   modify it under the terms of the GNU Lesser General Public
-**   License as published by the Free Software Foundation.
+**   This Source Code Form is subject to the terms of the Mozilla Public
+**   License, v. 2.0. If a copy of the MPL was not distributed with this
+**   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 **
-**   Safe Render is distributed in the hope that it will be useful,
-**   but WITHOUT ANY WARRANTY; without even the implied warranty of
-**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-**   Lesser General Public License for more details.
-**
-**   You should have received a copy of the GNU Lesser General Public
-**   License along with Safe Render.  If not, see
-**   <http://www.gnu.org/licenses/>.
-**
-**   SPDX-License-Identifier: LGPL-3.0
+**   SPDX-License-Identifier: MPL-2.0
 **
 ******************************************************************************/
 
@@ -37,88 +28,43 @@
 namespace lsr
 {
 
-FrameHandler::FrameHandler(Database& db, IDataHandler& dataHandler, DisplayManager& dsp)
+FrameHandler::FrameHandler(IHMI& hmi, Database& db, DisplayManager& dsp)
     : NonCopyable()
     , m_db(db)
-    , m_widgetPool()
-    , m_dataHandler(dataHandler)
-    , m_dataContext(dataHandler)
     , m_display(dsp)
     , m_error(LSR_NO_ENGINE_ERROR)
-    , m_pWindow(NULL)
+    , m_window(dsp, WindowDefinition(m_db.getDdh(), 0U))
+    , m_hmi(hmi)
 {
     // since we don't use exceptions we need an extra initialize method to capture errors (start())
-}
-
-FrameHandler::~FrameHandler()
-{
-    static_cast<void>(Window::dispose(m_widgetPool, m_pWindow));  // ignore return value
 }
 
 bool FrameHandler::start()
 {
     ASSERT(m_db.getError() == LSR_NO_ENGINE_ERROR);
 
-    if (m_pWindow != NULL)
-    {
-        static_cast<void>(Window::dispose(m_widgetPool, m_pWindow));  // ignore return value
-        m_pWindow = NULL;
-    }
-
-    const HMIGlobalSettingsType* const pSettings = m_db.getDdh()->GetHMIGlobalSettings();
-    ASSERT(pSettings != NULL);
-    const DisplaySizeType* const pDisplaySize = pSettings->GetDisplaySize();
-    ASSERT(pDisplaySize != NULL);
-
-    WindowDefinition winDef;
-    winDef.width = static_cast<I32>(pDisplaySize->GetWidth());
-    winDef.height = static_cast<I32>(pDisplaySize->GetHeight());
-    winDef.xPos = 0;
-    winDef.yPos = 0;
-    winDef.id = 0U; // for multi display support
-
-    m_pWindow = Window::create(m_widgetPool, m_db, m_display, winDef, &m_dataContext, m_error);
-
-    return (m_pWindow != NULL);
-}
-
-void FrameHandler::update(const U32 monotonicTimeMs)
-{
-    ASSERT(NULL != m_pWindow);
-
-    m_pWindow->update(monotonicTimeMs);
+    m_error = m_window.setup(m_hmi, m_db);
+    return (LSR_NO_ENGINE_ERROR == m_error.get());
 }
 
 bool FrameHandler::render()
 {
-    ASSERT(NULL != m_pWindow);
-
-    return m_pWindow->render();
+    return m_window.render();
 }
 
 bool FrameHandler::verify()
 {
-    ASSERT(NULL != m_pWindow);
-
-    return m_pWindow->verify();
+    return m_window.verify();
 }
 
 bool FrameHandler::handleWindowEvents()
 {
-    ASSERT(NULL != m_pWindow);
-
-    return m_pWindow->handleWindowEvents();
+    return m_window.handleWindowEvents();
 }
 
 LSREngineError FrameHandler::getError()
 {
-    if (NULL != m_pWindow)
-    {
-        m_error = m_pWindow->getError();
-    }
-
-    m_error = m_widgetPool.getError();
-
+    m_error = m_window.getError();
     return m_error.get();
 }
 

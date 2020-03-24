@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <ddh:DDH xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddh="http://www.populus.luxoft.com/ddh">
   <VersionData>
-    <DDHVersion ddh:DDHSchemaVersion="5.4.0">
+    <DDHVersion ddh:DDHSchemaVersion="5.5.0">
       <Version>4.57.0</Version>
       <HMIVehicleId>1</HMIVehicleId>
       <DDHStringIndex>1</DDHStringIndex>
@@ -84,34 +84,7 @@
           <Height>69</Height>
         </Area>
         <Visible>
-          <Expression>
-            <Operator>fallback</Operator>
-            <Term>
-              <Expression>
-                <Operator>or</Operator>
-                <Term>
-                  <DynamicData>
-                    <Data>42#data_1</Data>
-                    <SubData>None</SubData>
-                  </DynamicData>
-                </Term>
-                <Term>
-                  <Expression>
-                    <Operator>not</Operator>
-                    <Term>
-                      <DynamicData>
-                        <Data>42#data_2</Data>
-                        <SubData>None</SubData>
-                      </DynamicData>
-                    </Term>
-                  </Expression>
-                </Term>
-              </Expression>
-            </Term>
-            <Term>
-              <Boolean>true</Boolean>
-            </Term>
-          </Expression>
+          <Boolean>false</Boolean>
         </Visible>
         <Bitmap>
           <BitmapId>Telltales.ddh::Parking_Break</BitmapId>
@@ -125,37 +98,7 @@
           <Height>68</Height>
         </Area>
         <Visible>
-          <Expression>
-            <Operator>and</Operator>
-            <Term>
-              <Expression>
-                <Operator>greater</Operator>
-                <Term>
-                  <DynamicData>
-                    <Data>255#data_2</Data>
-                    <SubData>None</SubData>
-                  </DynamicData>
-                </Term>
-                <Term>
-                  <Integer>10</Integer>
-                </Term>
-              </Expression>
-            </Term>
-            <Term>
-              <Expression>
-                <Operator>fallback</Operator>
-                <Term>
-                  <DynamicData>
-                    <Data>42#data_3</Data>
-                    <SubData>None</SubData>
-                  </DynamicData>
-                </Term>
-                <Term>
-                  <Boolean>true</Boolean>
-                </Term>
-              </Expression>
-            </Term>
-          </Expression>
+          <Boolean>false</Boolean>
         </Visible>
         <Bitmap>
           <BitmapId>Telltales.ddh::Airbag_Warning</BitmapId>
@@ -201,34 +144,7 @@
           <Height>69</Height>
         </Area>
         <Visible>
-          <Expression>
-            <Operator>fallback</Operator>
-            <Term>
-              <Expression>
-                <Operator>or</Operator>
-                <Term>
-                  <DynamicData>
-                    <Data>42#data_1</Data>
-                    <SubData>None</SubData>
-                  </DynamicData>
-                </Term>
-                <Term>
-                  <Expression>
-                    <Operator>not</Operator>
-                    <Term>
-                      <DynamicData>
-                        <Data>42#data_2</Data>
-                        <SubData>None</SubData>
-                      </DynamicData>
-                    </Term>
-                  </Expression>
-                </Term>
-              </Expression>
-            </Term>
-            <Term>
-              <Boolean>true</Boolean>
-            </Term>
-          </Expression>
+          <Boolean>false</Boolean>
         </Visible>
         <Bitmap>
           <BitmapId>Telltales.ddh::Parking_Break_palette</BitmapId>
@@ -243,18 +159,7 @@
           <Height>68</Height>
         </Area>
         <Visible>
-          <Expression>
-            <Operator>fallback</Operator>
-            <Term>
-              <DynamicData>
-                <Data>42#data_3</Data>
-                <SubData>None</SubData>
-              </DynamicData>
-            </Term>
-            <Term>
-              <Boolean>true</Boolean>
-            </Term>
-          </Expression>
+          <Boolean>false</Boolean>
         </Visible>
         <Bitmap>
           <BitmapId>Telltales.ddh::Airbag_Warning_palette</BitmapId>
@@ -264,11 +169,69 @@
     </Panel>
   </PanelDatabase>
   <BitmapDatabase>
-    <Bitmap ddh:Name="Airbag_Warning"/>
-    <Bitmap ddh:Name="Airbag_Warning_palette"/>
-    <Bitmap ddh:Name="Parking_Break"/>
-    <Bitmap ddh:Name="Parking_Break_palette"/>
-    <Bitmap ddh:Name="palette"/>
+    <Bitmap ddh:Name="Airbag_Warning">
+      <SkinnedBitmap>
+        <SkinId>Default</SkinId>
+        <Default>
+          <StateBitmap>
+            <BitmapFileName>\Telltales\Bitmaps\Airbag_Warning.png</BitmapFileName>
+          </StateBitmap>
+          <RenderValue>FixedSize</RenderValue>
+        </Default>
+      </SkinnedBitmap>
+    </Bitmap>
+    <Bitmap ddh:Name="Airbag_Warning_palette">
+      <SkinnedBitmap>
+        <SkinId>Default</SkinId>
+        <Default>
+          <StateBitmap>
+            <BitmapFileName>\Telltales\Bitmaps\Airbag_Warning_palette.png</BitmapFileName>
+          </StateBitmap>
+          <RenderValue>FixedSize</RenderValue>
+        </Default>
+      </SkinnedBitmap>
+    </Bitmap>
+    <Bitmap ddh:Name="Parking_Break">
+      <SkinnedBitmap>
+        <SkinId>Default</SkinId>
+        <Default>
+          <StateBitmap>
+            <BitmapFileName>\Telltales\Bitmaps\Parking_Break.png</BitmapFileName>
+          </StateBitmap>
+          <RenderValue>FixedSize</RenderValue>
+        </Default>
+      </SkinnedBitmap>
+    </Bitmap>
+    <Bitmap ddh:Name="Parking_Break_palette">
+      <SkinnedBitmap>
+        <SkinId>Default</SkinId>
+        <Default>
+          <StateBitmap>
+            <BitmapFileName>\Telltales\Bitmaps\Parking_Break_palette.png</BitmapFileName>
+          </StateBitmap>
+          <Palette>4293849589</Palette>
+          <Palette>4286578943</Palette>
+          <Palette>4284309756</Palette>
+          <Palette>4289506040</Palette>
+          <Palette>4293849589</Palette>
+          <Palette>4286578943</Palette>
+          <Palette>4284309756</Palette>
+          <Palette>4289506040</Palette>
+          <RenderValue>FixedSize</RenderValue>
+        </Default>
+      </SkinnedBitmap>
+    </Bitmap>
+    <Bitmap ddh:Name="palette">
+      <SkinnedBitmap>
+        <SkinId>Default</SkinId>
+        <Default>
+          <StateBitmap>
+            <BitmapFileName>\Telltales\Bitmaps\palette.png</BitmapFileName>
+          </StateBitmap>
+          <RenderValue>FixedSize</RenderValue>
+        </Default>
+      </SkinnedBitmap>
+    </Bitmap>
   </BitmapDatabase>
   <ControlMapDatabase/>
   <EventDatabase/>
@@ -288,10 +251,9 @@
         <DataId>4</DataId>
       </CurrentSkinValue>
     </RuntimeSettings>
-    <SkinDataValue>
-      <SkinId>Default</SkinId>
+    <Skin ddh:Name="Default">
       <DataValue>0</DataValue>
-    </SkinDataValue>
+    </Skin>
     <ColorSet>
       <DefaultDisplayBackgroundColorId>Telltales.ddh::Background Color</DefaultDisplayBackgroundColorId>
       <DefaultPageBackgroundColorId>Telltales.ddh::Transparent Color</DefaultPageBackgroundColorId>
@@ -364,8 +326,22 @@
     </TextIdMap>
   </LanguageMapDatabase>
   <ColorDatabase>
-    <Color ddh:Name="Background Color"/>
-    <Color ddh:Name="Transparent Color"/>
+    <Color ddh:Name="Background Color">
+      <SkinnedColor>
+        <SkinId>Default</SkinId>
+        <Color>
+          <Color>4278190080</Color>
+        </Color>
+      </SkinnedColor>
+    </Color>
+    <Color ddh:Name="Transparent Color">
+      <SkinnedColor>
+        <SkinId>Default</SkinId>
+        <Color>
+          <Color>0</Color>
+        </Color>
+      </SkinnedColor>
+    </Color>
   </ColorDatabase>
   <GuardDatabase/>
   <AnimationDatabase>
@@ -375,75 +351,6 @@
   <TimerDatabase/>
   <SceneDatabase/>
   <StaticDataModel/>
-  <SkinDatabase>
-    <Skin ddh:Name="Default">
-      <ColorMap>
-        <ColorId>Telltales.ddh::Background Color</ColorId>
-        <Color>
-          <Color>4278190080</Color>
-        </Color>
-      </ColorMap>
-      <ColorMap>
-        <ColorId>Telltales.ddh::Transparent Color</ColorId>
-        <Color>
-          <Color>0</Color>
-        </Color>
-      </ColorMap>
-      <Bitmap>
-        <BitmapId>Telltales.ddh::Airbag_Warning</BitmapId>
-        <Default>
-          <StateBitmap>
-            <BitmapFileName>\Telltales\Bitmaps\Airbag_Warning.png</BitmapFileName>
-          </StateBitmap>
-          <RenderValue>FixedSize</RenderValue>
-        </Default>
-      </Bitmap>
-      <Bitmap>
-        <BitmapId>Telltales.ddh::Airbag_Warning_palette</BitmapId>
-        <Default>
-          <StateBitmap>
-            <BitmapFileName>\Telltales\Bitmaps\Airbag_Warning_palette.png</BitmapFileName>
-          </StateBitmap>
-          <RenderValue>FixedSize</RenderValue>
-        </Default>
-      </Bitmap>
-      <Bitmap>
-        <BitmapId>Telltales.ddh::Parking_Break</BitmapId>
-        <Default>
-          <StateBitmap>
-            <BitmapFileName>\Telltales\Bitmaps\Parking_Break.png</BitmapFileName>
-          </StateBitmap>
-          <RenderValue>FixedSize</RenderValue>
-        </Default>
-      </Bitmap>
-      <Bitmap>
-        <BitmapId>Telltales.ddh::Parking_Break_palette</BitmapId>
-        <Default>
-          <StateBitmap>
-            <BitmapFileName>\Telltales\Bitmaps\Parking_Break_palette.png</BitmapFileName>
-          </StateBitmap>
-          <Palette>4293849589</Palette>
-          <Palette>4286578943</Palette>
-          <Palette>4284309756</Palette>
-          <Palette>4289506040</Palette>
-          <Palette>4293849589</Palette>
-          <Palette>4286578943</Palette>
-          <Palette>4284309756</Palette>
-          <Palette>4289506040</Palette>
-          <RenderValue>FixedSize</RenderValue>
-        </Default>
-      </Bitmap>
-      <Bitmap>
-        <BitmapId>Telltales.ddh::palette</BitmapId>
-        <Default>
-          <StateBitmap>
-            <BitmapFileName>\Telltales\Bitmaps\palette.png</BitmapFileName>
-          </StateBitmap>
-          <RenderValue>FixedSize</RenderValue>
-        </Default>
-      </Bitmap>
-    </Skin>
-  </SkinDatabase>
   <ScriptDatabase/>
   <VideoDatabase/>
   <PriorityDatabase/>
