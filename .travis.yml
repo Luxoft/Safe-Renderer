@@ -1,0 +1,37 @@
+dist: trusty
+
+language: cpp
+compiler: g++
+
+env:
+  global:
+    - secure: "Y47E1y3fxpLgkocZb3PPi33o6kNpqkpcNhcIHMC1R6M89otSZ+vPG5kdj+fO9JF81C6FXqX3hB9fN8P67936NEfJ3s0guL053kj4Y21IuTARtIdLPBPCSPKm4QiEPgC6KkEmgRrE7qjJLnid46FYR5ZgDRUU9nRL2yIdpnlVVOZjgvPlY3eJ9EAfj1b4HUb3JNfwrSrezbCPuAFEVpv/sNiGCu9aWrdpkEz9c9+Bkym4jxgc7xB9YD4cZD6/ypF0+A5N7f6bZMb6sece2hgKM1b6gBZc7TojnVSj3ZA8bpsmvzKtW4nYuIKlcpk1vzL10MqXasTT9pRKjdDu32cG4NlmIKxH3CTgxPCgpvUfIinlbRAbPTK5r29vrRXenpe8khoaI/dHs2+eFl3qr3NKLNX67CHJ3GEfaRYUhpsKiOebelaU3ndXTIxdrF4cMzsqpV1D2Q8WQrhdj3cxabVNUUG++BwvxyBG5QRMGuZHTT/n+T84go8TXpOCdEzHCmld8OLQ6COHRLVXiIQI7HjL4kCpmfP9pVIGROigjVfa3WJXXXCxn2zlx0xHHccG+YiXet9OiODFnAtPHqzv3aUdmAPlPbP6LEv1nJMO66T6Dq2iSQWVjGAH1uwq+8J6QQkVt0CtM2ClioE7X7JxVAfPRa4wZFlMsjGGRf6PiS6Hx/U="
+
+before_install:
+  - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc
+      - g++
+      - cmake
+    coverity_scan:
+      project:
+        name: Luxoft/Safe-Renderer
+        description: Luxoft Safe Renderer project
+        version: 0.4.0
+      notification_email: arazvalyaev@luxoft.com
+      build_command_prepend: "mkdir build; cd build; cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/toolchain-gcc-linux-x64.cmake -DCMAKE_BUILD_TYPE=Release -DHMI_PROJECT_PATH=../test/database/Telltales .."
+      build_command: "make"
+      branch_pattern: coverity_scan
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/toolchain-gcc-linux-x64.cmake -DCMAKE_BUILD_TYPE=Release -DHMI_PROJECT_PATH=../test/database/Telltales ..
+
+script:
+  - make
